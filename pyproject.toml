@@ -1,0 +1,25 @@
+[project]
+name = "LBGPT"
+version = "0.0.1"
+authors = [
+  { name="Marvin Labs", email="marvin@marvin-labs.com" },
+]
+description = "Load balancer for asynchroneous requests to the APIs of OpenAI and Azure (if configured) for ChatGPT"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Marvin-Labs/lbgpt"
+"Bug Tracker" = "https://github.com/Marvin-Labs/lbgpt/issues"
+
+
+[build-system]
+requires = ["hatchling", "openai", "tenacity"]
+build-backend = "hatchling.build"
+
+
