@@ -1,6 +1,6 @@
 # Load Balancing ChatGPT (LBGPT)
 
-Enhance your ChatGPT API experience with the LoadBalancing ChatGPT (LBGPT), a wrapper around OpenAI's API designed to boost performance, enable caching, and provide seamless integration with Azure's OpenAI API. 
+Enhance your ChatGPT API experience with the LoadBalancing ChatGPT (LBGPT), a wrapper around OpenAI's API designed to boost performance, enable caching, and provide seamless integration with Azure's OpenAI API.
 
 This tool significantly optimizes single request response times by asynchronously interacting with the OpenAI API and efficiently caching results. It also offers automatic retries in the event of API errors and the option to balance requests between OpenAI and Azure for an even more robust AI experience.
 
@@ -65,8 +65,8 @@ import asyncio
 
 chatgpt = lbgpt.LoadBalancedGPT(
     openai_api_key="YOUR_OPENAI_API_KEY",
-    azure_api_key="YOUR_AZURE_API_KEY", 
-    azure_api_base="YOUR AZURE API BASE", 
+    azure_api_key="YOUR_AZURE_API_KEY",
+    azure_api_base="YOUR AZURE API BASE",
     azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
 res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
 ```

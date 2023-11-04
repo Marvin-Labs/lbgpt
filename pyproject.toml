@@ -21,5 +21,3 @@ classifiers = [
 [build-system]
 requires = ["hatchling", "openai", "tenacity"]
 build-backend = "hatchling.build"
-
-
