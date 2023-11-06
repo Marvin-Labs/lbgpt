@@ -25,7 +25,12 @@ class _BaseGPT(abc.ABC):
     def __init__(self, max_parallel_calls: int, cache: Optional[Any] = None):
         self.cache = cache
         self.max_parallel_calls = max_parallel_calls
-        self.semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
+        self.semaphore = self.refresh_semaphore()
+
+    def refresh_semaphore(self):
+        semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
+        self.semaphore = semaphore
+        return semaphore
 
     @abc.abstractmethod
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
@@ -35,6 +40,9 @@ class _BaseGPT(abc.ABC):
         self,
         chatgpt_chat_completion_request_body_list: list[dict],
     ) -> Sequence[openai.ChatCompletion]:
+
+        self.refresh_semaphore()
+
         return await asyncio.gather(
             *[
                 self.cached_chat_completion(**content)
@@ -163,6 +171,9 @@ class LoadBalancedGPT(_BaseGPT):
         self.ratio_openai_to_azure = ratio_openai_to_azure
 
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
+        self.openai.refresh_semaphore()
+        self.azure.refresh_semaphore()
+
         if random.random() < self.ratio_openai_to_azure:
             # route to OpenAI API
             return await self.openai.chat_completion(**kwargs)
