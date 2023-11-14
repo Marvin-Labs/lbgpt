@@ -10,10 +10,10 @@ import openai
 import openai.error
 from tenacity import (
     after_log,
-    retry,
     retry_if_exception_type,
     stop_after_attempt,
     wait_random_exponential,
+    AsyncRetrying,
 )
 
 from lbgpt.cache import make_hash_sha256
@@ -22,10 +22,18 @@ logger = getLogger(__name__)
 
 
 class _BaseGPT(abc.ABC):
-    def __init__(self, max_parallel_calls: int, cache: Optional[Any] = None):
+    def __init__(
+        self,
+        max_parallel_calls: int,
+        cache: Optional[Any] = None,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+    ):
         self.cache = cache
         self.max_parallel_calls = max_parallel_calls
         self.semaphore = self.refresh_semaphore()
+        self.stop_after_attempts = stop_after_attempts
+        self.stop_on_exception = stop_on_exception
 
     def refresh_semaphore(self):
         semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
@@ -40,7 +48,6 @@ class _BaseGPT(abc.ABC):
         self,
         chatgpt_chat_completion_request_body_list: list[dict],
     ) -> Sequence[openai.ChatCompletion]:
-
         self.refresh_semaphore()
 
         return await asyncio.gather(
@@ -50,25 +57,37 @@ class _BaseGPT(abc.ABC):
             ]
         )
 
-    @retry(
-        retry=(
-            retry_if_exception_type(openai.error.Timeout)
-            | retry_if_exception_type(openai.error.RateLimitError)
-            | retry_if_exception_type(openai.error.TryAgain)
-            | retry_if_exception_type(openai.error.APIConnectionError)
-        ),
-        wait=wait_random_exponential(min=5, max=60),
-        stop=stop_after_attempt(10),
-        after=after_log(logger, logging.WARNING),
-    )
-    async def cached_chat_completion(self, **kwargs) -> openai.ChatCompletion:
+    async def cached_chat_completion(self, **kwargs) -> Optional[openai.ChatCompletion]:
         if self.cache is not None:
             hashed = make_hash_sha256(kwargs)
             if hashed in self.cache:
                 logger.debug("cache hit")
                 return self.cache[hashed]
 
-        out = await self.chat_completion(**kwargs)
+        try:
+            async for attempt in AsyncRetrying(
+                retry=(
+                    retry_if_exception_type(openai.error.Timeout)
+                    | retry_if_exception_type(openai.error.RateLimitError)
+                    | retry_if_exception_type(openai.error.TryAgain)
+                    | retry_if_exception_type(openai.error.APIConnectionError)
+                    | retry_if_exception_type(openai.error.APIError)
+                ),
+                wait=wait_random_exponential(min=5, max=60),
+                stop=stop_after_attempt(self.stop_after_attempts)
+                if self.stop_after_attempts is not None
+                else None,
+                after=after_log(logger, logging.WARNING),
+            ):
+                with attempt:
+                    out = await self.chat_completion(**kwargs)
+
+        except Exception as e:
+            if self.stop_on_exception:
+                raise e
+            else:
+                logger.exception(e)
+                return None
 
         if self.cache is not None:
             self.cache[hashed] = out
@@ -82,8 +101,15 @@ class ChatGPT(_BaseGPT):
         api_key: str,
         max_parallel_calls: int = 5,
         cache: Optional[Any] = None,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
     ):
-        super().__init__(cache=cache, max_parallel_calls=max_parallel_calls)
+        super().__init__(
+            cache=cache,
+            max_parallel_calls=max_parallel_calls,
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
+        )
         self.api_key = api_key
 
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
@@ -106,8 +132,16 @@ class AzureGPT(_BaseGPT):
         azure_openai_version: str = "2023-05-15",
         azure_openai_type: str = "azure",
         max_parallel_calls: int = 5,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
     ):
-        super().__init__(cache=cache, max_parallel_calls=max_parallel_calls)
+        super().__init__(
+            cache=cache,
+            max_parallel_calls=max_parallel_calls,
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
+        )
+
         self.api_key = api_key
         self.azure_api_base = azure_api_base
         self.azure_model_map = azure_model_map
@@ -146,16 +180,22 @@ class LoadBalancedGPT(_BaseGPT):
         max_parallel_calls_openai: int = 5,
         max_parallel_calls_azure: int = 5,
         ratio_openai_to_azure: float = 0.25,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
     ):
         super().__init__(
             cache=cache,
             max_parallel_calls=max_parallel_calls_openai + max_parallel_calls_azure,
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
         )
 
         self.openai = ChatGPT(
             api_key=openai_api_key,
             cache=cache,
             max_parallel_calls=max_parallel_calls_openai,
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
         )
 
         self.azure = AzureGPT(
@@ -166,6 +206,8 @@ class LoadBalancedGPT(_BaseGPT):
             azure_openai_type=azure_openai_type,
             cache=cache,
             max_parallel_calls=max_parallel_calls_azure,
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
         )
 
         self.ratio_openai_to_azure = ratio_openai_to_azure
@@ -183,4 +225,5 @@ class LoadBalancedGPT(_BaseGPT):
                 warnings.warn(
                     "Our Azure API does not support model {kwargs['model']}. Falling back to OpenAI API."
                 )
+                return await self.openai.chat_completion(**kwargs)
             return await self.azure.chat_completion(**kwargs)
