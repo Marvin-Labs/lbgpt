@@ -114,7 +114,6 @@ azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZUR
 
 chatgpt = lbgpt.MultiLoadBalancedGPT(
     gpts=[openai_chatgpt, azure_chatgpt],
-    allocation_function_weights=[0.25, 0.75],
     allocation_function='max_headroom',
 )
     
