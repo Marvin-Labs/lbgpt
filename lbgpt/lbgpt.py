@@ -1,98 +1,16 @@
 # -*- coding: utf-8 -*-
-import abc
-import random
-import warnings
+from enum import Enum
 from logging import getLogger
-import asyncio
-import logging
-from typing import Any, Optional, Sequence
+from typing import Any, Optional, Sequence, Callable
 import openai
 import openai.error
-from tenacity import (
-    after_log,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_random_exponential,
-    AsyncRetrying,
-)
 
-from lbgpt.cache import make_hash_sha256
+from lbgpt.allocation import random_allocation_function
+from lbgpt.base import _BaseGPT
 
 logger = getLogger(__name__)
 
 
-class _BaseGPT(abc.ABC):
-    def __init__(
-        self,
-        max_parallel_calls: int,
-        cache: Optional[Any] = None,
-        stop_after_attempts: Optional[int] = 10,
-        stop_on_exception: bool = False,
-    ):
-        self.cache = cache
-        self.max_parallel_calls = max_parallel_calls
-        self.semaphore = self.refresh_semaphore()
-        self.stop_after_attempts = stop_after_attempts
-        self.stop_on_exception = stop_on_exception
-
-    def refresh_semaphore(self):
-        semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
-        self.semaphore = semaphore
-        return semaphore
-
-    @abc.abstractmethod
-    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
-        raise NotImplementedError
-
-    async def chat_completion_list(
-        self,
-        chatgpt_chat_completion_request_body_list: list[dict],
-    ) -> Sequence[openai.ChatCompletion]:
-        self.refresh_semaphore()
-
-        return await asyncio.gather(
-            *[
-                self.cached_chat_completion(**content)
-                for content in chatgpt_chat_completion_request_body_list
-            ]
-        )
-
-    async def cached_chat_completion(self, **kwargs) -> Optional[openai.ChatCompletion]:
-        if self.cache is not None:
-            hashed = make_hash_sha256(kwargs)
-            if hashed in self.cache:
-                logger.debug("cache hit")
-                return self.cache[hashed]
-
-        try:
-            async for attempt in AsyncRetrying(
-                retry=(
-                    retry_if_exception_type(openai.error.Timeout)
-                    | retry_if_exception_type(openai.error.RateLimitError)
-                    | retry_if_exception_type(openai.error.TryAgain)
-                    | retry_if_exception_type(openai.error.APIConnectionError)
-                    | retry_if_exception_type(openai.error.APIError)
-                ),
-                wait=wait_random_exponential(min=5, max=60),
-                stop=stop_after_attempt(self.stop_after_attempts)
-                if self.stop_after_attempts is not None
-                else None,
-                after=after_log(logger, logging.WARNING),
-            ):
-                with attempt:
-                    out = await self.chat_completion(**kwargs)
-
-        except Exception as e:
-            if self.stop_on_exception:
-                raise e
-            else:
-                logger.exception(e)
-                return None
-
-        if self.cache is not None:
-            self.cache[hashed] = out
-
-        return out
 
 
 class ChatGPT(_BaseGPT):
@@ -167,7 +85,62 @@ class AzureGPT(_BaseGPT):
             )
 
 
-class LoadBalancedGPT(_BaseGPT):
+
+
+ALLOCATION_FUNCTIONS: dict[str, Callable[[Any], _BaseGPT]] = {
+    'random': random_allocation_function
+}
+
+
+class MultiLoadBalancedGPT(_BaseGPT):
+    def __init__(
+        self,
+        gpts: list[_BaseGPT],
+        allocation_function: str = "random",
+        allocation_function_kwargs: Optional[dict] = None,
+        allocation_function_weights: Optional[Sequence] = None,
+        cache: Optional[Any] = None,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+    ):
+        self.gpts = gpts
+
+        if isinstance(allocation_function, str):
+            allocation_function = ALLOCATION_FUNCTIONS[allocation_function]
+        else:
+            raise NotImplementedError(f'Cannot infer allocation function from type {type(allocation_function)}')
+
+        self.allocation_function: Callable[[Any], _BaseGPT] = allocation_function
+        self.allocation_function_kwargs = allocation_function_kwargs or {}
+
+        if allocation_function_weights is not None:
+            assert len(allocation_function_weights) == len(gpts), 'if provided, `allocation_function_weights` must be the same length as gpts'
+
+        self.allocation_function_weights = allocation_function_weights
+
+        super().__init__(
+            cache=cache,
+            max_parallel_calls=sum([gpt.max_parallel_calls for gpt in gpts]),
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
+        )
+
+
+    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
+        gpt = self.allocation_function(
+            self.gpts,
+            weights=self.allocation_function_weights,
+            **self.allocation_function_kwargs,
+        )
+
+        return await gpt.chat_completion(**kwargs)
+
+
+class LoadBalancedGPT(MultiLoadBalancedGPT):
+    """
+    We are continuing to support this for backward compatability reasons, but it is discouraged to use it.
+    """
+
     def __init__(
         self,
         openai_api_key: str,
@@ -183,13 +156,6 @@ class LoadBalancedGPT(_BaseGPT):
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
     ):
-        super().__init__(
-            cache=cache,
-            max_parallel_calls=max_parallel_calls_openai + max_parallel_calls_azure,
-            stop_after_attempts=stop_after_attempts,
-            stop_on_exception=stop_on_exception,
-        )
-
         self.openai = ChatGPT(
             api_key=openai_api_key,
             cache=cache,
@@ -210,20 +176,13 @@ class LoadBalancedGPT(_BaseGPT):
             stop_on_exception=stop_on_exception,
         )
 
-        self.ratio_openai_to_azure = ratio_openai_to_azure
+        super().__init__(
+            gpts=[self.openai, self.azure],
+            cache=cache,
+            allocation_function='random',
+            allocation_function_weights=[ratio_openai_to_azure, 1 - ratio_openai_to_azure],
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
+        )
 
-    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
-        self.openai.refresh_semaphore()
-        self.azure.refresh_semaphore()
 
-        if random.random() < self.ratio_openai_to_azure:
-            # route to OpenAI API
-            return await self.openai.chat_completion(**kwargs)
-        else:
-            # route to Azure API
-            if kwargs["model"] not in self.azure.azure_model_map:
-                warnings.warn(
-                    "Our Azure API does not support model {kwargs['model']}. Falling back to OpenAI API."
-                )
-                return await self.openai.chat_completion(**kwargs)
-            return await self.azure.chat_completion(**kwargs)
