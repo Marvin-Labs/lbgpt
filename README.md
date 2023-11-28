@@ -92,12 +92,35 @@ azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZUR
 chatgpt = lbgpt.MultiLoadBalancedGPT(
     gpts=[openai_chatgpt, azure_chatgpt],
     allocation_function_weights=[0.25, 0.75],
+    allocation_function='random',
 )
     
 res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
 ```
 
 However, the MultiLoadBalancedGPT offers more flexibility in terms of the load balancing inputs, e.g. supporting multiple Azure instances or OpenAI keys. 
+
+You can also select the allocation function `max_headroom` to automatically pick the API with the most available capacity. This requires you to tell the model constructors your RPM (requests per minute) and/or TPM (tokens per minute) limits. 
+
+For example, if you have an OpenAI API key with a 5,000 TPM limit and an Azure API key with a 10,000 TPM limit, you can use the following code:
+
+```python
+import lbgpt
+import asyncio
+
+openai_chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", limit_tpm=5_000)
+azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE", azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"}, limit_tpm=10_000)
+
+
+chatgpt = lbgpt.MultiLoadBalancedGPT(
+    gpts=[openai_chatgpt, azure_chatgpt],
+    allocation_function_weights=[0.25, 0.75],
+    allocation_function='max_headroom',
+)
+    
+res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+```
+
 
 ## How to Get API Keys
 To obtain your OpenAI API key, visit the [official OpenAI site](https://platform.openai.com/account/api-keys). For Azure API key acquisition, please refer to the official Azure documentation.
