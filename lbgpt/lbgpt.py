@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from logging import getLogger
-from typing import Any, Optional, Sequence, Callable
+from typing import Any, Optional, Sequence, Callable, Coroutine
 import openai
 import openai.error
 
-from lbgpt.allocation import random_allocation_function
+from lbgpt.allocation import (
+    random_allocation_function,
+    max_headroom_allocation_function,
+)
 from lbgpt.base import _BaseGPT
 
 logger = getLogger(__name__)
-
-
 
 
 class ChatGPT(_BaseGPT):
@@ -21,12 +22,18 @@ class ChatGPT(_BaseGPT):
         cache: Optional[Any] = None,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
+        max_cache_size: Optional[int] = 1_000,
+        limit_tpm: Optional[int] = None,
+        limit_rpm: Optional[int] = None,
     ):
         super().__init__(
             cache=cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
+            max_cache_size=max_cache_size,
+            limit_tpm=limit_tpm,
+            limit_rpm=limit_rpm,
         )
         self.api_key = api_key
 
@@ -52,12 +59,18 @@ class AzureGPT(_BaseGPT):
         max_parallel_calls: int = 5,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
+        max_cache_size: Optional[int] = 1_000,
+        limit_tpm: Optional[int] = None,
+        limit_rpm: Optional[int] = None,
     ):
         super().__init__(
             cache=cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
+            max_cache_size=max_cache_size,
+            limit_tpm=limit_tpm,
+            limit_rpm=limit_rpm,
         )
 
         self.api_key = api_key
@@ -85,10 +98,9 @@ class AzureGPT(_BaseGPT):
             )
 
 
-
-
-ALLOCATION_FUNCTIONS: dict[str, Callable[[Any], _BaseGPT]] = {
-    'random': random_allocation_function
+ALLOCATION_FUNCTIONS = {
+    "random": random_allocation_function,
+    "max_headroom": max_headroom_allocation_function,
 }
 
 
@@ -108,13 +120,17 @@ class MultiLoadBalancedGPT(_BaseGPT):
         if isinstance(allocation_function, str):
             allocation_function = ALLOCATION_FUNCTIONS[allocation_function]
         else:
-            raise NotImplementedError(f'Cannot infer allocation function from type {type(allocation_function)}')
+            raise NotImplementedError(
+                f"Cannot infer allocation function from type {type(allocation_function)}"
+            )
 
-        self.allocation_function: Callable[[Any], _BaseGPT] = allocation_function
+        self.allocation_function = allocation_function
         self.allocation_function_kwargs = allocation_function_kwargs or {}
 
         if allocation_function_weights is not None:
-            assert len(allocation_function_weights) == len(gpts), 'if provided, `allocation_function_weights` must be the same length as gpts'
+            assert len(allocation_function_weights) == len(
+                gpts
+            ), "if provided, `allocation_function_weights` must be the same length as gpts"
 
         self.allocation_function_weights = allocation_function_weights
 
@@ -125,9 +141,8 @@ class MultiLoadBalancedGPT(_BaseGPT):
             stop_on_exception=stop_on_exception,
         )
 
-
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
-        gpt = self.allocation_function(
+        gpt = await self.allocation_function(
             self.gpts,
             weights=self.allocation_function_weights,
             **self.allocation_function_kwargs,
@@ -179,10 +194,11 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
         super().__init__(
             gpts=[self.openai, self.azure],
             cache=cache,
-            allocation_function='random',
-            allocation_function_weights=[ratio_openai_to_azure, 1 - ratio_openai_to_azure],
+            allocation_function="random",
+            allocation_function_weights=[
+                ratio_openai_to_azure,
+                1 - ratio_openai_to_azure,
+            ],
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
         )
-
-
