@@ -4,7 +4,7 @@ Enhance your ChatGPT API experience with the LoadBalancing ChatGPT (LBGPT), a wr
 
 This tool significantly optimizes single request response times by asynchronously interacting with the OpenAI API and efficiently caching results. It also offers automatic retries in the event of API errors and the option to balance requests between OpenAI and Azure for an even more robust AI experience.
 
-Proudly build by the team of [Marvin Labs](https://marvinlabs.com/) where we use AI to help financial analysts make better investment decisions.
+Proudly build by the team of [Marvin Labs](https://marvin-labs.com/) where we use AI to help financial analysts make better investment decisions.
 
 ## Installation
 You can easily install LoadBalancing ChatGPT via pip:
