@@ -22,7 +22,7 @@ class ChatGPT(_BaseGPT):
         cache: Optional[Any] = None,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
-        max_cache_size: Optional[int] = 1_000,
+        max_usage_cache_size: Optional[int] = 1_000,
         limit_tpm: Optional[int] = None,
         limit_rpm: Optional[int] = None,
     ):
@@ -31,7 +31,7 @@ class ChatGPT(_BaseGPT):
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
-            max_cache_size=max_cache_size,
+            max_usage_cache_size=max_usage_cache_size,
             limit_tpm=limit_tpm,
             limit_rpm=limit_rpm,
         )
@@ -59,7 +59,7 @@ class AzureGPT(_BaseGPT):
         max_parallel_calls: int = 5,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
-        max_cache_size: Optional[int] = 1_000,
+        max_usage_cache_size: Optional[int] = 1_000,
         limit_tpm: Optional[int] = None,
         limit_rpm: Optional[int] = None,
     ):
@@ -68,7 +68,7 @@ class AzureGPT(_BaseGPT):
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
-            max_cache_size=max_cache_size,
+            max_usage_cache_size=max_usage_cache_size,
             limit_tpm=limit_tpm,
             limit_rpm=limit_rpm,
         )

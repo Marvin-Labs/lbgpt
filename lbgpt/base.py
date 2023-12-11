@@ -28,35 +28,39 @@ class _BaseGPT(abc.ABC):
         self,
         max_parallel_calls: int,
         cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
-        max_cache_size: Optional[int] = 1_000,
+        max_usage_cache_size: Optional[int] = 1_000,
         limit_tpm: Optional[int] = None,
         limit_rpm: Optional[int] = None,
     ):
+        # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
+        self.semantic_cache = semantic_cache
+
         self.max_parallel_calls = max_parallel_calls
         self.semaphore = self.refresh_semaphore()
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
-        self.cache_list = []
-        self.max_cache_size = max_cache_size
+        self.usage_cache_list = []
+        self.max_usage_cache_size = max_usage_cache_size
 
         self.limit_tpm = limit_tpm
         self.limit_rpm = limit_rpm
 
-    def add_usage_to_cache(self, usage: Usage):
+    def add_usage_to_usage_cache(self, usage: Usage):
         # evict if the list is too long. Do this to protect memory usage if required
-        if self.max_cache_size and len(self.cache_list) > self.max_cache_size:
-            self.cache_list.pop(0)
+        if self.max_usage_cache_size and len(self.usage_cache_list) > self.max_usage_cache_size:
+            self.usage_cache_list.pop(0)
 
-        self.cache_list.append(usage)
+        self.usage_cache_list.append(usage)
 
-    def cache_list_after_start_datetime(
+    def usage_cache_list_after_start_datetime(
         self, start_datetime: datetime.datetime
     ) -> list[Usage]:
-        return [k for k in self.cache_list if k.start_datetime > start_datetime]
+        return [k for k in self.usage_cache_list if k.start_datetime > start_datetime]
 
     def get_usage_stats(self, include_usage_reservation: bool = False) -> UsageStats:
         current_usage_tokens = 0
@@ -70,7 +74,7 @@ class _BaseGPT(abc.ABC):
             )
             current_usage_requests = self.semaphore._value
 
-        cache_list_after_start_datetime = self.cache_list_after_start_datetime(
+        cache_list_after_start_datetime = self.usage_cache_list_after_start_datetime(
             datetime.datetime.now() - datetime.timedelta(seconds=60)
         )
 
@@ -92,9 +96,9 @@ class _BaseGPT(abc.ABC):
         (2) 10% of the limit_tpm
         (3) zero otherwise
         """
-        if len(self.cache_list) > 0:
+        if len(self.usage_cache_list) > 0:
             return int(
-                median([k.input_tokens + k.output_tokens for k in self.cache_list])
+                median([k.input_tokens + k.output_tokens for k in self.usage_cache_list])
             )
 
         if self.limit_tpm:
@@ -116,7 +120,7 @@ class _BaseGPT(abc.ABC):
         if self.limit_rpm:
             headroom_rpm = (
                 self.expected_tokens_per_request()
-                * (self.limit_rpm - cur_usage.requests - 1),
+                * (self.limit_rpm - cur_usage.requests - 1)
             )
         else:
             headroom_rpm = sys.maxsize
@@ -145,12 +149,20 @@ class _BaseGPT(abc.ABC):
             ]
         )
 
+
+
     async def cached_chat_completion(self, **kwargs) -> Optional[openai.ChatCompletion]:
+        # this is standard cache. We are always trying standard cache first
         if self.cache is not None:
             hashed = make_hash_sha256(kwargs)
             if hashed in self.cache:
-                logger.debug("cache hit")
+                logger.debug("standard cache hit")
                 return self.cache[hashed]
+
+        # if the item is not in the standard cache, we are trying the semantic cache (if available)
+        # we are currently only supporting semantic cache for FAISS models
+        # TODO: ADD
+
 
         try:
             async for attempt in AsyncRetrying(
