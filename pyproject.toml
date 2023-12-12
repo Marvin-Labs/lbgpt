@@ -1,8 +1,8 @@
 [project]
 name = "LBGPT"
-version = "0.0.5"
+version = "0.1.0"
 authors = [
-  { name="Marvin Labs", email="marvin@marvin-labs.com" },
+    { name = "Marvin Labs", email = "marvin@marvin-labs.com" },
 ]
 description = "Load balancer for asynchroneous requests to the APIs of OpenAI and Azure (if configured) for ChatGPT"
 readme = "README.md"
@@ -19,5 +19,5 @@ classifiers = [
 
 
 [build-system]
-requires = ["hatchling", "openai", "tenacity"]
+requires = ["hatchling", "openai>=1.0", "tenacity"]
 build-backend = "hatchling.build"

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
+from asyncio import Timeout
 from logging import getLogger
-from typing import Any, Optional, Sequence, Callable, Coroutine
+from typing import Any, Optional, Sequence
 import openai
-import openai.error
+from openai._types import NOT_GIVEN, NotGiven
 
 from lbgpt.allocation import (
     random_allocation_function,
@@ -19,6 +19,7 @@ class ChatGPT(_BaseGPT):
         self,
         api_key: str,
         max_parallel_calls: int = 5,
+        request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
         cache: Optional[Any] = None,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
@@ -35,14 +36,19 @@ class ChatGPT(_BaseGPT):
             limit_tpm=limit_tpm,
             limit_rpm=limit_rpm,
         )
-        self.api_key = api_key
+        self.client = openai.AsyncOpenAI(
+            api_key=api_key,
+            timeout=request_timeout,
+            max_retries=0,
+        )
 
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
         # one request to the OpenAI API respecting their ratelimit
 
+        timeout = kwargs.pop("request_timeout", self.client.timeout)
+
         async with self.semaphore:
-            return await openai.ChatCompletion.acreate(
-                api_key=self.api_key,
+            return await self.client.with_options(timeout=timeout).chat.completions.create(
                 **kwargs,
             )
 
@@ -57,6 +63,7 @@ class AzureGPT(_BaseGPT):
         azure_openai_version: str = "2023-05-15",
         azure_openai_type: str = "azure",
         max_parallel_calls: int = 5,
+        request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
         max_usage_cache_size: Optional[int] = 1_000,
@@ -73,27 +80,28 @@ class AzureGPT(_BaseGPT):
             limit_rpm=limit_rpm,
         )
 
-        self.api_key = api_key
-        self.azure_api_base = azure_api_base
+        self.client = openai.AsyncAzureOpenAI(
+            api_key=api_key,
+            azure_endpoint=azure_api_base,
+            api_version=azure_openai_version,
+            timeout=request_timeout,
+            max_retries=0,
+        )
+
         self.azure_model_map = azure_model_map
-        self.azure_openai_version = azure_openai_version
-        self.azure_openai_type = azure_openai_type
 
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
         """One request to the Azure OpenAI API respecting their ratelimit
         # needs to change the model parameter to deployment id
         """
 
-        model = kwargs.pop("model")
-        deployment_id = self.azure_model_map[model]
-        kwargs["deployment_id"] = deployment_id
+        deployment_id = self.azure_model_map[kwargs['model']]
+        kwargs["model"] = deployment_id
+
+        timeout = kwargs.pop("request_timeout", self.client.timeout)
 
         async with self.semaphore:
-            return await openai.ChatCompletion.acreate(
-                api_key=self.api_key,
-                api_base=self.azure_api_base,
-                api_type=self.azure_openai_type,
-                api_version=self.azure_openai_version,
+            return await self.client.with_options(timeout=timeout).chat.completions.create(
                 **kwargs,
             )
 

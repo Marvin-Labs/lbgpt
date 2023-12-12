@@ -8,7 +8,6 @@ import logging
 from statistics import median
 from typing import Any, Optional, Sequence
 import openai
-import openai.error
 from tenacity import (
     after_log,
     retry_if_exception_type,
@@ -16,8 +15,9 @@ from tenacity import (
     wait_random_exponential,
     AsyncRetrying,
 )
+from tqdm.asyncio import tqdm
 
-from lbgpt.cache import make_hash_sha256
+from lbgpt.cache import make_hash_chatgpt_request
 from lbgpt.usage import Usage, UsageStats
 
 logger = getLogger(__name__)
@@ -44,15 +44,22 @@ class _BaseGPT(abc.ABC):
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
-        self.usage_cache_list = []
+        self._usage_cache_list = []
         self.max_usage_cache_size = max_usage_cache_size
 
         self.limit_tpm = limit_tpm
         self.limit_rpm = limit_rpm
 
+    @property
+    def usage_cache_list(self):
+        return self._usage_cache_list
+
     def add_usage_to_usage_cache(self, usage: Usage):
         # evict if the list is too long. Do this to protect memory usage if required
-        if self.max_usage_cache_size and len(self.usage_cache_list) > self.max_usage_cache_size:
+        if (
+            self.max_usage_cache_size
+            and len(self.usage_cache_list) > self.max_usage_cache_size
+        ):
             self.usage_cache_list.pop(0)
 
         self.usage_cache_list.append(usage)
@@ -98,7 +105,9 @@ class _BaseGPT(abc.ABC):
         """
         if len(self.usage_cache_list) > 0:
             return int(
-                median([k.input_tokens + k.output_tokens for k in self.usage_cache_list])
+                median(
+                    [k.input_tokens + k.output_tokens for k in self.usage_cache_list]
+                )
             )
 
         if self.limit_tpm:
@@ -118,9 +127,8 @@ class _BaseGPT(abc.ABC):
             headroom_tpm = sys.maxsize
 
         if self.limit_rpm:
-            headroom_rpm = (
-                self.expected_tokens_per_request()
-                * (self.limit_rpm - cur_usage.requests - 1)
+            headroom_rpm = self.expected_tokens_per_request() * (
+                self.limit_rpm - cur_usage.requests - 1
             )
         else:
             headroom_rpm = sys.maxsize
@@ -139,22 +147,22 @@ class _BaseGPT(abc.ABC):
     async def chat_completion_list(
         self,
         chatgpt_chat_completion_request_body_list: list[dict],
+            show_progress=True
     ) -> Sequence[openai.ChatCompletion]:
         self.refresh_semaphore()
 
-        return await asyncio.gather(
+        return await tqdm.gather(
             *[
                 self.cached_chat_completion(**content)
                 for content in chatgpt_chat_completion_request_body_list
-            ]
+            ],
+            disable=not show_progress,
         )
-
-
 
     async def cached_chat_completion(self, **kwargs) -> Optional[openai.ChatCompletion]:
         # this is standard cache. We are always trying standard cache first
         if self.cache is not None:
-            hashed = make_hash_sha256(kwargs)
+            hashed = make_hash_chatgpt_request(kwargs)
             if hashed in self.cache:
                 logger.debug("standard cache hit")
                 return self.cache[hashed]
@@ -163,15 +171,12 @@ class _BaseGPT(abc.ABC):
         # we are currently only supporting semantic cache for FAISS models
         # TODO: ADD
 
-
         try:
             async for attempt in AsyncRetrying(
                 retry=(
-                    retry_if_exception_type(openai.error.Timeout)
-                    | retry_if_exception_type(openai.error.RateLimitError)
-                    | retry_if_exception_type(openai.error.TryAgain)
-                    | retry_if_exception_type(openai.error.APIConnectionError)
-                    | retry_if_exception_type(openai.error.APIError)
+                    retry_if_exception_type(openai.APIConnectionError)
+                    | retry_if_exception_type(openai.RateLimitError)
+                    | retry_if_exception_type(openai.APIStatusError)
                 ),
                 wait=wait_random_exponential(min=5, max=60),
                 stop=stop_after_attempt(self.stop_after_attempts)
