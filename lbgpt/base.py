@@ -176,7 +176,6 @@ class _BaseGPT(abc.ABC):
                 retry=(
                     retry_if_exception_type(openai.APIConnectionError)
                     | retry_if_exception_type(openai.RateLimitError)
-                    | retry_if_exception_type(openai.APIStatusError)
                 ),
                 wait=wait_random_exponential(min=5, max=60),
                 stop=stop_after_attempt(self.stop_after_attempts)
