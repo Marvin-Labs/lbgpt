@@ -4,7 +4,7 @@ import sys
 
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, Optional
 else:
     from typing_extensions import Self
 
@@ -17,9 +17,10 @@ class Usage:
     start_datetime: datetime.datetime
     end_datetime: datetime.datetime
 
+    attempt: Optional[int] = None
+
 
 @dataclasses.dataclass
 class UsageStats:
     tokens: int
     requests: int
-

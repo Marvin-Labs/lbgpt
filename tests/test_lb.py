@@ -86,6 +86,12 @@ def test_lbgpt_max_headroom():
     )
 
     res = asyncio.run(lb.chat_completion_list([single_request_content] * 5, show_progress=False))
+    assert len(lb.usage_cache_list) == 5
+
+    assert len(lb.gpts[0].usage_cache_list) < 5
+    assert len(lb.gpts[1].usage_cache_list) < 5
+
+
     assert len(res) == 5
     for k in res:
         assert "pong" in k.choices[0].message.content.lower()
@@ -116,6 +122,8 @@ def test_chatgpt_async(mocker: MockerFixture):
     openai = mocker.spy(lb, "chat_completion")
 
     res = asyncio.run(lb.chat_completion_list([single_request_content] * 5, show_progress=False))
+
+    assert len(lb.usage_cache_list) == 5
 
     assert len(res) == 5
     for k in res:
@@ -152,6 +160,8 @@ def test_azure_async(mocker: MockerFixture):
     azure = mocker.spy(lb, "chat_completion")
 
     res = asyncio.run(lb.chat_completion_list([single_request_content] * 5, show_progress=False))
+
+    assert len(lb.usage_cache_list) == 5
 
     assert len(res) == 5
     for k in res:

@@ -2,6 +2,10 @@ import asyncio
 import random
 from typing import Sequence, Optional
 from lbgpt.base import _BaseGPT
+from logging import getLogger
+
+
+logger = getLogger(__name__)
 
 
 async def random_allocation_function(gpts: list[_BaseGPT], weights=Optional[Sequence[float]], **kwargs) -> _BaseGPT:
@@ -14,7 +18,8 @@ async def max_headroom_allocation_function(gpts: list[_BaseGPT], overallocate: b
     even if there is no allocation left available. Otherwise, we are waiting here until the overallocation is resolved
     """
 
-    best_alternative = max(gpts, key=lambda gpt: gpt.headroom())
+    # choosing a random one in case of a tie
+    best_alternative = max(gpts, key=lambda gpt: (gpt.headroom(), random.random()))
 
     if overallocate:
         return best_alternative
@@ -24,5 +29,6 @@ async def max_headroom_allocation_function(gpts: list[_BaseGPT], overallocate: b
             return best_alternative
         else:
             await asyncio.sleep(1)
+            logger.info('waiting for overallocation to resolve, best alternative: %s', best_alternative)
             return await max_headroom_allocation_function(gpts, overallocate=overallocate, **kwargs)
 

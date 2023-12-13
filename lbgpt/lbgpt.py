@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from asyncio import Timeout
 from logging import getLogger
 from typing import Any, Optional, Sequence
@@ -10,6 +11,7 @@ from lbgpt.allocation import (
     max_headroom_allocation_function,
 )
 from lbgpt.base import _BaseGPT
+from lbgpt.usage import Usage
 
 logger = getLogger(__name__)
 
@@ -48,9 +50,20 @@ class ChatGPT(_BaseGPT):
         timeout = kwargs.pop("request_timeout", self.client.timeout)
 
         async with self.semaphore:
-            return await self.client.with_options(timeout=timeout).chat.completions.create(
+            start = datetime.datetime.now()
+            out = await self.client.with_options(timeout=timeout).chat.completions.create(
                 **kwargs,
             )
+            self.add_usage_to_usage_cache(
+                Usage(
+                    input_tokens=out.usage.prompt_tokens,
+                    output_tokens=out.usage.total_tokens,
+                    start_datetime=start,
+                    end_datetime=datetime.datetime.now(),
+                )
+            )
+
+            return out
 
 
 class AzureGPT(_BaseGPT):
@@ -95,15 +108,27 @@ class AzureGPT(_BaseGPT):
         # needs to change the model parameter to deployment id
         """
 
-        deployment_id = self.azure_model_map[kwargs['model']]
+        deployment_id = self.azure_model_map[kwargs["model"]]
         kwargs["model"] = deployment_id
 
         timeout = kwargs.pop("request_timeout", self.client.timeout)
 
         async with self.semaphore:
-            return await self.client.with_options(timeout=timeout).chat.completions.create(
+            start = datetime.datetime.now()
+            out = await self.client.with_options(timeout=timeout).chat.completions.create(
                 **kwargs,
             )
+            self.add_usage_to_usage_cache(
+                Usage(
+                    input_tokens=out.usage.prompt_tokens,
+                    output_tokens=out.usage.total_tokens,
+                    start_datetime=start,
+                    end_datetime=datetime.datetime.now(),
+                )
+            )
+
+            return out
+
 
 
 ALLOCATION_FUNCTIONS = {
@@ -148,6 +173,11 @@ class MultiLoadBalancedGPT(_BaseGPT):
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
         )
+
+    @property
+    def usage_cache_list(self) -> list[Usage]:
+        out = sum([gpt.usage_cache_list for gpt in self.gpts], [])
+        return out
 
     async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
         gpt = await self.allocation_function(

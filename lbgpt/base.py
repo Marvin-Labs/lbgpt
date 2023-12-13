@@ -8,6 +8,7 @@ import logging
 from statistics import median
 from typing import Any, Optional, Sequence
 import openai
+from openai.types.chat import ChatCompletion
 from tenacity import (
     after_log,
     retry_if_exception_type,
@@ -51,23 +52,23 @@ class _BaseGPT(abc.ABC):
         self.limit_rpm = limit_rpm
 
     @property
-    def usage_cache_list(self):
+    def usage_cache_list(self) -> list[Usage]:
         return self._usage_cache_list
 
     def add_usage_to_usage_cache(self, usage: Usage):
         # evict if the list is too long. Do this to protect memory usage if required
         if (
             self.max_usage_cache_size
-            and len(self.usage_cache_list) > self.max_usage_cache_size
+            and len(self._usage_cache_list) > self.max_usage_cache_size
         ):
-            self.usage_cache_list.pop(0)
+            self._usage_cache_list.pop(0)
 
-        self.usage_cache_list.append(usage)
+        self._usage_cache_list.append(usage)
 
     def usage_cache_list_after_start_datetime(
         self, start_datetime: datetime.datetime
     ) -> list[Usage]:
-        return [k for k in self.usage_cache_list if k.start_datetime > start_datetime]
+        return [k for k in self._usage_cache_list if k.start_datetime > start_datetime]
 
     def get_usage_stats(self, include_usage_reservation: bool = False) -> UsageStats:
         current_usage_tokens = 0
@@ -103,10 +104,10 @@ class _BaseGPT(abc.ABC):
         (2) 10% of the limit_tpm
         (3) zero otherwise
         """
-        if len(self.usage_cache_list) > 0:
+        if len(self._usage_cache_list) > 0:
             return int(
                 median(
-                    [k.input_tokens + k.output_tokens for k in self.usage_cache_list]
+                    [k.input_tokens + k.output_tokens for k in self._usage_cache_list]
                 )
             )
 
@@ -184,7 +185,7 @@ class _BaseGPT(abc.ABC):
                 after=after_log(logger, logging.WARNING),
             ):
                 with attempt:
-                    out = await self.chat_completion(**kwargs)
+                    out: ChatCompletion = await self.chat_completion(**kwargs)
 
         except Exception as e:
             if self.stop_on_exception:
