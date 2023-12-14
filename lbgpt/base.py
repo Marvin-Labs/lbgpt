@@ -15,6 +15,7 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,
     AsyncRetrying,
+    RetryCallState,
 )
 from tqdm.asyncio import tqdm
 
@@ -22,6 +23,12 @@ from lbgpt.cache import make_hash_chatgpt_request
 from lbgpt.usage import Usage, UsageStats
 
 logger = getLogger(__name__)
+
+
+def after_logging(retry_state: RetryCallState) -> None:
+    logger.warning(
+        f"Retrying: attempt {retry_state.attempt_number} ended with: {retry_state.outcome.exception()} after {'%0.3f' % retry_state.seconds_since_start}(s),",
+    )
 
 
 class _BaseGPT(abc.ABC):
@@ -146,9 +153,7 @@ class _BaseGPT(abc.ABC):
         raise NotImplementedError
 
     async def chat_completion_list(
-        self,
-        chatgpt_chat_completion_request_body_list: list[dict],
-            show_progress=True
+        self, chatgpt_chat_completion_request_body_list: list[dict], show_progress=True
     ) -> Sequence[openai.ChatCompletion]:
         self.refresh_semaphore()
 
@@ -177,12 +182,14 @@ class _BaseGPT(abc.ABC):
                 retry=(
                     retry_if_exception_type(openai.APIConnectionError)
                     | retry_if_exception_type(openai.RateLimitError)
+                    # shall also retry for bad gateway error (502)
+                    # profile the error when it comes up again
                 ),
                 wait=wait_random_exponential(min=5, max=60),
                 stop=stop_after_attempt(self.stop_after_attempts)
                 if self.stop_after_attempts is not None
                 else None,
-                after=after_log(logger, logging.WARNING),
+                after=after_logging,
             ):
                 with attempt:
                     out: ChatCompletion = await self.chat_completion(**kwargs)
