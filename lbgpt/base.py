@@ -4,13 +4,11 @@ import datetime
 import sys
 from logging import getLogger
 import asyncio
-import logging
 from statistics import median
 from typing import Any, Optional, Sequence
 import openai
 from openai.types.chat import ChatCompletion
 from tenacity import (
-    after_log,
     retry_if_exception_type,
     stop_after_attempt,
     wait_random_exponential,
