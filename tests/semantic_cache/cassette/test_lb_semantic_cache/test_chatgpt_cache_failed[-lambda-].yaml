@@ -1,0 +1,995 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 7eb14af2-e95a-4ee6-97e4-20bf9cd4c274
+      user-agent:
+      - unknown/None; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: GET
+    uri: https://huggingface.co/api/models/bert-base-uncased
+  response:
+    body:
+      string: '{"_id":"621ffdc036468d709f174338","id":"bert-base-uncased","modelId":"bert-base-uncased","sha":"1dbc166cf8765166998eff31ade2eb64c8a40076","lastModified":"2023-06-30T01:42:19.000Z","private":false,"disabled":false,"gated":false,"pipeline_tag":"fill-mask","tags":["transformers","pytorch","tf","jax","rust","coreml","onnx","safetensors","bert","fill-mask","exbert","en","dataset:bookcorpus","dataset:wikipedia","arxiv:1810.04805","license:apache-2.0","autotrain_compatible","endpoints_compatible","has_space","region:us"],"downloads":49670416,"library_name":"transformers","mask_token":"[MASK]","widgetData":[{"text":"Paris
+        is the [MASK] of France."},{"text":"The goal of life is [MASK]."}],"likes":1257,"model-index":null,"config":{"architectures":["BertForMaskedLM"],"model_type":"bert"},"cardData":{"language":"en","tags":["exbert"],"license":"apache-2.0","datasets":["bookcorpus","wikipedia"]},"transformersInfo":{"auto_model":"AutoModelForMaskedLM","pipeline_tag":"fill-mask","processor":"AutoTokenizer"},"spaces":["microsoft/HuggingGPT","mteb/leaderboard","Vision-CAIR/minigpt4","lnyan/stablediffusion-infinity","multimodalart/latentdiffusion","Salesforce/BLIP","shi-labs/Versatile-Diffusion","AIGC-Audio/AudioGPT","cvlab/zero123-live","xinyu1205/recognize-anything","Audio-AGI/AudioSep","yizhangliu/Grounded-Segment-Anything","DAMO-NLP-SG/Video-LLaMA","declare-lab/mustango","shgao/EditAnything","gligen/demo","Awiny/Image2Paragraph","IDEA-Research/Grounded-SAM","ShilongLiu/Grounding_DINO_demo","Yuliang/ECON","Vision-CAIR/MiniGPT-v2","haotiz/glip-zeroshot-demo","liuyuan-pal/SyncDreamer","nateraw/lavila","Pinwheel/GLIP-BLIP-Object-Detection-VQA","exbert-project/exbert","abyildirim/inst-inpaint","fffiloni/Video-Matting-Anything","shi-labs/Matting-Anything","sam-hq-team/sam-hq","magicr/BuboGPT","OpenGVLab/InternGPT","clip-italian/clip-italian-demo","mmlab-ntu/relate-anything-model","MirageML/sjc","keras-io/bert-semantic-similarity","Gladiator/Text-Summarizer","NAACL2022/CLIP-Caption-Reward","milyiyo/reimagine-it","society-ethics/model-card-regulatory-check","ysharma/text-to-image-to-video","eson/tokenizer-arena","merve/Grounding_DINO_demo","avid-ml/bias-detection","OpenGVLab/VideoChatGPT","yenniejun/tokenizers-languages","Junfeng5/GLEE_demo","flax-community/koclip","pseudolab/AI_Tutor_BERT","ynhe/AskAnything","SeViLA/SeViLA","flax-community/clip-reply-demo","ALM/CALM","PSLD/PSLD","TencentARC/VLog","kaushalya/medclip-roco","sasha/BiasDetection","tornadoslims/instruct-pix2pix","HaloMaster/chinesesummary","Make-A-Protagonist/Make-A-Protagonist-inference","ccolas/TastyPiano","sasha/WinoBiasCheck","attention-refocusing/Attention-refocusing","emilylearning/llm_uncertainty","fffiloni/audioldm-text-to-audio-generation-copy","mlpc-lab/BLIVA","AIGC-Audio/Make_An_Audio","AnimaLab/bias-test-gpt-pairs","Dreamsome/HuggingFace-Datasets-Text-Quality-Analysis","EuroPython2022/clickbaitonator","mbahrami/Auto-Complete_Semantic","taesiri/HuggingGPT-Lite","taka-yamakoshi/tokenizer-demo","Caoyunkang/Segment-Any-Anomaly","RitaParadaRamos/SmallCapDemo","Shredder/CONBERT-3","Volkopat/SegmentAnythingxGroundingDINO","bradarrML/stablediffusion-infinity","codelion/Grounding_DINO_demo","emilylearning/spurious_correlation_evaluation","flax-community/Multilingual-VQA","iakarshu/docformer_for_document_classification","linfanluntan/Grounded-SAM","webshop/amazon_shop","zdou0830/desco","7Vivek/Next-Word-Prediction-Streamlit","AILab-CVC/SEED-LLaMA","KAIST-Geometric-AI-Lab/salad-demo","RamAnanth1/T2I-Adapter","YouLiXiya/Mobile-SAM","anonymousauthorsanonymous/uncertainty","deeplearning/audioldm-text-to-audio-generation","doevent/blip","koajoel/PolyFormer","thewhole/GaussianDreamer_Demo","Gradio-Blocks/spurious_correlation_evaluation","Pippoz/All_in_one","badayvedat/AudioSep","diagaiwei/ir_chinese_medqa","eson/bert-perplexity","librarian-bots/MetaRefine","tennant/MUG_caption","zjunlp/KGEditor","AIGC-Audio/Make_An_Audio_inpaint","CVH-vn1210/make_hair","ICML2022/selection_bias_induced_spurious_correlations","Lihuchen/AcroBERT","Ramos-Ramos/albef-vqa","akhaliq/SummerTime","camenduru-com/audioldm-text-to-audio-generation","docs-demos/bert-base-uncased","erc/entity-referring-classifier","ipvikas/ImageProcessing","jackyccl/segment-anything","sohomghosh/FiNCAT_Financial_Numeral_Claim_Analysis_Tool","yfyangd/PictureBookUnderstanding","DrGabrielLopez/BERTopic","HemanthSai7/IntelligentQuestionGenerator","LightChen2333/OpenSLU","Menna2211/Text-Image","Purple11/Grounded-Diffusion","Shredder/CONBERT-2","Suniilkumaar/AudioSep","UserXTheUnknown/stablediffusion-infinity","ZeroTwo3/AudioSep","aliabd/SummerTime","amankishore/sjc","amsterdamNLP/attention-rollout","amsterdamNLP/value-zeroing","anirudhmittal/humour-detection","ben-epstein/ner-spans-to-tokens-tags","caltex1/streamlit_pdf_gpt","damilojohn/text-descrambler","dawood/audioldm-text-to-audio-generation","dragonSwing/annotate-anything","edenehuyh/BLIQ_ImageCaptioning","ferdmartin/GradApplicationDocsApp","jiaqingj/ConZIC","joonkim/bert-political-sentiment-analysis","mbahrami/AutoComplete","piecurus/Summarizer","russellc/BLIP","shubh2014shiv/Japanese_NLP","smhavens/AnalogyArcade","sohomghosh/FLUEnT","taka-yamakoshi/bert-priors-demo","tillyu/Emojimotion","yuezih/BLIP-SMILE","zjunlp/MKG_Analogy","7jimmy/classificationbysharjeel","AIFILMS/audioldm-text-to-audio-generation","Alfasign/HuggingGPT-Lite","Arulkumar03/GroundingDINO_SOTA_Zero_Shot_Model","Aymene/FakeNewsDetector","Berbex/FinalProject","Cat125/text-generator-v3","ChristopherMarais/Andrew_AI-BB_classification-beta","CodyJiang/Finetuning-Sentiment-Analysis-App","Daniel-Saeedi/sent-debias","Daniel-Saeedi/auto-debias","Dusan/clickbaitonator","EinfachOlder/HuggingChat","Froleptan/stablediffusion-infinity","GT-RIPL/GPT-K","Hallucinate/demo","Kayson/InstructDiffusion","Kwabbs/SENTIMENT_APP","MattGPT/ClassUI","Menna2211/ImCaptioning","MingGatsby/Grounding_DINO_demo","PHZane/emrwa","ParisNeo/Blip_QA","Pranjal2041/SemSup-XC","Puyush/MultiLabel-TextClassification","RKocielnik/bias-test-gpt","RichardMB1217/blip","Seetha/IMA-pipeline-streamlit","Shredder/CONBERT","Shubham2003/chatWithPdfs","Sifal/En2Kab","VTechAI/Segment-Anything","VedantGitte/Bigbasket_Chaabi","Yiqin/ChatVID","Zpwang-AI/InsultingLanguageDetection","abidlabs/mteb-leaderboard","altafalam3/Text-Summarizer","anonymousauthorsanonymous/spurious","any0019/text-style-transfer-demo","arnavkartikeya/SCRIPture-final","bigslime/stablediffusion-infinity","blaziant/ysda_nlp_ops","blaziant/ysda_nlp_ops_update","ccarr0807/HuggingGPT","chendl/compositional_test","contluForse/HuggingGPT","dentadelta123/GuardrailDetection","fclong/summary","ferdmartin/GradApplicationDocsApp2","hlopez/Twitter-Positivity-Analyzer","imh0/transformers-p1-embeddings","jeang/ernie_demo_toy","jeffrymahbuubi/bert-advanced-cnn-hate-speech-classification","jennysun/jwsun-multisubject-render-model","kurone/cp_tags_prediction","leoneat/comments_refiner","lvwerra/bary_score","mehmetsah/sahgpt","mohamedemam/bert_sentaces_similarty","mzltest/gpt2-chinese-composition","netgvarun2005/VirtualTherapist","pragmaticslab/bary_score","ruanchaves/hashtag-segmentation","saurshaz/HuggingGPT","simonza/Product_Search_v0","skf15963/summary","theholycityweb/HuggingGPT","themanas021/AI-Generated-text-Detection","zeno-ml/translation-critique","zhangchuntao/ttg","zy5830850/MedRPG","0xSparked/yungpunks","7acnemFgistzu/Blip_QA","7jimmy/TextClassificationBySharjeel12","ACRLab/FraleyLabAttachmentBot","AITECHPRODUCTS/chromadb","ASAM-Team/ASAM","Admin08077/autotrain-xrzv-uzdc-r2m0-86609143150","Admin08077/Pity","Aegisgfx/instruct-pix2pix","AhmedFaisal/milestone-3","Alexxggs/sounds-samples","Alfasign/newpd","Alifarsi/llms_compare","AlisterAnhedonia/extrasneo","AmanSharma/instruct-pix2pix","Anandx05/BLIP","Anavya1/Anavya-TEXTSUMMARIZERADVANCE","AndrewMetaBlock/minigpt4","AnishaBhatnagar/LLVM_trial","Ankush05/Code5","Anna-UoC/classification","Anna-UoC/classification2","Anna-UoC/classification3","Anon3365/BiasTestGPT","AravindAG/Reviewer","AravindVepati/Chaabi_Assignment","Ashrafb/chatWithPdfs","Ateras/kohya_ss","Aygtljl518866/HuggingGPT","Ayush28/demo-app","BMukhtar/BMA","BecomeAllan/meta-demo-app","BenKirb/audioldm-text-to-audio-generation","Betacuckgpt/HuggingGPT","Booguy/linguask","CCYAO/HuggingGPT","CS4NLP/vqa_demo","Choco0real/DemoCVCourse","Chokyounghoon/HuggingGPT","Coder246/glip-zeroshot-demo","CodyJiang/text-sentiment-analysis-app","CollaalloC/HuggingGPT","Cran-May/yugang-bert","Danishhh/text_classified","Datasculptor/AudioGPT","DeepLearning101/IE101TW","DiViorg/RECModel","DingShinn/ding-test-1","DiningSystem/minigpt4","Domw/p5-nlp","DylanLi/Covid19detection","EddyGiusepe/Movie_Genre_Prediction","EgorRacio/ArticleTransformer","EinfachOlder/HuggingGPT-Lite","ElixirRod/Versatile-Diffusion","EranLa/Table-QA-Based-On-StableLM-Tuned-Alpha","FANCHIYU/HuggingGPT","FahadAlam/Fill-Mask","Faizan15/classificationpredictions","FirsttyBoy/audioldm-text-to-audio-generation","GV05/blip-pool-alarm","Georgeeliwilliams01/twitter-sentiment-analysis","GoTogether/App_Prototype","GopalGoyal/test","HYCCC/zero-shot_sentiment_analysis","HaggiVaggi/FindMyMovie","Hank528286709/tb","Hank528286709/ad","Hemi1403/HuggingGPT","Hrsh-Venket/Corrected-Speech-to-Text","IBounhas/Riadh","Jackie2235/E-commerceKeyphraseGeneration","Jainesh212/Milestone3","Jeney/Matte-Anything","Jhoeel/AutoMarcaDino2","JoshiaT/stablediffusion","JuanJoseMV/neuraltextgen_BERT","Junssssss/minigpt4","Jvs37/FTLM","K00B404/minigpt4","KGBrain/Causal-pipeline","KSolomon/minigpt4","Kajal17/AI_Voyagers","Kajal17/AI_Voyagers_2","Kejo11/minigpt4","Keshavp08/Classifier","Lihuchen/AcroBERT_v2","Lisisowow/minigpt4","MAEBA96/SIMPLE-CONVERSATIONAL-BOT","MagKoz/HuggingGPT","Manto2023/AudioGPT","Marchello/ingsoc_censor","MartinRages/Versatile-Diffusion","Matt-CB/TwitterAccountAnalyzer","Mcdof/HuggingGPT","Meffordh/HuggingGPT","MeghanaVeerannagari/test-space","Metformin/test","Midtown/minigpt4","Mmmm2/minigpt4","MrDdz/Tweet-Sentiment-Analysis","Msp/HuggingGPT","Muennighoff/tmp","NaamanSaif/HuggingGPT","NarayanaMayya/web-creations-for-ai-models.streamlit.app3","Neu256/Prome-LLM","Nickabragin/tagger","NimaKL/FireWatch-Streamlit","Noobian/MeetingChat","ODR/glip-zeroshot-demo","OK-ODT/audioldm-text-to-audio-generation-test2","OK-ODT/audioldm-text-to-audio-generation-4","Oiliver/GH29BERT","OurNhan/asdasd","OurNhan/sentiment-analysis","PCMS-MSP/MSP","PankajNk/Automate_MCQ","PeepDaSlan9/Recognize_Anything-Tag2Text","PenguinMan/News_Bias_Discrminator","Pfs2021Funny/HuggingGPT","Pinguin/audioldm-text-to-audio-generation","Pitak/HuggingGPT","PlengP/phishoff","Pranav-K/FinBert","Prgckwb/sd-gui-gradio","Pruthul/CS482-104-Milestone2","Ptato/Sentiment-Analysis","Pushpa/bert","Pushpa/APP","RKocielnik/bias-test-gpt-pairs","Rams901/OpenSLU","Reiner4/extrasneo","Roopalav/MarineLitter","RudiCahyan/Stable-Diffusion","SLAYEROFALL3050/Audio_Generator_Using_GAN","Sadiksha/Sentiment_analysis_bert","Sahilqwdqwdqwdqdqdq/bert-semantic-similarity","Saiharish98/Disasternlpanalysis","Sam10155/499demo","Samp007/Finetuning_Language_Models","Samp007/Milestone-3","SanKl123/bertchat4docker","Sarvech/BERTSelf-Harm","SatAT/transformer_service","Satinurus/AudioGPT","Schrodingers/gradio_deploy","Sevenlee/minigpt4","Sharathhebbar24/Sentence-Similarity","SharpAI/minigpt4","Shenziqian/HuggingGPT","ShraddhaGami/minigpt4","ShraddhaGami/minigpt4-qwe","Shredder/Sample","Shrey/cc-bert","SidneyChen/MBTIdemo","SilverStarShadow/HF-SillyTavern-Extras","Sirus1/Multimodal_Demo","Solshine/Training","Sparkles-AI/gpt4mini","Steljoka/instruct-pix2pix4444444","Svngoku/bert-semantic-similarity","TRMT/Multimodal_Bird_Search","TRMT/test","TRaw/digital-alchemy","TensorBoyML/Lucifer_Alive","Thefrudi78/Extra","Thziin/Kakaka","Tj/audioldm-text-to-audio-generation-copy","Treav/reccsys","TuanBC/token_counter","TwoPerCent/instruct-pix2pix","Ujjwal123/EZ-Crossword","VirSingh/perf-prediction","Vishakaraj/GroundingDino","VishalF5/F5","Vito99/HuggingGPT-Lite","Wmcs91/Versatile-Diffusion","YaTharThShaRma999/GLEE_demo","YaTharThShaRma999/GLEE","Yugang998/Grounded-Segment-Anything","ZackBradshaw/omni_bot","Zalaruc/extrasseleo","Zeeshan01/Segment_and_track_Anything","Zhonathon/DRv2","ab8997/Sentiment-Analysis-App","adamtayzzz/test","ahmedelnakeeb/audioldm-text-to-audio-generation","aikenml/SAMmodel","aikenml/Segment_and_track_Anything","aikenml/Segment_and_track_Anything-Duplicated2","aikenml/Segment-And-Track-Anything-Model","aikenml/data_mining","aikenml/Segment-And-Track-Anything-Model_duplicated2","aikenml/Segment-And-Track-Anything-Model_dup","aikenml/SAM_Track_Duplicated2","aikenml/samtrack","aikenti/Segment-And-Track-Anything-Model","aimhxr/audioldm-text-to-audio-generation-test","ajag1/testing","ajag1/Milestone3","akhil2808/BERT-EPICS","alekeik1/shad-mlops-transformers","alexborelli/GradApplicationDocsApp","alexmealor/GenreFromLyrics","aliyan22/streamlit-llm-app","all-things-vits/comparative-explainability","alonegg/AudioGPT","amrithhun/streamlit_pdf_gpt","amuvarma/instruct-pix2pix","andreasref/BLIP-copy","andrienr/marble-catalogue","angelajyeung/text-sentiment-analysis-app","anichaudhri/OpenEyes","anirudh-techie/test-space","anon4757/BiasTestGPT","anonymous8/Rapid-Textual-Adversarial-Defense","anujbhardwaj64/FakeNews","aodianyun/Image2Paragraph","apande/chatgpt4img","apgarmd/jarvis","apgarmd/jarvis2","argo2001/YSDA_transformers_paper_classification","asafAdge/BLIP","asamsonenko/Article_topic_classifier","asgeorges/ll-create","avakos/ML2","aviralv/airline-sentiment-bert","avishek-018/bert-semantic-similarity","awacke1/3D.Live.Image.To.Model.Generator","ayaanzaveri/bert-api","ayanmw/minigpt4","basimmughal3/input-output","benpalgi/instruct-pix2pix","berkaygkv/curate-me-a-playlist","beskrovnykh/danielsearch-embeddings","better57/minigpt4","bhavyapandya/twitter-sentiment","bhavyapandya/Troll-detection","bingbort/MiniGPT-v2","binhnase04854/nobita-gpt","bla/Mobile-SAM","bountyfuljr/HuggingGPTplaypublic","burhaant/Fooocus","cagataydag/TSmarizer","calliber/HuggingGPT","cashqin/HuggingGPT","castorini/ONNX-Demo","cedpsam/latentdiffusion","cgr28/cs482-project","chrisW6825/HuggingGPT","cndavy/HuggingGPT","cocktailpeanut/AudioSep","comidan/video-llama2-test","crowul/TODO_YSDA_TEST_Rodionov","csncsn/AI_Gen_for_SG","csuvikv/tokenizer","danielacthomas2001/AI-Project-1","dashasabirova/HW-abstracts","datasciencedojo/Fill-Mask","dcams/HuggingGPT","dever/stablediffusion-infinity","dimaiklov/audioldm-text-to-audio-generation","dipro7/story-genre-classifier","dp92/Toxiclassifier","dragonSwing/capu-demo","drowdancer/extrasneo","dwolfe66/HuggingGPT","dzLu1203/subject_work_2022_MLA_demo","efobi/P5","efobi/P44","efobi/PP45","efobi/pd42","efobi/opo001","efobi/MI6","emee/test2vec","emilylearning/choose_your_own_spurious","ericanthonymitchell/model-editing","ever53339/chatbot-byu-cs501-final","ewriji/heil-A.412C","eyemabhishek/det-gpt-space-v10","farbereth/fiona-farber","farbereth/fiona-farber2","farooq-09/txt-classification-nlp","fefenXteoso/GSAM-AD","felixfriday/MICROSOFTT_JARVIS_HuggingGPT","fersufWesi/relate-anything-model","frozenmad/audioldm-text-to-audio-generation","galem/glip-zeroshot-demo","gaocegege/HuggingGPT","geonmin-kim/NetsPresso_QA","gopikrsmscs/iSeBetter","gordonhu/BLIVA","gremlin97/Tag2Text_Demo","groundworm/minigpt4","grv805/GSAM-AD","hari-shankar-huggingface/text_sentiment_prediction","hezhaoqia/Recognize_Anything-Tag2Text","hf-100/minigpt4","hkmast/image_match","hlydecker/Grounded-Segment-Anything","indigoman/text_image_editing","infludata/test-space","infludata/test-space-2","innovativeillusions/HuggingGPT","irritablebro/HuggingGPT","ismot/12t10","jackbielinski/dan_AI","jacksabari/Iris_Classification","jbilcke-hf/segmentation-server-1","jbilcke-hf/segmentation-server-2","jbilcke-hf/segmentation-server-3","jbraha/aiproject","jcancela/npl-course","jeevavijay10/nlp-goemotions-senti-pred","jeffsss12121/name","jeromechew15/milestone3","jesoteric/Grounded-SAM","jfeng1115/marketing-analytics-bot","jihaitang/extrasneo11","jihaitang/extrasneo111","jihaitang/extrasneo4399","jihaitang/SillyTavern-Extras1","jishnuprakash/lex_glue_ecthrA","jishnuprakash/lex_glue_ecthrA_2","jiuku/audioldm-text-to-audio-generation","josephZw/masktext","katyaniki/RAG-project-new","kaza167/SHAD_ML","kaza167/SHAD_PAPERS","kcltw/asr_demo","keaneu/HuggingGPT","kelvinleong/streamlittestcsv","kelvinleong/streamlitcsv02","kent101/chatgpt-fine-tune-example","kenzab/Chatbot-Recruteur","kmlf/Lab_10","knoxcs/masked-probs","komleva/VQA","kony1337/audioldm-text-to-audio-generation","kotvkaske/test-transformer","krismaglasang/basic-sentiment-classifier-2labels","kruntuid/ysda_nlp_task12","ksiyang/Will_Your_SO_Question_Be_Answered","kya5/CS482-Milestone2","leadmaister/HuggingGPT","leadmaister/minigpt4","lianxin03/minigpt4","lizadakhova/shad-nlp","lokutus/HuggingGPT","lollo21/Will-GPT","louisbrulenaudet/HuggingGPT","lu-ny/Novel_Title_Summary_Gen","lucifer958/minigpt4","lugifudun/HuggingGPT","luminousncc/RoadProject","luminousncc/RoadProjectDemo","luminousncc/foodDetectionDemo","lylylyAI/instruct-pix2pix","lyzen/Milestone-3","lzqfree/HuggingGPT","malmukhtar/Accessibility-labeler","manu1435/HuggingGPT","mariasandu/sentiment-analysis-of-a-tweet","mariasandu/detecting-toxic-tweets","mariasandu/toxic-comment-app","mastere00/JarvisMeetsProfessor","mckeeboards/HuggingGPT","mearjunsha/HuggingGPT","merve/grounding_sam_inpainting","metaknightccc/sentiment-analysis-app","mimiqiao/HuggingGPT","mit-riya/Text2Questions","mlgeis/arxiv-subject-classifier-demo","mosby-t05/NER-UNDERSTAND","mrSoul7766/Grounded-Segment-Anything","mukulnag/HuggingGPT1","mygyasir/Text-Summarizer","mzltest/gpt2-2","nabarun/Image2Hashtag","naman7415963/twitter-sentiment","naman7415963/troll-detection","nanankawa/extrasneo-CodeSandBox","nateraw/jupyterlab-inference-dev","nateraw/text-generation-inference","nathanluskey/ml_in_prod","nguynking/fake-news-detection","nijoow/openai_space","nppmatt/milestone-3","nyaridori/Lazywritez","ohrol/minigpt4","oldfart/text-to-audio-generation","omar87/Image","osanseviero/Versatile-Diffusion","osmanthus/ConZIC","otmanheddouch/otmanhe","paracanthurus/lol","paranitik/3","passthebutter/HuggingGPT","paulzyd/Toronto-Recycling-Classifier","piggypocket/audioldm-text-to-audio-generation","poedator/scence_article_topics","poisonawaits/low_effort_v1","poisonawaits/kurkuma","pol9886/extrasneo","pol9886/extrasneo2","pors/HuggingGPT","poseg/Yandex_SHAD_ML_Lab2","pppppppppp2/instruct-pix2pix","prath/sentiment-analysis","principeroxido/hockey-recognizer-test","psychedelicbunny/sentimentanalysis","psychedelicbunny/sentiment","psyne/MLSLPDFSummarizer","rafatsiddiqui/minigpt4","rd448/multi-headed-toxicity-classifier","rianders/viewembedding","rima357/Query_Domain_Classification","rjiang12/bias-test-gpt","rjiang12/bias-test-gpt-breadcrumbs","rjiang12/bias-test-gpt-breadcrumbsV2","rjx/rjxai_image_identification","rngd/text-generation-webui","rstallman/bert-political-sentiment-analysis","ruchithahoney/fraud-detection","ryan12439/HuggingGPTpub","saidal/minigpt4","salomonsky/sphere","salomonsky/sp","sanjaykamath/Safeworld_Captioning_Spaces","sankalphimself/pitchpal","sergey-hovhannisyan/toxic-tweets","sethlxk/milestone3","sethlxk/test","shamim237/python-dev-task-skyranko","shaojiang/wenyanwen","sheacon/semantic-song-search","shivasai824/lets_see","shumik/minigpt4","simon-clmtd/exbert","sms07/Georgios-Ioannou-Visual-Question-Answering-With-Hugging-Face","sms07/Georgios-Ioannou-Visual-Question-Answering-With-Hugging-Face-FINAL","snaramirez872/Finetuning-Toxicity-Model","sofarikasid/Debit_Analysis","solo7917/extrasneo","solo7917/extrasneo1","sophiaaez/BLIPsinki2","spuun/BLIP","stanno/stablediffusion-infinity-capstonetest","stanno/capstone","steamur/minigpt","subhannadeem1/textclassification","sudhanvamg/RAM","sunny-annie/elbrus_nlp_project","suyogyj/IMLProject","svaddi/CommentaryGPT","svjack/TableQA-Chinese","switmer/mbti-sentiment","syedabdullah32/NLPquiz","syrxhx/HF-SillyTavern-Extras1","syrxhx/extrasneo1","syrxhx/SillyTavern-Extras1","tadevosiaan/Transformer_arXiv","taka-yamakoshi/causal-intervention-demo","tangjicheng123/BLIP","tayhan/minigpt-final","tbdaox/Grounded-Segment-Anythingx3","tbdaox/Grounded-Segment-Anythingz2","teddybearxzh/Versatile-Diffusion","tennant/MUG_caption_test","tenuplogu/chatgpt4img","thomasht86/instruct-pix2pix","tombm/gp-uq-tester","toniz/minigpt4","toxabuk/YSDA_HW","trhacknon/audioldm-text-to-audio-generation","trhacknon/HuggingGPT","trhacknon/minigpt4","tsgbalakarthik/HuggingGPT","turbowed/HuggingGPT","universal-ml/Remove-Anything","usiam/NLP4ELL","v-nemala/sentiment-analysis","vacuumisme/fastapi_nb_demo","valerymal/archive_topic_clf","vdvbszgs/minigpt4","viscosity/HuggingGPT","vitkishloh228/bert_arxiv_tagging","vitkishloh228/bert_tagger","vm567/Finetuning_HUPD_dataset","vosatorp/style-transfer","vovaf709/style_transfer","vs4vijay/HuggingGPT","waidhoferj/major-matcher","waleko/SegmentAnythingxGroundingDINO","wangyongda/ramdemo","weiq/minigpt4","wldmr/similarity-st1","wowochkin/HuggingGPT","xdite/mini","xfl218/test","xian-sheng/HuggingGPT","xnetba/train-test","xwwu/test","ylavie/HuggingGPT3","ylavie/HuggingGPT-Lite","ynp3/Milestone3","ynp3/trial","yonixw/test1","yuaiyu/Versatile-Diffusion","yxchng/elia","z11h/AudioGPT","zachlopez/sample_1","zachlopez/sample_2","zachlopez/sample_3","zamasam/extrasneo","zeabin/Grounded-Segment-Anything","zhangdream/HuggingGPT","zlwq/minigpt4","zztop1977/fcs"],"safetensors":{"parameters":{"F32":110106428},"total":110106428},"siblings":[{"rfilename":".gitattributes"},{"rfilename":"LICENSE"},{"rfilename":"README.md"},{"rfilename":"config.json"},{"rfilename":"coreml/fill-mask/float32_model.mlpackage/Data/com.apple.CoreML/model.mlmodel"},{"rfilename":"coreml/fill-mask/float32_model.mlpackage/Data/com.apple.CoreML/weights/weight.bin"},{"rfilename":"coreml/fill-mask/float32_model.mlpackage/Manifest.json"},{"rfilename":"flax_model.msgpack"},{"rfilename":"model.onnx"},{"rfilename":"model.safetensors"},{"rfilename":"pytorch_model.bin"},{"rfilename":"rust_model.ot"},{"rfilename":"tf_model.h5"},{"rfilename":"tokenizer.json"},{"rfilename":"tokenizer_config.json"},{"rfilename":"vocab.txt"}],"createdAt":"2022-03-02T23:29:04.000Z"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '22196'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:01 GMT
+      ETag:
+      - W/"56b4-/V/3iglhYXZUePmX6kxh3lhjqQQ"
+      Vary:
+      - Origin
+      Via:
+      - 1.1 287029756b3b548e3285589a3a05ee88.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - uFSlZA286eb5v0zCnXvbdMRkK2agO8KH_Fa6ovYJqpy2_gTfAcNkCQ==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Request-Id:
+      - Root=1-65818d05-0e9b226f0ed557cc3dc16881;7eb14af2-e95a-4ee6-97e4-20bf9cd4c274
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 07b2e7a2-c041-4fa9-b8bd-ac43a06037db
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/.gitattributes
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '491'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:02 GMT
+      ETag:
+      - '"505a7adf8be9e5fdf06aabbfbe9046e6c811f91b"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 3b7fbfe97fda90473a7f2324504fafb0.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - DNCOwp0zjahOPcm-wS_hgPwFl9f4ucwMoZXBaBj3-lWWLj091ToQJg==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d06-03a001834ca863ea3da377ff;07b2e7a2-c041-4fa9-b8bd-ac43a06037db
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 60b0c1ba-c768-4e29-838d-1b000cd778d0
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/LICENSE
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '11356'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:02 GMT
+      ETag:
+      - '"f49a4e16e68b128803cc2dcea614603632b04eac"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 241d42aec84c34a76f247329b30f2356.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - bVZK1rEODMEvHyLhdZkioSBy4BNMbaod6LhMG8FFQHpZez7OcOBLPA==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d06-3704439b577aae8f0324326d;60b0c1ba-c768-4e29-838d-1b000cd778d0
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - c8993f21-57fb-4353-b250-c5dc61addee8
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/README.md
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '10517'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:03 GMT
+      ETag:
+      - '"40a2aaca31dd005eb5f6ffad07b5ffed0a31d1f6"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 d8e9176f47607f3f1d3bfa8fb4239438.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - FPtL8XgesmsZvcBC2dyo_oucuiVAYmn2oZ1bIiLEeMSjpk6j7kcaaw==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d07-226f5b272333807666e198a4;c8993f21-57fb-4353-b250-c5dc61addee8
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 070fae8f-49e1-4060-887f-a16e79679ed4
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/config.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '570'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:04 GMT
+      ETag:
+      - '"45a2321a7ecfdaaf60a6c1fd7f5463994cc8907d"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 461079ea73843c2127940af381fcd540.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - uu9cWjUX0edx-ux2HLQpS1H75DBuGK_6RJiFnFhGzFSzLkA2rAIYHw==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d08-5c28e473733ddbf012319f9c;070fae8f-49e1-4060-887f-a16e79679ed4
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 77ac07e8-f95e-4510-af25-6befc9128eaf
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/coreml/fill-mask/float32_model.mlpackage/Data/com.apple.CoreML/model.mlmodel
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '164911'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Date:
+      - Tue, 19 Dec 2023 12:31:04 GMT
+      ETag:
+      - '"bd3e35c1681371542bd98f96b299be1832d89dbf"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 2642a80675a915ab1194b6859c71defe.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - twE7LbHp6d2DODn4AD29qrjto6NmHc8OMiuwGc-qrtOw0lxQAcqwDw==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d08-42418dc37d7664201bd1b723;77ac07e8-f95e-4510-af25-6befc9128eaf
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 619e5fac-c4e2-442f-b0ff-34c49af03d60
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/coreml/fill-mask/float32_model.mlpackage/Data/com.apple.CoreML/weights/weight.bin
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1055'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:05 GMT
+      Location:
+      - https://cdn-lfs.huggingface.co/bert-base-uncased/c0c9f4914b4f0053785e96b8583cd59cda63c2f1b6e95a03970d772bf097e289?response-content-disposition=attachment%3B+filename*%3DUTF-8%27%27weight.bin%3B+filename%3D%22weight.bin%22%3B&response-content-type=application%2Foctet-stream&Expires=1703247881&Policy=eyJTdGF0ZW1lbnQiOlt7IkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcwMzI0Nzg4MX19LCJSZXNvdXJjZSI6Imh0dHBzOi8vY2RuLWxmcy5odWdnaW5nZmFjZS5jby9iZXJ0LWJhc2UtdW5jYXNlZC9jMGM5ZjQ5MTRiNGYwMDUzNzg1ZTk2Yjg1ODNjZDU5Y2RhNjNjMmYxYjZlOTVhMDM5NzBkNzcyYmYwOTdlMjg5P3Jlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249KiZyZXNwb25zZS1jb250ZW50LXR5cGU9KiJ9XX0_&Signature=EmOgP6u6EV1GbeiOlk9ZtxP33DfDWMYa1OCWw6sJcvUeLjKVTBUKqsr%7E49xywo%7EGeTataXtJH-YD42mvM3iAS4TXe-1lTC11Tf8PL89Hv4vS31ZA1RYka-j8nbWy-%7EvtujXy4J4H2KcKsUCMxc0HkFCOSSBc7aom-ouWhk9D6EwREZ3kxSNQKoaaxgnHZVODr8Su6zBU5Hk0M7hEuuo-KPpZg-Yu5XsAP6n19tA-h6bFONx%7EEwGSJF7wJdwtYAJMGvDRlcTMmqIhE0RBTPCFovq86ybT2UM8cMXFIE8wpzHImZDU0MNnzllZa51yjxJs4vgxuxCEPxdYLBYWkZ2V8g__&Key-Pair-Id=KVTP0A1DKRTAX
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 3340f4226469787c29ee46b57612ee94.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - bSUPbxZ3R4yVLqYxh-s7y-Oz7phdKVyXrPiPzT49EnJtNs71S_2cpg==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Linked-ETag:
+      - '"c0c9f4914b4f0053785e96b8583cd59cda63c2f1b6e95a03970d772bf097e289"'
+      X-Linked-Size:
+      - '531833856'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d09-7f5c40aa11c8f1dd3118fae5;619e5fac-c4e2-442f-b0ff-34c49af03d60
+    status:
+      code: 302
+      message: Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - cad85a2c-c14d-46d3-8485-224c6fdee618
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/coreml/fill-mask/float32_model.mlpackage/Manifest.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '617'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:05 GMT
+      ETag:
+      - '"c1c37cd58b9eb000ddbb7ca90f04b893a33e50c8"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 d37a5fb71c7ad3df021ff13669d96b4c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - yCr9C5DVwE_-q85Zer-q_PVMLef5r4V3MPzMYeSOGjSk_spYKX2m0w==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d09-3ae58f1d07f93726434fc2a5;cad85a2c-c14d-46d3-8485-224c6fdee618
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - c35b5b63-aa25-4d99-a193-38ab77966eb6
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/model.onnx
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '972'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:05 GMT
+      Location:
+      - https://cdn-lfs.huggingface.co/bert-base-uncased/44d7a2896d341c51fb1eba89aea3a590e6af0ce33e25481136f7eeecb62e5f7f?response-content-disposition=attachment%3B+filename*%3DUTF-8%27%27model.onnx%3B+filename%3D%22model.onnx%22%3B&Expires=1703247390&Policy=eyJTdGF0ZW1lbnQiOlt7IkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcwMzI0NzM5MH19LCJSZXNvdXJjZSI6Imh0dHBzOi8vY2RuLWxmcy5odWdnaW5nZmFjZS5jby9iZXJ0LWJhc2UtdW5jYXNlZC80NGQ3YTI4OTZkMzQxYzUxZmIxZWJhODlhZWEzYTU5MGU2YWYwY2UzM2UyNTQ4MTEzNmY3ZWVlY2I2MmU1ZjdmP3Jlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249KiJ9XX0_&Signature=Y-V0v1Ft6Nb2GWqdOoB56Q3SIaLFKkTX5lY8HHAOvQD0jc0a-OKkZ0ujIUqKWyYhlilDXuBKKxIz35-PERW4cTqdkWoJrBAq-aS0A%7Ew1md5i7nQ4STY2fD2Cx-8-YlNWNbszM5xaZYh24ub95UxjklThhQ6PiKuHNDs8-hJ0CrxEAsoOdBkyUw-cBFk46jMmHsEmloVEB6gYnRtWvurfDBwIbfrt8VtyqF4rZDJ7tf3Smp9wzztJzIFpL%7E8OzybyT3OgR8ExxP9ZlKoiw3VbZW7bgy49gb5KDOmUweIKIEqcOiq2%7EGTtzGkBg5d9ZR6Ox-9rM4tJ0fiOK0Rf7yED3g__&Key-Pair-Id=KVTP0A1DKRTAX
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 775546ff387a8cddd75fe8854c9b34ae.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - Wevc8WSkI4jQHYtqOjqtjUFmRRhg7lEUAI1M25MSY5VTbDNwbEEB3Q==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Linked-ETag:
+      - '"44d7a2896d341c51fb1eba89aea3a590e6af0ce33e25481136f7eeecb62e5f7f"'
+      X-Linked-Size:
+      - '532091246'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d09-01066f2d1bda25157ad6877e;c35b5b63-aa25-4d99-a193-38ab77966eb6
+    status:
+      code: 302
+      message: Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 3acf551e-32de-4f6e-814a-d39c9d0f2220
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/model.safetensors
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '992'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:06 GMT
+      Location:
+      - https://cdn-lfs.huggingface.co/bert-base-uncased/68d45e234eb4a928074dfd868cead0219ab85354cc53d20e772753c6bb9169d3?response-content-disposition=attachment%3B+filename*%3DUTF-8%27%27model.safetensors%3B+filename%3D%22model.safetensors%22%3B&Expires=1703246721&Policy=eyJTdGF0ZW1lbnQiOlt7IkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcwMzI0NjcyMX19LCJSZXNvdXJjZSI6Imh0dHBzOi8vY2RuLWxmcy5odWdnaW5nZmFjZS5jby9iZXJ0LWJhc2UtdW5jYXNlZC82OGQ0NWUyMzRlYjRhOTI4MDc0ZGZkODY4Y2VhZDAyMTlhYjg1MzU0Y2M1M2QyMGU3NzI3NTNjNmJiOTE2OWQzP3Jlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249KiJ9XX0_&Signature=S3PyxAvoc-NhO0jMUD7ZLD-eZrKV%7Ejk9-tg66p7ackdi29bCoH1SgByJ374rgTQLa4utKpZwiuhVfstAvVtJitsRUpvhrAxgKSD2h6zszE2o%7EcDvkqaNCU8tQPsWkofuxMr0uWF6IlQ0-jg7jVSRnQpekRpfSrE6cVb-wBe7kfWSDk3CqY%7E8zFqpZEJIK3JgQ7QqiIxPueO9uy0sIf8XIv9stY9UztcZA4mV9eXfO52bfxKA8VSgT-vMD5RWqJHn%7EreiC7HGQ5nxpcLdRn032l3d4Vf6s1f2UCcRU6VVQWQXldhBKA-mQd%7Ec6mUZKz4A-%7EWN5zLL4dllAQ48ud3unQ__&Key-Pair-Id=KVTP0A1DKRTAX
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 4349a992977a09129baaddd00c798a5c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - kXzAG-yYcsrMmxBO5yNuQ7gasy2xHOwzXK3cxbFRd5wes4ervCKBCg==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Linked-ETag:
+      - '"68d45e234eb4a928074dfd868cead0219ab85354cc53d20e772753c6bb9169d3"'
+      X-Linked-Size:
+      - '440449768'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d0a-4ea5997a7e73b17d06335c96;3acf551e-32de-4f6e-814a-d39c9d0f2220
+    status:
+      code: 302
+      message: Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - d66fc84a-9e79-411c-b19b-3045538632ab
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/pytorch_model.bin
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1069'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:06 GMT
+      Location:
+      - https://cdn-lfs.huggingface.co/bert-base-uncased/097417381d6c7230bd9e3557456d726de6e83245ec8b24f529f60198a67b203a?response-content-disposition=attachment%3B+filename*%3DUTF-8%27%27pytorch_model.bin%3B+filename%3D%22pytorch_model.bin%22%3B&response-content-type=application%2Foctet-stream&Expires=1703248244&Policy=eyJTdGF0ZW1lbnQiOlt7IkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcwMzI0ODI0NH19LCJSZXNvdXJjZSI6Imh0dHBzOi8vY2RuLWxmcy5odWdnaW5nZmFjZS5jby9iZXJ0LWJhc2UtdW5jYXNlZC8wOTc0MTczODFkNmM3MjMwYmQ5ZTM1NTc0NTZkNzI2ZGU2ZTgzMjQ1ZWM4YjI0ZjUyOWY2MDE5OGE2N2IyMDNhP3Jlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249KiZyZXNwb25zZS1jb250ZW50LXR5cGU9KiJ9XX0_&Signature=liBNcDPIfuCa49bMjkYYKxBwsAWuG%7EjzmLeyKSt5UL-23oWv7YmkgDEvTw7j39K0ip67jXk-y80FUAKIT0SxjqseihuBZNtL3Jw-%7EYuzxGAECsLhntBqZOXn6003I6b4Tvbg7jQFXUFAjFYGtslCpR7kz9SZHc3bAIMiSn5yKoHne1yVg87ed6O4WRWZPRCwc2f7ZhV0gV%7EZW%7EYhFQrvcdqylKKZEaHJeTPv3PguyJLSSPUouj5kVNFvoQs-UTJZ2IrAeQGL7AcqaWXXxsJqTaU50yGpfUY5DHg3uwo4YteujfCw4dd8BshWJ2H5iJZyIDJB1cKgtT6sRDuumgTlqA__&Key-Pair-Id=KVTP0A1DKRTAX
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 ab4b337831c4c6f99adcb2dab4b4fe02.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - nB63v61o5dhvihOmXNdzO5yBvS4aPN76EuQLPH-wJoCrTAFXvH_OGA==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Linked-ETag:
+      - '"097417381d6c7230bd9e3557456d726de6e83245ec8b24f529f60198a67b203a"'
+      X-Linked-Size:
+      - '440473133'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d0a-29c58f3172f5ae1156b1f1f4;d66fc84a-9e79-411c-b19b-3045538632ab
+    status:
+      code: 302
+      message: Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 5a5d0f45-44c0-4424-a957-55fcf59afa1b
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '466062'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:07 GMT
+      ETag:
+      - '"949a6f013d67eb8a5b4b5b46026217b888021b88"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 ab4b337831c4c6f99adcb2dab4b4fe02.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - eqGiomtnzXiPuUuHvJa2dduj3mX4YaEafyPhaBXrcmqwQ5flCRuD_A==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d0b-67cfacbe63423d8c78a88cf3;5a5d0f45-44c0-4424-a957-55fcf59afa1b
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - df98b330-4308-4c80-bd26-ab17a74d2032
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/tokenizer_config.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '28'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:08 GMT
+      ETag:
+      - '"a661b1a138dac6dc5590367402d100765010ffd6"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 a31366a53812bf34f3391396b61f5832.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - BY5ecdlWtc0yy6ca3nJOxP_rjdP6bRSr33zZlnKHRqzxrQIQHo-Blg==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d0c-3682b8ac65ccc63c7ff68f6c;df98b330-4308-4c80-bd26-ab17a74d2032
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 00e50c52-3208-4113-8ddf-51af93428f1e
+      user-agent:
+      - sentence-transformers/2.2.2; hf_hub/0.19.4; python/3.11.4; torch/2.1.2
+    method: HEAD
+    uri: https://huggingface.co/bert-base-uncased/resolve/1dbc166cf8765166998eff31ade2eb64c8a40076/vocab.txt
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,ETag,Link,Accept-Ranges,Content-Range
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '231508'
+      Content-Security-Policy:
+      - default-src none; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 19 Dec 2023 12:31:08 GMT
+      ETag:
+      - '"fb140275c155a9c7c5a3b3e0e77a9e839594a938"'
+      Vary:
+      - Origin
+      Via:
+      - 1.1 3c715b9b0425f33db3495c6b3a2703f2.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - bChOWui20qlpCUXeU0EJNJItOIko6v4H4AZHaVtn1wTWQiAfC9y62g==
+      X-Amz-Cf-Pop:
+      - DXB50-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - 1dbc166cf8765166998eff31ade2eb64c8a40076
+      X-Request-Id:
+      - Root=1-65818d0c-1286347708407fe46048f007;00e50c52-3208-4113-8ddf-51af93428f1e
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-3.5-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '197'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.3.8
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.3.8
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-8XTXZh5CYNY9LNujh0qLVuBQcAEOK\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1702989069,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
+      null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
+      11,\n    \"completion_tokens\": 2,\n    \"total_tokens\": 13\n  },\n  \"system_fingerprint\":
+      null\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 837fa92f8f6db47f-DXB
+      Cache-Control:
+      - no-cache, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 19 Dec 2023 12:31:09 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=nxoTUI52DLDV728CInu9nUhmLlBnnVQvauaG_tZcc7I-1702989069-1-AalaStCMd0ve+PuIjJvGRpkqj8IO3RWvXUR4ShNM0rWMq04EYpS9Y6ZCV32NcIijpodxaOZOZp9ZJ/uOa4n19X0=;
+        path=/; expires=Tue, 19-Dec-23 13:01:09 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=8DhqOinZohUdT2PCqlPwD2Cn5nWvzMpzMJslS.FMA_k-1702989069436-0-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-model:
+      - gpt-3.5-turbo-0613
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '196'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '1000000'
+      x-ratelimit-limit-tokens_usage_based:
+      - '1000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '999943'
+      x-ratelimit-remaining-tokens_usage_based:
+      - '999943'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 3ms
+      x-ratelimit-reset-tokens_usage_based:
+      - 3ms
+      x-request-id:
+      - e47482bcb89c8db18b71ed24fd0fb7fa
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with test"}],
+      "model": "gpt-3.5-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '197'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.3.8
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.3.8
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-8XTXaccGRhi4Sv0FddLOYRExdaFou\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1702989070,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"test\"\n      },\n      \"logprobs\":
+      null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
+      11,\n    \"completion_tokens\": 1,\n    \"total_tokens\": 12\n  },\n  \"system_fingerprint\":
+      null\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 837fa9345f7f126e-DXB
+      Cache-Control:
+      - no-cache, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 19 Dec 2023 12:31:10 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=HEqoG5GjJR6zTCX2y0gW44NYfupDzTGtexnbVj3lqyo-1702989070-1-AeIOSPaeykFfslDeOnCQqZvkMZz8QEZf5ZwhkZr+YYZLWdVZ0f69El1tUoMPbhm9V7lxQlb5wRLka/seM9zh/0Q=;
+        path=/; expires=Tue, 19-Dec-23 13:01:10 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=b85FPh6owdE6tZoDGlc0LIDTf50mToPCemslaB.jvkk-1702989070682-0-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-model:
+      - gpt-3.5-turbo-0613
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '611'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '1000000'
+      x-ratelimit-limit-tokens_usage_based:
+      - '1000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '999943'
+      x-ratelimit-remaining-tokens_usage_based:
+      - '999943'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 3ms
+      x-ratelimit-reset-tokens_usage_based:
+      - 3ms
+      x-request-id:
+      - 445ed3e535b69c9eda31c1ebcd486ab8
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

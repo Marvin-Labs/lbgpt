@@ -48,7 +48,7 @@ class _BaseGPT(abc.ABC):
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
-        self.semaphore = self.refresh_semaphore()
+        self.semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
@@ -143,10 +143,9 @@ class _BaseGPT(abc.ABC):
 
         return min([headroom_tpm, headroom_rpm])
 
-    def refresh_semaphore(self) -> asyncio.Semaphore:
+    def refresh(self) -> None:
         semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
         self.semaphore = semaphore
-        return semaphore
 
     @abc.abstractmethod
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
@@ -155,7 +154,7 @@ class _BaseGPT(abc.ABC):
     async def chat_completion_list(
         self, chatgpt_chat_completion_request_body_list: list[dict], show_progress=True
     ) -> Sequence[ChatCompletionAddition]:
-        self.refresh_semaphore()
+        self.refresh()
 
         return await tqdm.gather(
             *[

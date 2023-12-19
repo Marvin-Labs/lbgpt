@@ -3,6 +3,8 @@ import datetime
 from asyncio import Timeout
 from logging import getLogger
 from typing import Any, Optional, Sequence
+
+import httpx
 import openai
 from openai._types import NOT_GIVEN, NotGiven
 
@@ -24,6 +26,7 @@ class ChatGPT(_BaseGPT):
         max_parallel_calls: int = 5,
         request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
         cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
         max_usage_cache_size: Optional[int] = 1_000,
@@ -32,6 +35,7 @@ class ChatGPT(_BaseGPT):
     ):
         super().__init__(
             cache=cache,
+            semantic_cache=semantic_cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -39,11 +43,17 @@ class ChatGPT(_BaseGPT):
             limit_tpm=limit_tpm,
             limit_rpm=limit_rpm,
         )
+
         self.client = openai.AsyncOpenAI(
             api_key=api_key,
             timeout=request_timeout,
             max_retries=0,
         )
+
+    def refresh(self) -> None:
+        self.client = self.client.copy(http_client=httpx.AsyncClient())
+        super().refresh()
+
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
@@ -74,6 +84,7 @@ class AzureGPT(_BaseGPT):
         azure_api_base: str,
         azure_model_map: dict[str, str],
         cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
         azure_openai_version: str = "2023-05-15",
         azure_openai_type: str = "azure",
         max_parallel_calls: int = 5,
@@ -86,6 +97,7 @@ class AzureGPT(_BaseGPT):
     ):
         super().__init__(
             cache=cache,
+            semantic_cache=semantic_cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -103,6 +115,10 @@ class AzureGPT(_BaseGPT):
         )
 
         self.azure_model_map = azure_model_map
+
+    def refresh(self) -> None:
+        self.client = self.client.copy(http_client=httpx.AsyncClient())
+        super().refresh()
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         """One request to the Azure OpenAI API respecting their ratelimit
@@ -146,6 +162,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
         allocation_function_kwargs: Optional[dict] = None,
         allocation_function_weights: Optional[Sequence] = None,
         cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
     ):
@@ -170,6 +187,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
 
         super().__init__(
             cache=cache,
+            semantic_cache=semantic_cache,
             max_parallel_calls=sum([gpt.max_parallel_calls for gpt in gpts]),
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -202,6 +220,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
         azure_api_base: str,
         azure_model_map: dict[str, str],
         cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
         azure_openai_version: str = "2023-05-15",
         azure_openai_type: str = "azure",
         max_parallel_calls_openai: int = 5,
@@ -213,6 +232,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
         self.openai = ChatGPT(
             api_key=openai_api_key,
             cache=cache,
+            semantic_cache=semantic_cache,
             max_parallel_calls=max_parallel_calls_openai,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,

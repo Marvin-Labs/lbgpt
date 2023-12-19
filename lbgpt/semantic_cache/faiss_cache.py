@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 from typing import Any, Optional
 
@@ -6,8 +7,12 @@ from langchain.vectorstores.faiss import FAISS, dependable_faiss_import
 from langchain.vectorstores.utils import DistanceStrategy
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import CompletionCreateParams, ChatCompletion
+from openai.types.completion_create_params import (
+    CompletionCreateParamsNonStreaming,
+    CompletionCreateParamsStreaming,
+)
 
-from lbgpt.semantic_cache.base import _SemanticCacheBase
+from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition
 
 
@@ -41,30 +46,33 @@ class FaissSemanticCache(_SemanticCacheBase):
                 index=faiss.IndexFlatL2(len(_test_embedding)),
                 docstore=InMemoryDocstore(),
                 index_to_docstore_id={},
-                distance_strategy=DistanceStrategy.EUCLIDEAN_DISTANCE,
+                distance_strategy=DistanceStrategy.COSINE,
             )
 
-        self._euclidean_threshold = 2 - 2 * cosine_similarity_threshold
-
-    def query_cache(self, query: CompletionCreateParams | dict[str, Any]) -> Optional[ChatCompletionAddition]:
-        query = CompletionCreateParams(**query)
+    def query_cache(
+        self, query: CompletionCreateParams | dict[str, Any]
+    ) -> Optional[ChatCompletionAddition]:
+        query = get_completion_create_params(**query)
 
         res = self.faiss_.similarity_search_with_score_by_vector(
             embedding=self.embed_messages(query["messages"]),
             filter=self.non_message_dict(query),
             k=1,
-            threshold=self._euclidean_threshold,
         )
 
+        res = [r for r in res if r[1] <= 1 - self.cosine_similarity_threshold]
+
         if len(res) > 0:
-            return ChatCompletionAddition(**res[0][0].metadata["result"], is_exact=res[0][1] >= 1.0)
+            return ChatCompletionAddition(
+                **res[0][0].metadata["result"], is_exact=res[0][1] <= 0.00001
+            )
         else:
             return
 
     def add_cache(
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
-        query = CompletionCreateParams(**query)
+        query = get_completion_create_params(**query)
 
         self.faiss_.add_embeddings(
             text_embeddings=[
@@ -73,5 +81,18 @@ class FaissSemanticCache(_SemanticCacheBase):
                     self.embed_messages(query["messages"]),
                 )
             ],
-            metadatas=[{"result": response, **self.non_message_dict(query)}],
+            metadatas=[
+                {
+                    "result": response.model_dump(
+                        exclude={
+                            "is_exact",
+                        }
+                    ),
+                    **self.non_message_dict(query),
+                }
+            ],
         )
+
+    @property
+    def count(self) -> int:
+        return len(self.faiss_.index_to_docstore_id)
