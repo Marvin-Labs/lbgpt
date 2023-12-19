@@ -18,6 +18,8 @@ from tenacity import (
 from tqdm.asyncio import tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
+from lbgpt.semantic_cache.base import _SemanticCacheBase
+from lbgpt.types import ChatCompletionAddition
 from lbgpt.usage import Usage, UsageStats
 
 logger = getLogger(__name__)
@@ -43,7 +45,7 @@ class _BaseGPT(abc.ABC):
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
-        self.semantic_cache = semantic_cache
+        self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
         self.semaphore = self.refresh_semaphore()
@@ -147,12 +149,12 @@ class _BaseGPT(abc.ABC):
         return semaphore
 
     @abc.abstractmethod
-    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
+    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         raise NotImplementedError
 
     async def chat_completion_list(
         self, chatgpt_chat_completion_request_body_list: list[dict], show_progress=True
-    ) -> Sequence[openai.ChatCompletion]:
+    ) -> Sequence[ChatCompletionAddition]:
         self.refresh_semaphore()
 
         return await tqdm.gather(
@@ -163,17 +165,28 @@ class _BaseGPT(abc.ABC):
             disable=not show_progress,
         )
 
-    async def cached_chat_completion(self, **kwargs) -> Optional[openai.ChatCompletion]:
-        # this is standard cache. We are always trying standard cache first
+    def _request_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
-            hashed = make_hash_chatgpt_request(kwargs)
             if hashed in self.cache:
                 logger.debug("standard cache hit")
                 return self.cache[hashed]
+        return None
+
+    async def cached_chat_completion(self, **kwargs) -> Optional[ChatCompletionAddition]:
+        # this is standard cache. We are always trying standard cache first
+        if self.cache is not None:
+            hashed = make_hash_chatgpt_request(kwargs)
+            out = self._request_from_cache(hashed)
+            if out is not None:
+                return out
 
         # if the item is not in the standard cache, we are trying the semantic cache (if available)
         # we are currently only supporting semantic cache for FAISS models
-        # TODO: ADD
+        if self.semantic_cache is not None:
+            sc: Optional[ChatCompletionAddition] = self.semantic_cache.query_cache(kwargs)
+            if sc is not None:
+                logger.debug("semantic cache hit")
+                return sc
 
         try:
             async for attempt in AsyncRetrying(
@@ -190,7 +203,7 @@ class _BaseGPT(abc.ABC):
                 after=after_logging,
             ):
                 with attempt:
-                    out: ChatCompletion = await self.chat_completion(**kwargs)
+                    out: ChatCompletionAddition = await self.chat_completion(**kwargs)
 
         except Exception as e:
             if self.stop_on_exception:
@@ -198,6 +211,9 @@ class _BaseGPT(abc.ABC):
             else:
                 logger.exception(e)
                 return None
+
+        if self.semantic_cache is not None:
+            self.semantic_cache.add_cache(kwargs, out)
 
         if self.cache is not None:
             self.cache[hashed] = out

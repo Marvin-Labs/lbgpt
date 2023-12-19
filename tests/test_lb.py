@@ -7,6 +7,7 @@ from lbgpt import LoadBalancedGPT, ChatGPT, AzureGPT
 from pytest_mock import MockerFixture
 
 from lbgpt.lbgpt import MultiLoadBalancedGPT
+from lbgpt.types import ChatCompletionAddition
 
 random.seed(42)
 
@@ -43,6 +44,7 @@ def test_lb_async(mocker: MockerFixture):
     assert len(res) == 5
     for k in res:
         assert "pong" in k.choices[0].message.content.lower()
+        assert isinstance(res, ChatCompletionAddition)
 
     assert azure.call_count >= 1
     assert openai.call_count >= 1
@@ -95,6 +97,7 @@ def test_lbgpt_max_headroom():
     assert len(res) == 5
     for k in res:
         assert "pong" in k.choices[0].message.content.lower()
+        assert isinstance(res, ChatCompletionAddition)
 
 
 
@@ -128,6 +131,7 @@ def test_chatgpt_async(mocker: MockerFixture):
     assert len(res) == 5
     for k in res:
         assert "pong" in k.choices[0].message.content.lower()
+        assert isinstance(res, ChatCompletionAddition)
 
     assert openai.call_count >= 5
 
@@ -166,5 +170,6 @@ def test_azure_async(mocker: MockerFixture):
     assert len(res) == 5
     for k in res:
         assert "pong" in k.choices[0].message.content.lower()
+        assert isinstance(res, ChatCompletionAddition)
 
     assert azure.call_count >= 5

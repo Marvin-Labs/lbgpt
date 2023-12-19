@@ -6,12 +6,8 @@ from typing import Any
 from openai.types import CompletionCreateParams
 
 
-def make_hash_chatgpt_request(
-    chat_completion_create: CompletionCreateParams | dict[str, Any]
-) -> str:
-    """Converting a chatgpt request to a hash for caching and deduplication purposes"""
-
-    non_message_parameters = dict(
+def non_message_parameters_from_create(chat_completion_create: CompletionCreateParams | dict[str, Any]) -> dict[str, Any]:
+    return dict(
         model=chat_completion_create["model"],
         frequency_penalty=chat_completion_create.get("frequency_penalty", 0.0),
         logit_bias=chat_completion_create.get("logit_bias"),
@@ -28,6 +24,14 @@ def make_hash_chatgpt_request(
         function_call=chat_completion_create.get("function_call"),
         functions=chat_completion_create.get("functions"),
     )
+
+
+def make_hash_chatgpt_request(
+    chat_completion_create: CompletionCreateParams | dict[str, Any]
+) -> str:
+    """Converting a chatgpt request to a hash for caching and deduplication purposes"""
+
+    non_message_parameters = non_message_parameters_from_create(chat_completion_create=chat_completion_create)
 
     messages = [
         {

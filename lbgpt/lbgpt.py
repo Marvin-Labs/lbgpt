@@ -11,6 +11,7 @@ from lbgpt.allocation import (
     max_headroom_allocation_function,
 )
 from lbgpt.base import _BaseGPT
+from lbgpt.types import ChatCompletionAddition
 from lbgpt.usage import Usage
 
 logger = getLogger(__name__)
@@ -44,7 +45,7 @@ class ChatGPT(_BaseGPT):
             max_retries=0,
         )
 
-    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
+    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
 
         timeout = kwargs.pop("request_timeout", self.client.timeout)
@@ -63,7 +64,7 @@ class ChatGPT(_BaseGPT):
                 )
             )
 
-            return out
+            return ChatCompletionAddition.from_chat_completion(out)
 
 
 class AzureGPT(_BaseGPT):
@@ -103,7 +104,7 @@ class AzureGPT(_BaseGPT):
 
         self.azure_model_map = azure_model_map
 
-    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
+    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         """One request to the Azure OpenAI API respecting their ratelimit
         # needs to change the model parameter to deployment id
         """
@@ -127,7 +128,7 @@ class AzureGPT(_BaseGPT):
                 )
             )
 
-            return out
+            return ChatCompletionAddition.from_chat_completion(out)
 
 
 
@@ -179,7 +180,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
         out = sum([gpt.usage_cache_list for gpt in self.gpts], [])
         return out
 
-    async def chat_completion(self, **kwargs) -> openai.ChatCompletion:
+    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         gpt = await self.allocation_function(
             self.gpts,
             weights=self.allocation_function_weights,
