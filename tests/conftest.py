@@ -7,7 +7,6 @@ import vcr  # type: ignore[import]
 import vcr.request  # type: ignore[import]
 import vcr.util  # type: ignore[import]
 
-
 vcr_match_on = ("method", "scheme", "host", "port", "path", "query")
 
 
@@ -27,5 +26,3 @@ def vcr_config() -> Dict[str, Any]:
         "filter_query_parameters": ["token"],
         "ignore_hosts": ["localhost", "testserver"],
     }
-
-

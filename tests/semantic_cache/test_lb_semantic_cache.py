@@ -11,7 +11,6 @@ from lbgpt import ChatGPT
 from lbgpt.semantic_cache.faiss_cache import FaissSemanticCache
 from lbgpt.types import ChatCompletionAddition
 
-
 SEMANTIC_CACHES = [
     lambda: FaissSemanticCache(
         embedding_model=HuggingFaceEmbeddings(model_name="bert-base-uncased"),

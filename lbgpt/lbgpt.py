@@ -9,8 +9,8 @@ import openai
 from openai._types import NOT_GIVEN, NotGiven
 
 from lbgpt.allocation import (
-    random_allocation_function,
     max_headroom_allocation_function,
+    random_allocation_function,
 )
 from lbgpt.base import _BaseGPT
 from lbgpt.types import ChatCompletionAddition
@@ -54,7 +54,6 @@ class ChatGPT(_BaseGPT):
         self.client = self.client.copy(http_client=httpx.AsyncClient())
         super().refresh()
 
-
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
 
@@ -62,7 +61,9 @@ class ChatGPT(_BaseGPT):
 
         async with self.semaphore:
             start = datetime.datetime.now()
-            out = await self.client.with_options(timeout=timeout).chat.completions.create(
+            out = await self.client.with_options(
+                timeout=timeout
+            ).chat.completions.create(
                 **kwargs,
             )
             self.add_usage_to_usage_cache(
@@ -132,7 +133,9 @@ class AzureGPT(_BaseGPT):
 
         async with self.semaphore:
             start = datetime.datetime.now()
-            out = await self.client.with_options(timeout=timeout).chat.completions.create(
+            out = await self.client.with_options(
+                timeout=timeout
+            ).chat.completions.create(
                 **kwargs,
             )
             self.add_usage_to_usage_cache(
@@ -145,7 +148,6 @@ class AzureGPT(_BaseGPT):
             )
 
             return ChatCompletionAddition.from_chat_completion(out)
-
 
 
 ALLOCATION_FUNCTIONS = {

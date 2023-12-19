@@ -1,14 +1,13 @@
 import abc
 import copy
+import logging
 from typing import Any, Iterable, Optional
 
 from langchain_core.embeddings import Embeddings
-import logging
-
-from openai.types.chat import CompletionCreateParams, ChatCompletion
+from openai.types.chat import ChatCompletion, CompletionCreateParams
 from openai.types.completion_create_params import (
-    CompletionCreateParamsStreaming,
     CompletionCreateParamsNonStreaming,
+    CompletionCreateParamsStreaming,
 )
 
 from lbgpt.cache import non_message_parameters_from_create

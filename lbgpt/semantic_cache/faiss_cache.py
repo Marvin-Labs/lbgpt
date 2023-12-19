@@ -2,15 +2,11 @@ import math
 from pathlib import Path
 from typing import Any, Optional
 
-from langchain.docstore import InMemoryDocstore
-from langchain.vectorstores.faiss import FAISS, dependable_faiss_import
 from langchain.vectorstores.utils import DistanceStrategy
+from langchain_community.docstore import InMemoryDocstore
+from langchain_community.vectorstores.faiss import FAISS, dependable_faiss_import
 from langchain_core.embeddings import Embeddings
-from openai.types.chat import CompletionCreateParams, ChatCompletion
-from openai.types.completion_create_params import (
-    CompletionCreateParamsNonStreaming,
-    CompletionCreateParamsStreaming,
-)
+from openai.types.chat import ChatCompletion, CompletionCreateParams
 
 from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition

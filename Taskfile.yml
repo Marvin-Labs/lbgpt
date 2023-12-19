@@ -1,0 +1,48 @@
+# https://taskfile.dev
+
+version: '3'
+
+env:
+  PYTHONPATH: .
+
+dotenv: ['.env']
+
+tasks:
+  update-pip-build-tools:
+    internal: true
+    cmds:
+      - pip install pip-tools pip setuptools wheel --upgrade
+
+  requirements-generate:
+    desc: Generation of requirements.txt from requirements.in
+    cmds:
+      - task: update-pip-build-tools
+      - pip-compile requirements-testing.in --output-file requirements-testing.txt --resolver=backtracking -q --strip-extras
+    sources:
+      - requirements-testing.in
+    generates:
+      - requirements-testing.txt
+    aliases:
+      - rg
+
+  install:
+    desc: Installation of relevant packages for the project
+    cmds:
+      - task: update-pip-build-tools
+      - cmd: pip-sync requirements-testing.txt -vv
+
+  tests:
+    aliases:
+      - test
+    desc: Runs tests from the dev machine shell
+    cmds:
+      - pytest
+
+  lint:
+    desc: Linting
+    cmds:
+      - black lbgpt/
+      - black tests/
+
+      - isort lbgpt/ --profile black --filter-files
+      - isort tests/ --profile black --filter-files

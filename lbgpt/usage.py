@@ -2,9 +2,8 @@ import dataclasses
 import datetime
 import sys
 
-
 if sys.version_info >= (3, 11):
-    from typing import Self, Optional
+    from typing import Optional, Self
 else:
     from typing_extensions import Self
 

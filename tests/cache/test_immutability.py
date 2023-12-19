@@ -16,7 +16,7 @@ def test_cache_immutability():
         request_timeout=10,
     )
 
-    res_base = 'PSez9z+xC/CxkHTYJ/4mMKic9Fdg6oRyRVeXu8AAtRI='
+    res_base = "PSez9z+xC/CxkHTYJ/4mMKic9Fdg6oRyRVeXu8AAtRI="
 
     for _ in range(20):
         res_next_pass = make_hash_chatgpt_request(single_request_content)
@@ -48,4 +48,6 @@ def test_cache_immutability_with_slack():
         request_timeout=10,
     )
 
-    assert make_hash_chatgpt_request(single_request_content_1) == make_hash_chatgpt_request(single_request_content_2)
+    assert make_hash_chatgpt_request(
+        single_request_content_1
+    ) == make_hash_chatgpt_request(single_request_content_2)

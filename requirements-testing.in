@@ -3,3 +3,15 @@ sentence-transformers
 langchain
 openai
 tenacity
+diskcache
+faiss-cpu
+pydantic<2.0
+
+
+# testing related
+black
+isort
+pytest
+vcrpy
+pytest-recording
+pytest-mock

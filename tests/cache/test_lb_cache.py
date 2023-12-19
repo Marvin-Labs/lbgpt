@@ -10,7 +10,6 @@ from pytest_mock import MockerFixture
 from lbgpt import ChatGPT
 from lbgpt.types import ChatCompletionAddition
 
-
 CACHES = [diskcache.Cache(tempfile.TemporaryDirectory().name)]
 
 

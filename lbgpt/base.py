@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 import abc
+import asyncio
 import datetime
 import sys
 from logging import getLogger
-import asyncio
 from statistics import median
 from typing import Any, Optional, Sequence
+
 import openai
 from openai.types.chat import ChatCompletion
 from tenacity import (
+    AsyncRetrying,
+    RetryCallState,
     retry_if_exception_type,
     stop_after_attempt,
     wait_random_exponential,
-    AsyncRetrying,
-    RetryCallState,
 )
 from tqdm.asyncio import tqdm
 
@@ -171,7 +172,9 @@ class _BaseGPT(abc.ABC):
                 return self.cache[hashed]
         return None
 
-    async def cached_chat_completion(self, **kwargs) -> Optional[ChatCompletionAddition]:
+    async def cached_chat_completion(
+        self, **kwargs
+    ) -> Optional[ChatCompletionAddition]:
         # this is standard cache. We are always trying standard cache first
         if self.cache is not None:
             hashed = make_hash_chatgpt_request(kwargs)
@@ -182,7 +185,9 @@ class _BaseGPT(abc.ABC):
         # if the item is not in the standard cache, we are trying the semantic cache (if available)
         # we are currently only supporting semantic cache for FAISS models
         if self.semantic_cache is not None:
-            sc: Optional[ChatCompletionAddition] = self.semantic_cache.query_cache(kwargs)
+            sc: Optional[ChatCompletionAddition] = self.semantic_cache.query_cache(
+                kwargs
+            )
             if sc is not None:
                 logger.debug("semantic cache hit")
                 return sc

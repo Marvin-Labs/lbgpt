@@ -6,7 +6,9 @@ from typing import Any
 from openai.types import CompletionCreateParams
 
 
-def non_message_parameters_from_create(chat_completion_create: CompletionCreateParams | dict[str, Any]) -> dict[str, Any]:
+def non_message_parameters_from_create(
+    chat_completion_create: CompletionCreateParams | dict[str, Any]
+) -> dict[str, Any]:
     return dict(
         model=chat_completion_create["model"],
         frequency_penalty=chat_completion_create.get("frequency_penalty", 0.0),
@@ -31,7 +33,9 @@ def make_hash_chatgpt_request(
 ) -> str:
     """Converting a chatgpt request to a hash for caching and deduplication purposes"""
 
-    non_message_parameters = non_message_parameters_from_create(chat_completion_create=chat_completion_create)
+    non_message_parameters = non_message_parameters_from_create(
+        chat_completion_create=chat_completion_create
+    )
 
     messages = [
         {
