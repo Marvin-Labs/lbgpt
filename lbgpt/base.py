@@ -2,10 +2,11 @@
 import abc
 import asyncio
 import datetime
+import logging
 import sys
 from logging import getLogger
 from statistics import median
-from typing import Any, Optional, Sequence
+from typing import Any, Optional, Sequence, Callable
 
 import openai
 from openai.types.chat import ChatCompletion
@@ -17,6 +18,7 @@ from tenacity import (
     wait_random_exponential,
 )
 from tqdm.asyncio import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
 from lbgpt.semantic_cache.base import _SemanticCacheBase
@@ -26,10 +28,15 @@ from lbgpt.usage import Usage, UsageStats
 logger = getLogger(__name__)
 
 
-def after_logging(retry_state: RetryCallState) -> None:
-    logger.warning(
-        f"Retrying: attempt {retry_state.attempt_number} ended with: {retry_state.outcome.exception()} after {'%0.3f' % retry_state.seconds_since_start}(s),",
-    )
+def after_logging(logger_level: int = logging.WARNING) -> Callable[[RetryCallState], None]:
+    def logging_function(retry_state: RetryCallState) -> None:
+        with logging_redirect_tqdm():
+            logger.log(
+                level=logger_level,
+                msg=f"Retrying request after {'%0.2f' % retry_state.seconds_since_start}s as attempt {retry_state.attempt_number} ended with `{retry_state.outcome.exception()}`",
+            )
+
+    return logging_function
 
 
 class _BaseGPT(abc.ABC):
@@ -58,6 +65,7 @@ class _BaseGPT(abc.ABC):
 
         self.limit_tpm = limit_tpm
         self.limit_rpm = limit_rpm
+
 
     @property
     def usage_cache_list(self) -> list[Usage]:
@@ -153,13 +161,13 @@ class _BaseGPT(abc.ABC):
         raise NotImplementedError
 
     async def chat_completion_list(
-        self, chatgpt_chat_completion_request_body_list: list[dict], show_progress=True
+        self, chatgpt_chat_completion_request_body_list: list[dict], show_progress=True, logging_level: int = logging.WARNING
     ) -> Sequence[ChatCompletionAddition]:
         self.refresh()
 
         return await tqdm.gather(
             *[
-                self.cached_chat_completion(**content)
+                self.cached_chat_completion(logging_level=logging_level, **content)
                 for content in chatgpt_chat_completion_request_body_list
             ],
             disable=not show_progress,
@@ -173,7 +181,7 @@ class _BaseGPT(abc.ABC):
         return None
 
     async def cached_chat_completion(
-        self, **kwargs
+        self, logging_level: int = logging.WARNING, **kwargs
     ) -> Optional[ChatCompletionAddition]:
         # this is standard cache. We are always trying standard cache first
         if self.cache is not None:
@@ -204,7 +212,7 @@ class _BaseGPT(abc.ABC):
                 stop=stop_after_attempt(self.stop_after_attempts)
                 if self.stop_after_attempts is not None
                 else None,
-                after=after_logging,
+                after=after_logging(logger_level=logging_level),
             ):
                 with attempt:
                     out: ChatCompletionAddition = await self.chat_completion(**kwargs)
