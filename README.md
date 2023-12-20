@@ -30,22 +30,6 @@ The `chat_completion_list` function expects a list of dictionaries with fully-fo
 By default, LBGPT processes five requests in parallel, but you can adjust this by setting the `max_concurrent_requests` parameter in the constructor.
 
 
-
-### Caching
-Take advantage of request caching to avoid redundant calls:
-
-```python
-import lbgpt
-import asyncio
-import diskcache
-
-cache = diskcache.Cache("cache_dir")
-chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", cache=cache)
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
-```
-
-While LBGPT is tested with [diskcache](https://pypi.org/project/diskcache/), it should work seamlessly with any cache that implements the `__getitem__` and `__setitem__` methods.
-
 ### Azure
 For users with an Azure account and proper OpenAI services setup, lbgpt offers an interface for Azure, similar to the OpenAI API. Here's how you can use it:
 
@@ -119,6 +103,56 @@ chatgpt = lbgpt.MultiLoadBalancedGPT(
     
 res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
 ```
+
+## Caching
+
+LBGPT implements two means of caching: basic caching and semantic cachin:
+
+* Basic caching: Caches the exact request and response.
+* Semantic caching: Caches the request and response, but allows for semantic variations in the messages in the request.
+
+Both caching methods can be combined. If both caches are used, requests are first requested from the basic cache. Only if the request is not found in the basic cache, the semantic cache is checked. If the request is not found in the semantic cache, the request is sent to the API and the response is cached in both caches.
+
+
+### Basic Caching
+Take advantage of request caching to avoid redundant calls:
+
+```python
+import lbgpt
+import asyncio
+import diskcache
+
+cache = diskcache.Cache("cache_dir")
+chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", cache=cache)
+res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+```
+
+While LBGPT is tested only with [diskcache](https://pypi.org/project/diskcache/), it should work seamlessly with any cache that implements the `__getitem__` and `__setitem__` methods.
+
+
+### Semantic Caching
+Semantic caching looks for semantic variations of the request in the cache. For example, if the request message is "Hello, how are you?", the semantic cache will also return a cached response for "Hello, how are you doing?". The semantic cache uses embedding models supported by HuggingFace to determine semantic similarity.
+
+```python
+import lbgpt
+from lbgpt.semantic_cache import FaissSemanticCache
+from langchain.embeddings import HuggingFaceEmbeddings
+
+import asyncio
+
+semantic_cache = FaissSemanticCache(
+        embedding_model=HuggingFaceEmbeddings(model_name="bert-base-uncased"),
+        cosine_similarity_threshold=0.95,
+        path='cache_dir'
+    )
+
+chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", semantic_cache=semantic_cache)
+res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+```
+
+Currently, the only supported semantic cache is the langchain interface to [FAISS](https://faiss.ai/). Please let us know if you would like to see support for other semantic caches. 
+
+In this example, all requests messages are embedded using the `bert-base-uncased` model from HuggingFace. The cosine similarity threshold determines how similar two messages must be to be considered semantically equivalent. The path parameter determines where the semantic cache is stored.
 
 
 ## How to Get API Keys
