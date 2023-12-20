@@ -1,21 +1,38 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import os
+import random
+import string
 import tempfile
+import time
 
 import pytest
 from langchain.embeddings import HuggingFaceEmbeddings
 from pytest_mock import MockerFixture
 
 from lbgpt import ChatGPT
-from lbgpt.semantic_cache.faiss_cache import FaissSemanticCache
+from lbgpt.semantic_cache import FaissSemanticCache, QdrantSemanticCache
 from lbgpt.types import ChatCompletionAddition
+
+# for qdrant we want to get truly random names. However, it may be that the random seed is set somewhere else,
+# so we have to create an instance of random.Random with a new seed here.
+rng = random.Random(time.time())
+
+
+TEST_EMBEDDING_MODEL = HuggingFaceEmbeddings(model_name="bert-base-uncased")
 
 SEMANTIC_CACHES = [
     lambda: FaissSemanticCache(
-        embedding_model=HuggingFaceEmbeddings(model_name="bert-base-uncased"),
+        embedding_model=TEST_EMBEDDING_MODEL,
         cosine_similarity_threshold=0.95,
         path=tempfile.TemporaryDirectory().name,
+    ),
+    lambda: QdrantSemanticCache(
+        embedding_model=TEST_EMBEDDING_MODEL,
+        cosine_similarity_threshold=0.95,
+        host="localhost",
+        port=6333,
+        collection_name=''.join(rng.choice(string.ascii_letters) for _ in range(20))
     )
 ]
 

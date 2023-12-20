@@ -36,6 +36,7 @@ tasks:
       - test
     desc: Runs tests from the dev machine shell
     cmds:
+      - task: docker:start
       - pytest
 
   lint:
@@ -46,3 +47,13 @@ tasks:
 
       - isort lbgpt/ --profile black --filter-files
       - isort tests/ --profile black --filter-files
+
+  docker:start:
+    desc: Starts docker containers
+    cmds:
+      - docker-compose up -d
+
+  docker:stop:
+    desc: Stops docker containers
+    cmds:
+      - docker-compose down

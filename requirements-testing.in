@@ -6,7 +6,7 @@ tenacity
 diskcache
 faiss-cpu
 pydantic<2.0
-
+qdrant-client
 
 # testing related
 black

@@ -1,4 +1,3 @@
-import math
 from pathlib import Path
 from typing import Any, Optional
 
@@ -16,8 +15,8 @@ class FaissSemanticCache(_SemanticCacheBase):
     def __init__(
         self,
         embedding_model: Embeddings,
-        cosine_similarity_threshold: float = 0.99,
         path: str | Path = "faiss_cache",
+        cosine_similarity_threshold: float = 0.99,
     ):
         super().__init__(
             embedding_model=embedding_model,

@@ -50,11 +50,27 @@ class _SemanticCacheBase(abc.ABC):
         return self.embeddings_model.embed_documents([txt])[0]
 
     def non_message_dict(
-        self, chat_completion_create: CompletionCreateParams | dict[str, Any]
+        self,
+        chat_completion_create: CompletionCreateParams | dict[str, Any],
+        allowed_types: Optional[Iterable] = None,
+        convert_not_allowed_to_empty: bool = True,
     ) -> dict[str, Any]:
-        return non_message_parameters_from_create(
+        res = non_message_parameters_from_create(
             chat_completion_create=chat_completion_create
         )
+
+        if allowed_types is not None:
+            if convert_not_allowed_to_empty:
+                res = {
+                    k: v if isinstance(v, tuple(allowed_types)) else ""
+                    for k, v in res.items()
+                }
+            else:
+                res = {
+                    k: v for k, v in res.items() if isinstance(v, tuple(allowed_types))
+                }
+
+        return res
 
     @abc.abstractmethod
     def query_cache(

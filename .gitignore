@@ -5,3 +5,4 @@
 /.idea
 __pycache__
 /.task/checksum/requirements-generate
+.ipynb_checkpoints/
