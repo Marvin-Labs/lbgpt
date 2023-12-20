@@ -1,0 +1,372 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtIeImxtDd1rGnTCXfjYb40QqKxP","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:01:27 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - 78206ab0-a6f6-4230-959c-fdae1f2e4470
+      azureml-model-session:
+      - d005-20231215030115
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - 78206ab0-a6f6-4230-959c-fdae1f2e4470
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '232'
+      x-ratelimit-remaining-tokens:
+      - '239600'
+      x-request-id:
+      - 95b18006-793a-4a05-860c-c2bcf5a41b52
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtIem0F3mrLpcY8bLbKnM8IbRCMT","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:01:28 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - 61177d28-5896-459e-b597-0dbb701e7c28
+      azureml-model-session:
+      - d003-20231215015810
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - 61177d28-5896-459e-b597-0dbb701e7c28
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '232'
+      x-ratelimit-remaining-tokens:
+      - '239600'
+      x-request-id:
+      - e91bde60-88f6-4cba-9a1c-7306552df25e
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtIeCOf37wHKOf93mVkXtSDosgzk","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:01:27 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - 34f7f51a-7a4d-47db-992e-77fb1b0275e3
+      azureml-model-session:
+      - d003-20231215015810
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - 34f7f51a-7a4d-47db-992e-77fb1b0275e3
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '231'
+      x-ratelimit-remaining-tokens:
+      - '239550'
+      x-request-id:
+      - eee1e9c3-4c01-4cb7-8360-7a7fd1bd771c
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtIeytwIryORERypaFtwiPVnNPbU","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:01:27 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - e7823d1c-a618-47e2-bcff-da2f98b7c1e8
+      azureml-model-session:
+      - d002-20231215012849
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - e7823d1c-a618-47e2-bcff-da2f98b7c1e8
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '231'
+      x-ratelimit-remaining-tokens:
+      - '239550'
+      x-request-id:
+      - 85c8309b-1afa-4b58-b7c7-4723d8a70311
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtIeMkb0KCWO7kA7x12wmQMIA5Dk","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:01:27 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - 196b0d71-665c-41a7-95d6-74bd3c0a324f
+      azureml-model-session:
+      - d002-20231215012849
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - 196b0d71-665c-41a7-95d6-74bd3c0a324f
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '232'
+      x-ratelimit-remaining-tokens:
+      - '239600'
+      x-request-id:
+      - c3ecede8-507b-4fcf-b35b-f42bafcf842a
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

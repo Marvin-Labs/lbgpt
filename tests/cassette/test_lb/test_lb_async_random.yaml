@@ -1,0 +1,432 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-3.5-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '197'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-8XtJqgPeXNELfhS1HETKJAp0OcoBX\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1703088162,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
+      null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
+      11,\n    \"completion_tokens\": 2,\n    \"total_tokens\": 13\n  },\n  \"system_fingerprint\":
+      null\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 83891c750f8bb47e-DXB
+      Cache-Control:
+      - no-cache, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:02:42 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=qSB.Q5h95pkC_dDgPUPBJc.H3Hxt3QVOKailYusIa.0-1703088162-1-Aa39duIrsdZW+Z/TED9cqtSgNWwsfk03xIn3Rh/K553FRvyBc0s3UVNNipHJmG7xijt9N40pHInnuCcl+wP7kd0=;
+        path=/; expires=Wed, 20-Dec-23 16:32:42 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=BTdnGXx2I45i6sVBzryWZQbBdTi5MMSDn9iLaEgdylg-1703088162531-0-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-model:
+      - gpt-3.5-turbo-0613
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '182'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '1000000'
+      x-ratelimit-limit-tokens_usage_based:
+      - '1000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '999943'
+      x-ratelimit-remaining-tokens_usage_based:
+      - '999943'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 3ms
+      x-ratelimit-reset-tokens_usage_based:
+      - 3ms
+      x-request-id:
+      - 58ca0de14acb558dcae9f18eeadbbb2b
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtJqfrq3KttTe1cc01Awu8Re1cQw","object":"chat.completion","created":1703088162,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:02:42 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - b8e4d0a6-955e-423c-add1-e55645395671
+      azureml-model-session:
+      - d003-20231215015810
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - b8e4d0a6-955e-423c-add1-e55645395671
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '239'
+      x-ratelimit-remaining-tokens:
+      - '239950'
+      x-request-id:
+      - 66f6c5b2-f61f-48ab-bf40-0b8e9fffeff6
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtJqI1r460hjzhNkZWyanX6gVwRM","object":"chat.completion","created":1703088162,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:02:42 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - ed8bc7c7-ace4-4d04-b7c3-a5e7581cbfc7
+      azureml-model-session:
+      - d003-20231215015810
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - ed8bc7c7-ace4-4d04-b7c3-a5e7581cbfc7
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '239'
+      x-ratelimit-remaining-tokens:
+      - '239950'
+      x-request-id:
+      - b4f05b46-7a10-4f60-9740-0d7d1c42772e
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-35-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      api-key:
+      - ee7c9ed25d7e4a029036b4305aa4a2ea
+      connection:
+      - keep-alive
+      content-length:
+      - '196'
+      content-type:
+      - application/json
+      host:
+      - openai-mlexperiment.openai.azure.com
+      user-agent:
+      - AsyncAzureOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+  response:
+    content: '{"id":"chatcmpl-8XtJq11XAyMn9hlKo8owbKrc4Thqt","object":"chat.completion","created":1703088162,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
+
+      '
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:02:42 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      access-control-allow-origin:
+      - '*'
+      apim-request-id:
+      - 141d2122-dea4-46ef-8000-2ef12b58d2c2
+      azureml-model-session:
+      - d005-20231215030115
+      x-accel-buffering:
+      - 'no'
+      x-content-type-options:
+      - nosniff
+      x-ms-client-request-id:
+      - 141d2122-dea4-46ef-8000-2ef12b58d2c2
+      x-ms-region:
+      - France Central
+      x-ratelimit-remaining-requests:
+      - '239'
+      x-ratelimit-remaining-tokens:
+      - '239950'
+      x-request-id:
+      - 1035e49d-0d8f-4e9c-a350-bae5ecdfb52e
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-3.5-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '197'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-8XtJqPJM3qKEdKScTHfVOeADC5YGA\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1703088162,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
+      null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
+      11,\n    \"completion_tokens\": 2,\n    \"total_tokens\": 13\n  },\n  \"system_fingerprint\":
+      null\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 83891c750fa0b476-DXB
+      Cache-Control:
+      - no-cache, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 20 Dec 2023 16:02:42 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=YXgHdAtHrm08bY_MbTV1YadSogGrJRAPcEv3vh7tiJ0-1703088162-1-AS6lq/6LPorkybr+AWAcSp1da+7TUKSP4kzjihfqZLbbFaCQ3EwOYAocaFe7B8m3Hpvvvcxo1qYBgVNrR/ejUg8=;
+        path=/; expires=Wed, 20-Dec-23 16:32:42 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=gRh8wO.fYP6OHGr1rdeDtCtdIYPsCI30hcCwVojVfdM-1703088162701-0-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-model:
+      - gpt-3.5-turbo-0613
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '284'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '1000000'
+      x-ratelimit-limit-tokens_usage_based:
+      - '1000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '999943'
+      x-ratelimit-remaining-tokens_usage_based:
+      - '999943'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 3ms
+      x-ratelimit-reset-tokens_usage_based:
+      - 3ms
+      x-request-id:
+      - 038a4d2d221f54056d996a5bed0b2429
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

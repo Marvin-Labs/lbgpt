@@ -3,16 +3,18 @@ import asyncio
 import os
 import random
 
+import pytest
 from pytest_mock import MockerFixture
 
 from lbgpt import AzureGPT, ChatGPT, LoadBalancedGPT
 from lbgpt.lbgpt import MultiLoadBalancedGPT
 from lbgpt.types import ChatCompletionAddition
 
-random.seed(42)
 
+@pytest.mark.vcr
+def test_lb_async_random(mocker: MockerFixture):
+    random.seed(42)
 
-def test_lb_async(mocker: MockerFixture):
     messages = [
         {"role": "user", "content": "please respond with pong"},
     ]
@@ -53,7 +55,10 @@ def test_lb_async(mocker: MockerFixture):
     assert azure.call_count + openai.call_count == 5
 
 
+@pytest.mark.vcr
 def test_lbgpt_max_headroom():
+    random.seed(42)
+
     messages = [
         {"role": "user", "content": "please respond with pong"},
     ]
@@ -70,7 +75,7 @@ def test_lbgpt_max_headroom():
 
     model_openai = ChatGPT(
         api_key=os.environ["OPEN_AI_API_KEY"],
-        limit_tpm=100,
+        limit_tpm=1000,
     )
 
     model_azure = AzureGPT(
@@ -94,8 +99,8 @@ def test_lbgpt_max_headroom():
     )
     assert len(lb.usage_cache_list) == 5
 
-    assert len(lb.gpts[0].usage_cache_list) < 5
-    assert len(lb.gpts[1].usage_cache_list) < 5
+    assert len(lb.gpts[0].usage_cache_list) == 5
+    assert len(lb.gpts[1].usage_cache_list) == 0
 
     assert len(res) == 5
     for k in res:
@@ -103,6 +108,7 @@ def test_lbgpt_max_headroom():
         assert isinstance(k, ChatCompletionAddition)
 
 
+@pytest.mark.vcr
 def test_chatgpt_async(mocker: MockerFixture):
     messages = [
         {"role": "user", "content": "please respond with pong"},
@@ -140,6 +146,7 @@ def test_chatgpt_async(mocker: MockerFixture):
     assert openai.call_count >= 5
 
 
+@pytest.mark.vcr
 def test_azure_async(mocker: MockerFixture):
     messages = [
         {"role": "user", "content": "please respond with pong"},
