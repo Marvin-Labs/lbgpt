@@ -150,7 +150,7 @@ chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", semantic_cache=semantic_cache)
 res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
 ```
 
-Currently, the only supported semantic cache is the langchain interface to [FAISS](https://faiss.ai/). Please let us know if you would like to see support for other semantic caches. 
+Currently, the only supported semantic caches are [FAISS](https://faiss.ai/) (via the [langchain](https://www.langchain.com/) interface) and [Qdrant](https://qdrant.tech/). Please let us know if you would like to see support for other semantic caches. 
 
 In this example, all requests messages are embedded using the `bert-base-uncased` model from HuggingFace. The cosine similarity threshold determines how similar two messages must be to be considered semantically equivalent. The path parameter determines where the semantic cache is stored.
 
