@@ -32,8 +32,8 @@ SEMANTIC_CACHES = [
         cosine_similarity_threshold=0.95,
         host="localhost",
         port=6333,
-        collection_name=''.join(rng.choice(string.ascii_letters) for _ in range(20))
-    )
+        collection_name="".join(rng.choice(string.ascii_letters) for _ in range(20)),
+    ),
 ]
 
 

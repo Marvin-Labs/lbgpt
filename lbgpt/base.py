@@ -6,7 +6,7 @@ import logging
 import sys
 from logging import getLogger
 from statistics import median
-from typing import Any, Optional, Sequence, Callable
+from typing import Any, Callable, Optional, Sequence
 
 import openai
 from openai.types.chat import ChatCompletion
@@ -28,7 +28,9 @@ from lbgpt.usage import Usage, UsageStats
 logger = getLogger(__name__)
 
 
-def after_logging(logger_level: int = logging.WARNING) -> Callable[[RetryCallState], None]:
+def after_logging(
+    logger_level: int = logging.WARNING,
+) -> Callable[[RetryCallState], None]:
     def logging_function(retry_state: RetryCallState) -> None:
         with logging_redirect_tqdm():
             logger.log(
@@ -65,7 +67,6 @@ class _BaseGPT(abc.ABC):
 
         self.limit_tpm = limit_tpm
         self.limit_rpm = limit_rpm
-
 
     @property
     def usage_cache_list(self) -> list[Usage]:
@@ -161,7 +162,10 @@ class _BaseGPT(abc.ABC):
         raise NotImplementedError
 
     async def chat_completion_list(
-        self, chatgpt_chat_completion_request_body_list: list[dict], show_progress=True, logging_level: int = logging.WARNING
+        self,
+        chatgpt_chat_completion_request_body_list: list[dict],
+        show_progress=True,
+        logging_level: int = logging.WARNING,
     ) -> Sequence[ChatCompletionAddition]:
         self.refresh()
 

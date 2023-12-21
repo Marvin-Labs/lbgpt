@@ -32,7 +32,9 @@ class QdrantSemanticCache(_SemanticCacheBase):
         self.qdrant_client = QdrantClient(host=host, port=port)
         self.collection_name = collection_name
 
-        existing_collection_names = [k.name for k in self.qdrant_client.get_collections().collections]
+        existing_collection_names = [
+            k.name for k in self.qdrant_client.get_collections().collections
+        ]
         if collection_name not in existing_collection_names:
             # it is surprisingly difficult to figure out how long an embedding model is. Thus, we are actually
             # embedding a string here and then checking the length of the embedding
