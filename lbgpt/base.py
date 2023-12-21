@@ -211,8 +211,9 @@ class _BaseGPT(abc.ABC):
                 logger.debug("standard cache hit")
 
                 if self.propagate_standard_cache_to_semantic_cache:
-                    logger.debug("propagating standard cache to semantic cache")
-                    self.semantic_cache.add_cache(kwargs, out)
+                    if self.semantic_cache.query_cache(kwargs) is None:
+                        logger.debug("propagating standard cache to semantic cache")
+                        self.semantic_cache.add_cache(kwargs, out)
 
                 return out
 
