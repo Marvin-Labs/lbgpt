@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import logging
 import sys
+import warnings
 from logging import getLogger
 from statistics import median
 from typing import Any, Callable, Optional, Sequence
@@ -52,6 +53,7 @@ class _BaseGPT(abc.ABC):
         max_usage_cache_size: Optional[int] = 1_000,
         limit_tpm: Optional[int] = None,
         limit_rpm: Optional[int] = None,
+        propagate_standard_cache_to_semantic_cache: bool = False,
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
@@ -67,6 +69,20 @@ class _BaseGPT(abc.ABC):
 
         self.limit_tpm = limit_tpm
         self.limit_rpm = limit_rpm
+
+        self.propagate_standard_cache_to_semantic_cache = (
+            propagate_standard_cache_to_semantic_cache
+        )
+
+        # this is a silly configuration (propagating to semantic cache without having a semantic cache)
+        if (
+            self.propagate_standard_cache_to_semantic_cache
+            and self.semantic_cache is None
+        ):
+            self.propagate_standard_cache_to_semantic_cache = False
+            warnings.warn(
+                "propagate_standard_cache_to_semantic_cache is True, but no semantic cache is provided. There will be no propagation."
+            )
 
     @property
     def usage_cache_list(self) -> list[Usage]:
@@ -192,6 +208,12 @@ class _BaseGPT(abc.ABC):
             hashed = make_hash_chatgpt_request(kwargs)
             out = self._request_from_cache(hashed)
             if out is not None:
+                logger.debug("standard cache hit")
+
+                if self.propagate_standard_cache_to_semantic_cache:
+                    logger.debug("propagating standard cache to semantic cache")
+                    self.semantic_cache.add_cache(kwargs, out)
+
                 return out
 
         # if the item is not in the standard cache, we are trying the semantic cache (if available)

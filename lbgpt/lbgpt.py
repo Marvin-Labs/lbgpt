@@ -27,6 +27,7 @@ class ChatGPT(_BaseGPT):
         request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
+        propagate_standard_cache_to_semantic_cache: bool = False,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
         max_usage_cache_size: Optional[int] = 1_000,
@@ -36,6 +37,7 @@ class ChatGPT(_BaseGPT):
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
+            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -86,6 +88,7 @@ class AzureGPT(_BaseGPT):
         azure_model_map: dict[str, str],
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
+        propagate_standard_cache_to_semantic_cache: bool = False,
         azure_openai_version: str = "2023-05-15",
         azure_openai_type: str = "azure",
         max_parallel_calls: int = 5,
@@ -99,6 +102,7 @@ class AzureGPT(_BaseGPT):
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
+            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -165,6 +169,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
         allocation_function_weights: Optional[Sequence] = None,
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
+        propagate_standard_cache_to_semantic_cache: bool = False,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
     ):
@@ -190,6 +195,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
+            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             max_parallel_calls=sum([gpt.max_parallel_calls for gpt in gpts]),
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -223,6 +229,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
         azure_model_map: dict[str, str],
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
+        propagate_standard_cache_to_semantic_cache: bool = False,
         azure_openai_version: str = "2023-05-15",
         azure_openai_type: str = "azure",
         max_parallel_calls_openai: int = 5,
@@ -235,6 +242,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             api_key=openai_api_key,
             cache=cache,
             semantic_cache=semantic_cache,
+            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             max_parallel_calls=max_parallel_calls_openai,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -247,6 +255,8 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             azure_openai_version=azure_openai_version,
             azure_openai_type=azure_openai_type,
             cache=cache,
+            semantic_cache=semantic_cache,
+            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             max_parallel_calls=max_parallel_calls_azure,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
@@ -255,6 +265,8 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
         super().__init__(
             gpts=[self.openai, self.azure],
             cache=cache,
+            semantic_cache=semantic_cache,
+            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             allocation_function="random",
             allocation_function_weights=[
                 ratio_openai_to_azure,
