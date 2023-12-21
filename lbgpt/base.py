@@ -195,10 +195,10 @@ class _BaseGPT(abc.ABC):
 
     def _request_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
-            if hashed in self.cache:
+            out = self.cache.get(hashed)
+            if out is not None:
                 logger.debug("standard cache hit")
-                return self.cache[hashed]
-        return None
+                return out
 
     async def cached_chat_completion(
         self, logging_level: int = logging.WARNING, **kwargs
@@ -207,20 +207,17 @@ class _BaseGPT(abc.ABC):
         if self.cache is not None:
             hashed = make_hash_chatgpt_request(kwargs)
             out = self._request_from_cache(hashed)
-            if out is not None:
-                logger.debug("standard cache hit")
-
-                if self.propagate_standard_cache_to_semantic_cache:
-                    if self.semantic_cache.query_cache(kwargs) is None:
-                        logger.debug("propagating standard cache to semantic cache")
-                        self.semantic_cache.add_cache(kwargs, out)
+            if out is not None and self.propagate_standard_cache_to_semantic_cache:
+                if self.semantic_cache.query_cache(kwargs) is None:
+                    logger.debug("propagating standard cache to semantic cache")
+                    await self.semantic_cache.add_cache(kwargs, out)
 
                 return out
 
         # if the item is not in the standard cache, we are trying the semantic cache (if available)
         # we are currently only supporting semantic cache for FAISS models
         if self.semantic_cache is not None:
-            sc: Optional[ChatCompletionAddition] = self.semantic_cache.query_cache(
+            sc: Optional[ChatCompletionAddition] = await self.semantic_cache.query_cache(
                 kwargs
             )
             if sc is not None:
@@ -252,7 +249,7 @@ class _BaseGPT(abc.ABC):
                 return None
 
         if self.semantic_cache is not None:
-            self.semantic_cache.add_cache(kwargs, out)
+            await self.semantic_cache.add_cache(kwargs, out)
 
         if self.cache is not None:
             self.cache[hashed] = out

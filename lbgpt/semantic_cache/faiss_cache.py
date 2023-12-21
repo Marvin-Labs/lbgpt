@@ -44,12 +44,12 @@ class FaissSemanticCache(_SemanticCacheBase):
                 distance_strategy=DistanceStrategy.COSINE,
             )
 
-    def query_cache(
+    async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
         query = get_completion_create_params(**query)
 
-        res = self.faiss_.similarity_search_with_score_by_vector(
+        res = await self.faiss_.asimilarity_search_with_score_by_vector(
             embedding=self.embed_messages(query["messages"]),
             filter=self.non_message_dict(query),
             k=1,
@@ -64,7 +64,7 @@ class FaissSemanticCache(_SemanticCacheBase):
         else:
             return
 
-    def add_cache(
+    async def add_cache(
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
         query = get_completion_create_params(**query)

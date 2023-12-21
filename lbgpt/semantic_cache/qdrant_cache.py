@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import ChatCompletion, CompletionCreateParams
-from qdrant_client import QdrantClient
+from qdrant_client import AsyncQdrantClient, QdrantClient
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
 from qdrant_client.models import Distance, VectorParams
 
@@ -32,20 +32,28 @@ class QdrantSemanticCache(_SemanticCacheBase):
         )
 
         # setting up the Qdrant client properly
-        self.qdrant_client = QdrantClient(
+        # we are setting up a synchroneous and an asynchroneous client
+        # the synchroneous client is used for special operations like counting, listing, where we actually
+        # care about precision
+
+        self.qdrant_client = AsyncQdrantClient(
             host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
         )
+        self._sync_qdrant_client = QdrantClient(host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {}))
+
         self.collection_name = collection_name
 
+        collection_result = self._sync_qdrant_client.get_collections()
+
         existing_collection_names = [
-            k.name for k in self.qdrant_client.get_collections().collections
+            k.name for k in collection_result.collections
         ]
         if collection_name not in existing_collection_names:
             # it is surprisingly difficult to figure out how long an embedding model is. Thus, we are actually
             # embedding a string here and then checking the length of the embedding
             _test_embedding = embedding_model.embed_query("test")
 
-            self.qdrant_client.create_collection(
+            self._sync_qdrant_client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
                     size=len(_test_embedding), distance=Distance.COSINE
@@ -62,7 +70,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             raise NotImplementedError(f"cannot process type {type(value)}")
 
-    def query_cache(
+    async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
         query = get_completion_create_params(**query)
@@ -78,7 +86,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
             ]
         )
 
-        res = self.qdrant_client.search(
+        res = await self.qdrant_client.search(
             collection_name=self.collection_name,
             query_vector=self.embed_messages(query["messages"]),
             query_filter=query_filter,
@@ -97,12 +105,12 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             return
 
-    def add_cache(
+    async def add_cache(
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
         query = get_completion_create_params(**query)
 
-        self.qdrant_client.upsert(
+        await self.qdrant_client.upsert(
             collection_name=self.collection_name,
             wait=False,
             points=[
@@ -127,4 +135,4 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
     @property
     def count(self) -> int:
-        return self.qdrant_client.count(collection_name=self.collection_name).count
+        return self._sync_qdrant_client.count(collection_name=self.collection_name).count

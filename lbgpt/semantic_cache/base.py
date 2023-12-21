@@ -73,13 +73,13 @@ class _SemanticCacheBase(abc.ABC):
         return res
 
     @abc.abstractmethod
-    def query_cache(
+    async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
         return None
 
     @abc.abstractmethod
-    def add_cache(
+    async def add_cache(
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
         raise NotImplementedError()

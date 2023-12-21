@@ -17,7 +17,7 @@ interactions:
       host:
       - api.openai.com
       user-agent:
-      - AsyncOpenAI/Python 1.3.8
+      - AsyncOpenAI/Python 1.5.0
       x-stainless-arch:
       - x64
       x-stainless-async:
@@ -27,7 +27,7 @@ interactions:
       x-stainless-os:
       - Linux
       x-stainless-package-version:
-      - 1.3.8
+      - 1.5.0
       x-stainless-runtime:
       - CPython
       x-stainless-runtime-version:
@@ -35,8 +35,8 @@ interactions:
     method: POST
     uri: https://api.openai.com/v1/chat/completions
   response:
-    content: "{\n  \"id\": \"chatcmpl-8XQGfHjNcvZ9UHCXayIJXb0egVYwF\",\n  \"object\":
-      \"chat.completion\",\n  \"created\": 1702976489,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+    content: "{\n  \"id\": \"chatcmpl-8YBX5JCBw84tLSAY1Q9DXtRJ48cDC\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1703158175,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
       \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
       \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
       null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
@@ -46,7 +46,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 837e7613fac61262-DXB
+      - 838fc9c27be8b476-DXB
       Cache-Control:
       - no-cache, must-revalidate
       Connection:
@@ -56,14 +56,14 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Tue, 19 Dec 2023 09:01:30 GMT
+      - Thu, 21 Dec 2023 11:29:36 GMT
       Server:
       - cloudflare
       Set-Cookie:
-      - __cf_bm=sCMOandH5h_FdmaFqllcH2riLyspdWvFlCLhLmGQ1oU-1702976490-1-AdwFZGjGBqxh3otL8xgMTNI1P1A+11+Xrba+XNLceMB8ygFx1YGX3o8RQ8ZERnLiSaVwU35mrAWFI0u0iIdut5U=;
-        path=/; expires=Tue, 19-Dec-23 09:31:30 GMT; domain=.api.openai.com; HttpOnly;
+      - __cf_bm=VQ544wdJlRlqIDFTgD6d2GJEvihb5CIq4SnerZMSEFU-1703158176-1-AaFWqaKsUpRvVlCWvnCqE+et2tif+ZBCKLKqvzbigIvYE6dqBhVAU+Ozc4/Q+i/wHKUumysM9yclzhqsNjHT8h0=;
+        path=/; expires=Thu, 21-Dec-23 11:59:36 GMT; domain=.api.openai.com; HttpOnly;
         Secure; SameSite=None
-      - _cfuvid=OZgqVRdurw8pzVfFxjTj7w4FPQmS0K6QazsnByTzVTk-1702976490286-0-604800000;
+      - _cfuvid=wPkJSOfVJ45uMPSZ5oDRlhlRDSx5r3Bh3wtAQshuMA4-1703158176134-0-604800000;
         path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
       Transfer-Encoding:
       - chunked
@@ -76,7 +76,111 @@ interactions:
       openai-organization:
       - marvin-labs
       openai-processing-ms:
-      - '369'
+      - '471'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '1000000'
+      x-ratelimit-limit-tokens_usage_based:
+      - '1000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '999942'
+      x-ratelimit-remaining-tokens_usage_based:
+      - '999942'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 3ms
+      x-ratelimit-reset-tokens_usage_based:
+      - 3ms
+      x-request-id:
+      - 17abdf5f9332392a303c8b678b9d0e7e
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-3.5-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '197'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.5.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.5.0
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.4
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-8YBX6uew9uFyMNZc6U0aSAZremNZa\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1703158176,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
+      null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
+      11,\n    \"completion_tokens\": 2,\n    \"total_tokens\": 13\n  },\n  \"system_fingerprint\":
+      null\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 838fc9c92bbc125a-DXB
+      Cache-Control:
+      - no-cache, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 21 Dec 2023 11:29:37 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=Bn6gsAxLtXvR0iPeb4T2MX0fWjitZpKaZQhGREVgxXU-1703158177-1-AelrU6gLXp+Z05mV4MSs17KnxLUbMtDW6+j7t95ho8IjGTxMRauHqo3MaiLqlG5zpeuwGHjpnWLhMFvNh4ya5Q0=;
+        path=/; expires=Thu, 21-Dec-23 11:59:37 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=hIGhhR8c3gmgXJPS.rQYx.P.KsTXCU5Nz6dUT4tFhBs-1703158177220-0-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-model:
+      - gpt-3.5-turbo-0613
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '511'
       openai-version:
       - '2020-10-01'
       strict-transport-security:
@@ -100,7 +204,7 @@ interactions:
       x-ratelimit-reset-tokens_usage_based:
       - 3ms
       x-request-id:
-      - 0f8634e32a527730b0a58483bb754ef2
+      - e73e9cf290674efc33470d46095bab57
     http_version: HTTP/1.1
     status_code: 200
 version: 1
