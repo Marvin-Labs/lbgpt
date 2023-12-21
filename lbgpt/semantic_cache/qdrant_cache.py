@@ -18,9 +18,12 @@ class QdrantSemanticCache(_SemanticCacheBase):
     def __init__(
         self,
         embedding_model: Embeddings,
-        host: str,
         collection_name: str,
-        port: int = 6333,
+        host: Optional[str] = None,
+        port: Optional[int] = 6333,
+        url: Optional[str] = None,
+        api_key: Optional[str] = None,
+        qdrant_properties: Optional[dict[str, Any]] = None,
         cosine_similarity_threshold: float = 0.99,
     ):
         super().__init__(
@@ -29,7 +32,9 @@ class QdrantSemanticCache(_SemanticCacheBase):
         )
 
         # setting up the Qdrant client properly
-        self.qdrant_client = QdrantClient(host=host, port=port)
+        self.qdrant_client = QdrantClient(
+            host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
+        )
         self.collection_name = collection_name
 
         existing_collection_names = [
