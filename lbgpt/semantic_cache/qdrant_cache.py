@@ -6,6 +6,7 @@ import tenacity
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import ChatCompletion, CompletionCreateParams
 from qdrant_client import AsyncQdrantClient, QdrantClient
+from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
 from qdrant_client.models import Distance, VectorParams
 from tenacity import retry_if_exception_type, wait_random_exponential
@@ -73,7 +74,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
             raise NotImplementedError(f"cannot process type {type(value)}")
 
     @tenacity.retry(
-        retry=(retry_if_exception_type(TimeoutError)),
+        retry=(retry_if_exception_type(ResponseHandlingException)),
         wait=wait_random_exponential(min=5, max=60),
     )
     async def query_cache(
@@ -114,7 +115,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
 
     @tenacity.retry(
-        retry=(retry_if_exception_type(TimeoutError)),
+        retry=(retry_if_exception_type(ResponseHandlingException)),
         wait=wait_random_exponential(min=5, max=60),
     )
     async def add_cache(
