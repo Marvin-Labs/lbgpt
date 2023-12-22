@@ -213,7 +213,12 @@ class _BaseGPT(abc.ABC):
                 hashed = make_hash_chatgpt_request(kwargs)
                 out = self._request_from_cache(hashed)
                 if out is not None and self.propagate_standard_cache_to_semantic_cache:
-                    if await self.semantic_cache.query_cache(kwargs) is None:
+                    try:
+                        existing_item = await self.semantic_cache.query_cache(kwargs)
+                    except TimeoutError:
+                        existing_item = None
+
+                    if existing_item is None:
                         logger.debug("propagating standard cache to semantic cache")
                         await self.semantic_cache.add_cache(kwargs, out)
 
