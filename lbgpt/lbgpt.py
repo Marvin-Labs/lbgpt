@@ -172,6 +172,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
         propagate_standard_cache_to_semantic_cache: bool = False,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
+        max_parallel_requests: Optional[int] = None,
     ):
         self.gpts = gpts
 
@@ -191,12 +192,14 @@ class MultiLoadBalancedGPT(_BaseGPT):
             ), "if provided, `allocation_function_weights` must be the same length as gpts"
 
         self.allocation_function_weights = allocation_function_weights
+        if max_parallel_requests is None:
+            max_parallel_requests = sum([gpt.max_parallel_calls for gpt in gpts])
 
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
             propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
-            max_parallel_calls=sum([gpt.max_parallel_calls for gpt in gpts]),
+            max_parallel_calls=max_parallel_requests,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
         )
