@@ -215,7 +215,7 @@ class _BaseGPT(abc.ABC):
                 if out is not None and self.propagate_standard_cache_to_semantic_cache:
                     try:
                         existing_item = await self.semantic_cache.query_cache(kwargs)
-                    except TimeoutError:
+                    except Exception:
                         existing_item = None
 
                     if existing_item is None:
