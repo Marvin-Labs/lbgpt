@@ -2,11 +2,13 @@ import uuid
 from types import NoneType
 from typing import Any, Optional
 
+import tenacity
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import ChatCompletion, CompletionCreateParams
 from qdrant_client import AsyncQdrantClient, QdrantClient
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
 from qdrant_client.models import Distance, VectorParams
+from tenacity import retry_if_exception_type, wait_random_exponential
 
 from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition
@@ -39,15 +41,15 @@ class QdrantSemanticCache(_SemanticCacheBase):
         self.qdrant_client = AsyncQdrantClient(
             host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
         )
-        self._sync_qdrant_client = QdrantClient(host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {}))
+        self._sync_qdrant_client = QdrantClient(
+            host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
+        )
 
         self.collection_name = collection_name
 
         collection_result = self._sync_qdrant_client.get_collections()
 
-        existing_collection_names = [
-            k.name for k in collection_result.collections
-        ]
+        existing_collection_names = [k.name for k in collection_result.collections]
         if collection_name not in existing_collection_names:
             # it is surprisingly difficult to figure out how long an embedding model is. Thus, we are actually
             # embedding a string here and then checking the length of the embedding
@@ -70,6 +72,10 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             raise NotImplementedError(f"cannot process type {type(value)}")
 
+    @tenacity.retry(
+        retry=(retry_if_exception_type(TimeoutError)),
+        wait=wait_random_exponential(min=5, max=60),
+    )
     async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
@@ -106,6 +112,11 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             return
 
+
+    @tenacity.retry(
+        retry=(retry_if_exception_type(TimeoutError)),
+        wait=wait_random_exponential(min=5, max=60),
+    )
     async def add_cache(
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
@@ -136,4 +147,6 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
     @property
     def count(self) -> int:
-        return self._sync_qdrant_client.count(collection_name=self.collection_name).count
+        return self._sync_qdrant_client.count(
+            collection_name=self.collection_name
+        ).count
