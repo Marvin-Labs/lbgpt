@@ -93,6 +93,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
             with_payload=True,
             with_vectors=False,
             limit=1,
+            score_threshold=self.cosine_similarity_threshold,
         )
 
         res = [r for r in res if r.score >= self.cosine_similarity_threshold]

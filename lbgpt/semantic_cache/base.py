@@ -46,7 +46,7 @@ class _SemanticCacheBase(abc.ABC):
         return txt
 
     def embed_messages(self, messages: list[dict[str, Any]]) -> list[float]:
-        txt = "".join([self.message_to_text(message) for message in messages])
+        txt = self.messages_to_text(messages)
         return self.embeddings_model.embed_documents([txt])[0]
 
     def non_message_dict(
