@@ -271,6 +271,7 @@ class _BaseGPT(abc.ABC):
             if self.semantic_cache is not None:
                 await self.semantic_cache.add_cache(kwargs, out)
 
-            self._set_to_cache(hashed, out)
+            if self.cache is not None:
+                self._set_to_cache(hashed, out)
 
             return out
