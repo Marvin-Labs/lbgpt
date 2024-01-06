@@ -229,7 +229,7 @@ class _BaseGPT(abc.ABC):
 
                         if existing_item is None:
                             logger.debug("propagating standard cache to semantic cache")
-                        await self.semantic_cache.add_cache(kwargs, out)
+                            await self.semantic_cache.add_cache(kwargs, out)
 
                     # but return in any case
                     return out
