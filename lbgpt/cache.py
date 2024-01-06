@@ -48,7 +48,7 @@ def make_hash_chatgpt_request(
     hasher = hashlib.sha256()
     hasher.update(repr(make_hashable(non_message_parameters)).encode())
     hasher.update(repr(make_hashable(messages)).encode())
-    return base64.b64encode(hasher.digest()).decode()
+    return f'lbgpt_{base64.b64encode(hasher.digest()).decode()}'
 
 
 def make_hashable(o):

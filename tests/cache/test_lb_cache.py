@@ -6,15 +6,37 @@ import tempfile
 import diskcache
 import pytest
 from pytest_mock import MockerFixture
+import redis
 
 from lbgpt import ChatGPT
 from lbgpt.types import ChatCompletionAddition
 
-CACHES = [diskcache.Cache(tempfile.TemporaryDirectory().name)]
+
+redis_cache = redis.StrictRedis(
+    host="localhost",
+    port=6378,  # this is the port configured in the compose.yml file
+)
+
+redis_cache.flushdb()
+
+
+CACHES = [
+    diskcache.Cache(tempfile.TemporaryDirectory().name),
+    redis_cache
+]
+
+
+def _num_keys_in_cache(cache) -> int:
+    if isinstance(cache, redis.StrictRedis):
+        return cache.dbsize()
+    elif hasattr(cache, "count"):
+        return cache.count
+    else:
+        raise NotImplementedError
 
 
 @pytest.mark.parametrize("cache", CACHES)
-@pytest.mark.vcr
+@pytest.mark.vcr(ignore_localhost=True)
 def test_chatgpt_cache(mocker: MockerFixture, cache):
     messages = [
         {"role": "user", "content": "please respond with pong"},
@@ -37,8 +59,9 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
         cache=cache,
     )
 
-    # Setting the cache
-    cache_interaction = mocker.spy(lb, "_request_from_cache")
+    # Setting the mocks
+    cache_interaction = mocker.spy(lb, "_get_from_cache")
+    request_interaction = mocker.spy(lb, "chat_completion")
 
     # run with an empty cache
     asyncio.run(lb.chat_completion_list([single_request_content], show_progress=False))
@@ -48,10 +71,11 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
     assert cache_interaction.spy_return is None
 
     # some cache stats and hash
-    cache_stats = {"hash": hash(cache)}
+    cache_stats = {
+        "hash": hash(cache),
+        'count': _num_keys_in_cache(cache)
 
-    if hasattr(cache, "count"):
-        cache_stats["count"] = cache.count
+    }
 
     # Getting from cache
     asyncio.run(lb.chat_completion_list([single_request_content], show_progress=False))
@@ -61,6 +85,8 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
     assert isinstance(cache_interaction.spy_return, ChatCompletionAddition)
 
     # asserting that no items were added to the cache
-    if hasattr(cache, "count"):
-        assert cache.count == cache_stats["count"]
     assert hash(cache) == cache_stats["hash"]
+    assert _num_keys_in_cache(cache) == cache_stats["count"]
+
+    # assert that chatgpt was requested only once
+    assert request_interaction.call_count == 1

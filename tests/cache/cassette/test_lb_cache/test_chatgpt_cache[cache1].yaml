@@ -35,7 +35,7 @@ interactions:
     method: POST
     uri: https://api.openai.com/v1/chat/completions
   response:
-    content: "{\n  \"id\": \"chatcmpl-8e2dAE03p3wCiPTzPeOSVbeObNx5x\",\n  \"object\":
+    content: "{\n  \"id\": \"chatcmpl-8e2dALeq3PshhbQJpqrEBTsqyRmqy\",\n  \"object\":
       \"chat.completion\",\n  \"created\": 1704553924,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
       \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
       \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
@@ -46,7 +46,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 8414e5a63de2b47e-DXB
+      - 8414e5acbb92b479-DXB
       Cache-Control:
       - no-cache, must-revalidate
       Connection:
@@ -56,14 +56,14 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Sat, 06 Jan 2024 15:12:04 GMT
+      - Sat, 06 Jan 2024 15:12:05 GMT
       Server:
       - cloudflare
       Set-Cookie:
-      - __cf_bm=_LYyjoz7z8X4JZ_CPBIS8jOZYfY2Pej.m1nmubqRFXY-1704553924-1-AetT+jWC/BX4VLKIgZU2sYpkogxir3VEB4yUckw55mAT3VOgjOCneQJqramYANhPu9+BfEvMWY9D+FhNjbVoGy8=;
-        path=/; expires=Sat, 06-Jan-24 15:42:04 GMT; domain=.api.openai.com; HttpOnly;
+      - __cf_bm=uZ_B2hrtWA4sAS93J5cYo9JlBYkW7XsSASswlc5pzbg-1704553925-1-AffG4xVG+Q8RX22eYiq9Y1fUXeHJJF3tvbn3wP6tV9IFiWTPzBDKASxKKXznI7U7avQZ/hunvTnAKRg5shBtWaM=;
+        path=/; expires=Sat, 06-Jan-24 15:42:05 GMT; domain=.api.openai.com; HttpOnly;
         Secure; SameSite=None
-      - _cfuvid=gtRBREOfL4wTF1NbGAQMbQO0zqB9EaFtJYmI6pnZyFo-1704553924529-0-604800000;
+      - _cfuvid=.NUTVe0frdw5gLnp7H20lceX2DXVZoSKOToE__JWLsE-1704553925120-0-604800000;
         path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
       Transfer-Encoding:
       - chunked
@@ -76,7 +76,7 @@ interactions:
       openai-organization:
       - marvin-labs
       openai-processing-ms:
-      - '434'
+      - '246'
       openai-version:
       - '2020-10-01'
       strict-transport-security:
@@ -100,7 +100,7 @@ interactions:
       x-ratelimit-reset-tokens_usage_based:
       - 3ms
       x-request-id:
-      - 1f27146f3217a7613133bfbdeb79997d
+      - a2216eb99a7175be6c839dda241e296d
     http_version: HTTP/1.1
     status_code: 200
 version: 1

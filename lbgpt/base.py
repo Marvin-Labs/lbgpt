@@ -2,6 +2,7 @@
 import abc
 import asyncio
 import datetime
+import json
 import logging
 import sys
 import warnings
@@ -10,6 +11,7 @@ from statistics import median
 from typing import Any, Callable, Optional, Sequence
 
 import openai
+from openai._compat import model_dump, model_parse
 from openai.types.chat import ChatCompletion
 from tenacity import (
     AsyncRetrying,
@@ -193,12 +195,16 @@ class _BaseGPT(abc.ABC):
             disable=not show_progress,
         )
 
-    def _request_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
+    def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
             out = self.cache.get(hashed)
             if out is not None:
                 logger.debug("standard cache hit")
-                return out
+                return model_parse(ChatCompletionAddition, json.loads(out))
+
+    def _set_to_cache(self, hashed: str, value: ChatCompletionAddition):
+        if self.cache is not None:
+            self.cache.set(hashed, json.dumps(model_dump(value)))
 
     async def cached_chat_completion(
         self, logging_level: int = logging.WARNING, **kwargs
@@ -207,21 +213,25 @@ class _BaseGPT(abc.ABC):
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
 
-        async with self.semaphore:
+        async with (self.semaphore):
             # this is standard cache. We are always trying standard cache first
             if self.cache is not None:
                 hashed = make_hash_chatgpt_request(kwargs)
-                out = self._request_from_cache(hashed)
-                if out is not None and self.propagate_standard_cache_to_semantic_cache:
-                    try:
-                        existing_item = await self.semantic_cache.query_cache(kwargs)
-                    except Exception:
-                        existing_item = None
+                out = self._get_from_cache(hashed)
+                if out is not None:
 
-                    if existing_item is None:
-                        logger.debug("propagating standard cache to semantic cache")
+                    # propagate to semantic cache if required
+                    if self.propagate_standard_cache_to_semantic_cache:
+                        try:
+                            existing_item = await self.semantic_cache.query_cache(kwargs)
+                        except Exception:
+                            existing_item = None
+
+                        if existing_item is None:
+                            logger.debug("propagating standard cache to semantic cache")
                         await self.semantic_cache.add_cache(kwargs, out)
 
+                    # but return in any case
                     return out
 
             # if the item is not in the standard cache, we are trying the semantic cache (if available)
@@ -261,7 +271,6 @@ class _BaseGPT(abc.ABC):
             if self.semantic_cache is not None:
                 await self.semantic_cache.add_cache(kwargs, out)
 
-            if self.cache is not None:
-                self.cache[hashed] = out
+            self._set_to_cache(hashed, out)
 
             return out
