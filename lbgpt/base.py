@@ -171,10 +171,6 @@ class _BaseGPT(abc.ABC):
 
         return min([headroom_tpm, headroom_rpm])
 
-    def refresh(self) -> None:
-        semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
-        self.semaphore = semaphore
-
     @abc.abstractmethod
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         raise NotImplementedError
@@ -185,7 +181,6 @@ class _BaseGPT(abc.ABC):
         show_progress=True,
         logging_level: int = logging.WARNING,
     ) -> Sequence[ChatCompletionAddition]:
-        self.refresh()
 
         return await tqdm.gather(
             *[

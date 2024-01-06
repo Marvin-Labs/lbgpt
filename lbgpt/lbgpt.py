@@ -52,10 +52,6 @@ class ChatGPT(_BaseGPT):
             max_retries=0,
         )
 
-    def refresh(self) -> None:
-        self.client = self.client.copy(http_client=httpx.AsyncClient())
-        super().refresh()
-
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
 
@@ -120,10 +116,6 @@ class AzureGPT(_BaseGPT):
         )
 
         self.azure_model_map = azure_model_map
-
-    def refresh(self) -> None:
-        self.client = self.client.copy(http_client=httpx.AsyncClient())
-        super().refresh()
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         """One request to the Azure OpenAI API respecting their ratelimit
