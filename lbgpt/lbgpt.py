@@ -61,23 +61,22 @@ class ChatGPT(_BaseGPT):
 
         timeout = kwargs.pop("request_timeout", self.request_timeout)
 
-        async with self.semaphore:
-            start = datetime.datetime.now()
-            out = await self.get_client().with_options(
-                timeout=timeout
-            ).chat.completions.create(
-                **kwargs,
+        start = datetime.datetime.now()
+        out = await self.get_client().with_options(
+            timeout=timeout
+        ).chat.completions.create(
+            **kwargs,
+        )
+        self.add_usage_to_usage_cache(
+            Usage(
+                input_tokens=out.usage.prompt_tokens,
+                output_tokens=out.usage.total_tokens,
+                start_datetime=start,
+                end_datetime=datetime.datetime.now(),
             )
-            self.add_usage_to_usage_cache(
-                Usage(
-                    input_tokens=out.usage.prompt_tokens,
-                    output_tokens=out.usage.total_tokens,
-                    start_datetime=start,
-                    end_datetime=datetime.datetime.now(),
-                )
-            )
+        )
 
-            return ChatCompletionAddition.from_chat_completion(out)
+        return ChatCompletionAddition.from_chat_completion(out)
 
 
 class AzureGPT(_BaseGPT):
@@ -137,23 +136,22 @@ class AzureGPT(_BaseGPT):
 
         timeout = kwargs.pop("request_timeout", self.request_timeout)
 
-        async with self.semaphore:
-            start = datetime.datetime.now()
-            out = await self.get_client().with_options(
-                timeout=timeout
-            ).chat.completions.create(
-                **kwargs,
+        start = datetime.datetime.now()
+        out = await self.get_client().with_options(
+            timeout=timeout
+        ).chat.completions.create(
+            **kwargs,
+        )
+        self.add_usage_to_usage_cache(
+            Usage(
+                input_tokens=out.usage.prompt_tokens,
+                output_tokens=out.usage.total_tokens,
+                start_datetime=start,
+                end_datetime=datetime.datetime.now(),
             )
-            self.add_usage_to_usage_cache(
-                Usage(
-                    input_tokens=out.usage.prompt_tokens,
-                    output_tokens=out.usage.total_tokens,
-                    start_datetime=start,
-                    end_datetime=datetime.datetime.now(),
-                )
-            )
+        )
 
-            return ChatCompletionAddition.from_chat_completion(out)
+        return ChatCompletionAddition.from_chat_completion(out)
 
 
 ALLOCATION_FUNCTIONS = {
