@@ -186,3 +186,38 @@ def test_azure_async(mocker: MockerFixture):
         assert isinstance(k, ChatCompletionAddition)
 
     assert azure.call_count >= 5
+
+
+@pytest.mark.vcr
+def test_chatgpt_async_multiple_starts(mocker: MockerFixture):
+    messages = [
+        {"role": "user", "content": "please respond with pong"},
+    ]
+    single_request_content = dict(
+        messages=messages,
+        model="gpt-3.5-turbo-0613",
+        temperature=0,
+        max_tokens=50,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+        request_timeout=10,
+    )
+
+    lb = ChatGPT(
+        api_key=os.environ["OPEN_AI_API_KEY"],
+        stop_after_attempts=1,
+        stop_on_exception=True,
+    )
+
+    openai = mocker.spy(lb, "chat_completion")
+
+    res = asyncio.run(
+        lb.chat_completion_list([single_request_content] * 2, show_progress=False)
+    )
+
+    res2 = asyncio.run(
+        lb.chat_completion_list([single_request_content] * 2, show_progress=False)
+    )
+
+    assert len(res) + len(res2) == 4
