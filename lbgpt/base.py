@@ -33,6 +33,7 @@ logger = getLogger(__name__)
 
 def after_logging(
     logger_level: int = logging.WARNING,
+    logger_exception: bool = True,
 ) -> Callable[[RetryCallState], None]:
     def logging_function(retry_state: RetryCallState) -> None:
         with logging_redirect_tqdm():
@@ -40,6 +41,9 @@ def after_logging(
                 level=logger_level,
                 msg=f"Retrying request after {'%0.2f' % retry_state.seconds_since_start}s as attempt {retry_state.attempt_number} ended with `{retry_state.outcome.exception()}`",
             )
+
+            if logger_exception:
+                logger.exception(retry_state.outcome.exception())
 
     return logging_function
 
@@ -202,7 +206,10 @@ class _BaseGPT(abc.ABC):
             self.cache.set(hashed, json.dumps(model_dump(value)))
 
     async def cached_chat_completion(
-        self, logging_level: int = logging.WARNING, **kwargs
+        self,
+            logging_level: int = logging.WARNING,
+            logging_exception: bool = False,
+            **kwargs
     ) -> Optional[ChatCompletionAddition]:
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
@@ -251,7 +258,7 @@ class _BaseGPT(abc.ABC):
                     stop=stop_after_attempt(self.stop_after_attempts)
                     if self.stop_after_attempts is not None
                     else None,
-                    after=after_logging(logger_level=logging_level),
+                    after=after_logging(logger_level=logging_level, logger_exception=logging_exception),
                 ):
                     with attempt:
                         out: ChatCompletionAddition = await self.chat_completion(**kwargs)
