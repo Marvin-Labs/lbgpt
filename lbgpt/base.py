@@ -62,6 +62,7 @@ class _BaseGPT(abc.ABC):
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
+        self.semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
@@ -107,6 +108,14 @@ class _BaseGPT(abc.ABC):
     def get_usage_stats(self, include_usage_reservation: bool = False) -> UsageStats:
         current_usage_tokens = 0
         current_usage_requests = 0
+
+        if include_usage_reservation:
+            # Estimating current usage as the expected number of tokens times the number of
+            # currently outstanding requests (which are tracked in the semaphore)
+            current_usage_tokens = (
+                self.semaphore._value * self.expected_tokens_per_request()
+            )
+            current_usage_requests = self.semaphore._value
 
         cache_list_after_start_datetime = self.usage_cache_list_after_start_datetime(
             datetime.datetime.now() - datetime.timedelta(seconds=60)
@@ -199,9 +208,7 @@ class _BaseGPT(abc.ABC):
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
 
-        semaphore = asyncio.Semaphore(self.max_parallel_calls)
-
-        async with semaphore:
+        async with (self.semaphore):
             # this is standard cache. We are always trying standard cache first
             if self.cache is not None:
                 hashed = make_hash_chatgpt_request(kwargs)
