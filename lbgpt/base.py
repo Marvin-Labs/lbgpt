@@ -235,8 +235,9 @@ class _BaseGPT(abc.ABC):
 
         async with (self.semaphore):
             # this is standard cache. We are always trying standard cache first
+            hashed = make_hash_chatgpt_request(kwargs)
+
             if self.cache is not None:
-                hashed = make_hash_chatgpt_request(kwargs)
                 out = self._get_from_cache(hashed)
                 if out is not None:
 
