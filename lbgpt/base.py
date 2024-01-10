@@ -184,11 +184,12 @@ class _BaseGPT(abc.ABC):
         chatgpt_chat_completion_request_body_list: list[dict],
         show_progress=True,
         logging_level: int = logging.WARNING,
+        logging_exception: bool = False,
     ) -> Sequence[ChatCompletionAddition]:
 
         return await tqdm.gather(
             *[
-                self.cached_chat_completion(logging_level=logging_level, **content)
+                self.cached_chat_completion(logging_level=logging_level, logging_exception=logging_exception, **content)
                 for content in chatgpt_chat_completion_request_body_list
             ],
             disable=not show_progress,
