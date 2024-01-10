@@ -33,13 +33,20 @@ logger = getLogger(__name__)
 
 def after_logging(
     logger_level: int = logging.WARNING,
+    logger_exception: bool = True,
 ) -> Callable[[RetryCallState], None]:
     def logging_function(retry_state: RetryCallState) -> None:
         with logging_redirect_tqdm():
+            exception = retry_state.outcome.exception()
             logger.log(
                 level=logger_level,
-                msg=f"Retrying request after {'%0.2f' % retry_state.seconds_since_start}s as attempt {retry_state.attempt_number} ended with `{retry_state.outcome.exception()}`",
+                msg=f"Retrying request after {'%0.2f' % retry_state.seconds_since_start}s as attempt {retry_state.attempt_number} ended with `{repr(exception)}`",
             )
+
+            if logger_exception:
+                logger.exception(exception)
+                if hasattr(exception, 'request'):
+                    logger.error(exception.request)
 
     return logging_function
 
@@ -56,6 +63,7 @@ class _BaseGPT(abc.ABC):
         limit_tpm: Optional[int] = None,
         limit_rpm: Optional[int] = None,
         propagate_standard_cache_to_semantic_cache: bool = False,
+        propagate_semantic_cache_to_standard_cache: bool = False,
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
@@ -75,6 +83,9 @@ class _BaseGPT(abc.ABC):
         self.propagate_standard_cache_to_semantic_cache = (
             propagate_standard_cache_to_semantic_cache
         )
+        self.propagate_semantic_cache_to_standard_cache = (
+            propagate_semantic_cache_to_standard_cache
+        )
 
         # this is a silly configuration (propagating to semantic cache without having a semantic cache)
         if (
@@ -84,6 +95,16 @@ class _BaseGPT(abc.ABC):
             self.propagate_standard_cache_to_semantic_cache = False
             warnings.warn(
                 "propagate_standard_cache_to_semantic_cache is True, but no semantic cache is provided. There will be no propagation."
+            )
+
+        # this is a silly configuration (propagating to standard cache without having a standard cache)
+        if (
+            self.propagate_semantic_cache_to_standard_cache
+            and self.cache is None
+        ):
+            self.propagate_semantic_cache_to_standard_cache = False
+            warnings.warn(
+                "propagate_semantic_cache_to_standard_cache is True, but no standard cache is provided. There will be no propagation."
             )
 
     @property
@@ -180,11 +201,12 @@ class _BaseGPT(abc.ABC):
         chatgpt_chat_completion_request_body_list: list[dict],
         show_progress=True,
         logging_level: int = logging.WARNING,
+        logging_exception: bool = False,
     ) -> Sequence[ChatCompletionAddition]:
 
         return await tqdm.gather(
             *[
-                self.cached_chat_completion(logging_level=logging_level, **content)
+                self.cached_chat_completion(logging_level=logging_level, logging_exception=logging_exception, **content)
                 for content in chatgpt_chat_completion_request_body_list
             ],
             disable=not show_progress,
@@ -202,7 +224,10 @@ class _BaseGPT(abc.ABC):
             self.cache.set(hashed, json.dumps(model_dump(value)))
 
     async def cached_chat_completion(
-        self, logging_level: int = logging.WARNING, **kwargs
+        self,
+            logging_level: int = logging.WARNING,
+            logging_exception: bool = False,
+            **kwargs
     ) -> Optional[ChatCompletionAddition]:
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
@@ -210,8 +235,9 @@ class _BaseGPT(abc.ABC):
 
         async with (self.semaphore):
             # this is standard cache. We are always trying standard cache first
+            hashed = make_hash_chatgpt_request(kwargs)
+
             if self.cache is not None:
-                hashed = make_hash_chatgpt_request(kwargs)
                 out = self._get_from_cache(hashed)
                 if out is not None:
 
@@ -232,12 +258,18 @@ class _BaseGPT(abc.ABC):
             # if the item is not in the standard cache, we are trying the semantic cache (if available)
             # we are currently only supporting semantic cache for FAISS models
             if self.semantic_cache is not None:
-                sc: Optional[ChatCompletionAddition] = await self.semantic_cache.query_cache(
+                out: Optional[ChatCompletionAddition] = await self.semantic_cache.query_cache(
                     kwargs
                 )
-                if sc is not None:
+                if out is not None:
+                    # propagate to standard cache (we know it is not in standard cache,
+                    # otherwise we would not end up here
+
+                    if self.propagate_semantic_cache_to_standard_cache and out.is_exact:
+                        self._set_to_cache(hashed, out)
+
                     logger.debug("semantic cache hit")
-                    return sc
+                    return out
 
             try:
                 async for attempt in AsyncRetrying(
@@ -251,7 +283,7 @@ class _BaseGPT(abc.ABC):
                     stop=stop_after_attempt(self.stop_after_attempts)
                     if self.stop_after_attempts is not None
                     else None,
-                    after=after_logging(logger_level=logging_level),
+                    after=after_logging(logger_level=logging_level, logger_exception=logging_exception),
                 ):
                     with attempt:
                         out: ChatCompletionAddition = await self.chat_completion(**kwargs)
