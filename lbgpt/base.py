@@ -37,13 +37,16 @@ def after_logging(
 ) -> Callable[[RetryCallState], None]:
     def logging_function(retry_state: RetryCallState) -> None:
         with logging_redirect_tqdm():
+            exception = retry_state.outcome.exception()
             logger.log(
                 level=logger_level,
-                msg=f"Retrying request after {'%0.2f' % retry_state.seconds_since_start}s as attempt {retry_state.attempt_number} ended with `{retry_state.outcome.exception()}`",
+                msg=f"Retrying request after {'%0.2f' % retry_state.seconds_since_start}s as attempt {retry_state.attempt_number} ended with `{repr(exception)}`",
             )
 
             if logger_exception:
-                logger.exception(retry_state.outcome.exception())
+                logger.exception(exception)
+                if hasattr(exception, 'request'):
+                    logger.error(exception.request)
 
     return logging_function
 
@@ -60,6 +63,7 @@ class _BaseGPT(abc.ABC):
         limit_tpm: Optional[int] = None,
         limit_rpm: Optional[int] = None,
         propagate_standard_cache_to_semantic_cache: bool = False,
+        propagate_semantic_cache_to_standard_cache: bool = False,
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
@@ -79,6 +83,9 @@ class _BaseGPT(abc.ABC):
         self.propagate_standard_cache_to_semantic_cache = (
             propagate_standard_cache_to_semantic_cache
         )
+        self.propagate_semantic_cache_to_standard_cache = (
+            propagate_semantic_cache_to_standard_cache
+        )
 
         # this is a silly configuration (propagating to semantic cache without having a semantic cache)
         if (
@@ -88,6 +95,16 @@ class _BaseGPT(abc.ABC):
             self.propagate_standard_cache_to_semantic_cache = False
             warnings.warn(
                 "propagate_standard_cache_to_semantic_cache is True, but no semantic cache is provided. There will be no propagation."
+            )
+
+        # this is a silly configuration (propagating to standard cache without having a standard cache)
+        if (
+            self.propagate_semantic_cache_to_standard_cache
+            and self.cache is None
+        ):
+            self.propagate_semantic_cache_to_standard_cache = False
+            warnings.warn(
+                "propagate_semantic_cache_to_standard_cache is True, but no standard cache is provided. There will be no propagation."
             )
 
     @property
@@ -240,12 +257,18 @@ class _BaseGPT(abc.ABC):
             # if the item is not in the standard cache, we are trying the semantic cache (if available)
             # we are currently only supporting semantic cache for FAISS models
             if self.semantic_cache is not None:
-                sc: Optional[ChatCompletionAddition] = await self.semantic_cache.query_cache(
+                out: Optional[ChatCompletionAddition] = await self.semantic_cache.query_cache(
                     kwargs
                 )
-                if sc is not None:
+                if out is not None:
+                    # propagate to standard cache (we know it is not in standard cache,
+                    # otherwise we would not end up here
+
+                    if self.propagate_semantic_cache_to_standard_cache and out.is_exact:
+                        self._set_to_cache(hashed, out)
+
                     logger.debug("semantic cache hit")
-                    return sc
+                    return out
 
             try:
                 async for attempt in AsyncRetrying(
