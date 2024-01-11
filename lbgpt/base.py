@@ -12,7 +12,6 @@ from typing import Any, Callable, Optional, Sequence
 
 import openai
 from openai._compat import model_dump, model_parse
-from openai.types.chat import ChatCompletion
 from tenacity import (
     AsyncRetrying,
     RetryCallState,
@@ -70,7 +69,7 @@ class _BaseGPT(abc.ABC):
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
-        self.semaphore = asyncio.Semaphore(value=self.max_parallel_calls)
+        self._semaphore = None
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
@@ -106,6 +105,23 @@ class _BaseGPT(abc.ABC):
             warnings.warn(
                 "propagate_semantic_cache_to_standard_cache is True, but no standard cache is provided. There will be no propagation."
             )
+
+    @property
+    def semaphore(self) -> asyncio.Semaphore:
+        if self._semaphore is None:
+            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
+        return self._semaphore
+
+    def refresh_semaphore(self, live_refresh: bool=False) -> None:
+        # By default, we are setting the semaphore to None rather than actively refresh it.
+        # This means that it will be reset upon first usage rather than now. Can be overwritten to a live refresh
+        if live_refresh:
+            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
+        else:
+            self._semaphore = None
+
+    def request_setup(self):
+        self.refresh_semaphore()
 
     @property
     def usage_cache_list(self) -> list[Usage]:
@@ -232,6 +248,9 @@ class _BaseGPT(abc.ABC):
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
+
+
+        self.request_setup()
 
         async with (self.semaphore):
             # this is standard cache. We are always trying standard cache first

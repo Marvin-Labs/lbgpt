@@ -212,6 +212,11 @@ class MultiLoadBalancedGPT(_BaseGPT):
             stop_on_exception=stop_on_exception,
         )
 
+    def request_setup(self):
+        for gpt in self.gpts:
+            gpt.request_setup()
+        super().request_setup()
+
     @property
     def usage_cache_list(self) -> list[Usage]:
         out = sum([gpt.usage_cache_list for gpt in self.gpts], [])
