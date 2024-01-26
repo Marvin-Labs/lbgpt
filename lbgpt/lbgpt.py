@@ -65,10 +65,12 @@ class ChatGPT(_BaseGPT):
 
         async with self.semaphore:
             start = datetime.datetime.now()
-            out = await self.get_client().with_options(
-                timeout=timeout
-            ).chat.completions.create(
-                **kwargs,
+            out = (
+                await self.get_client()
+                .with_options(timeout=timeout)
+                .chat.completions.create(
+                    **kwargs,
+                )
             )
             self.add_usage_to_usage_cache(
                 Usage(
@@ -115,10 +117,10 @@ class AzureGPT(_BaseGPT):
             limit_rpm=limit_rpm,
         )
 
-        self.api_key=api_key
-        self.azure_api_base=azure_api_base
-        self.azure_openai_version=azure_openai_version
-        self.request_timeout=request_timeout
+        self.api_key = api_key
+        self.azure_api_base = azure_api_base
+        self.azure_openai_version = azure_openai_version
+        self.request_timeout = request_timeout
 
         self.azure_model_map = azure_model_map
 
@@ -143,10 +145,12 @@ class AzureGPT(_BaseGPT):
 
         async with self.semaphore:
             start = datetime.datetime.now()
-            out = await self.get_client().with_options(
-                timeout=timeout
-            ).chat.completions.create(
-                **kwargs,
+            out = (
+                await self.get_client()
+                .with_options(timeout=timeout)
+                .chat.completions.create(
+                    **kwargs,
+                )
             )
             self.add_usage_to_usage_cache(
                 Usage(
