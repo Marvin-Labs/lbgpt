@@ -113,7 +113,6 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             return
 
-
     @tenacity.retry(
         retry=(retry_if_exception_type(ResponseHandlingException)),
         wait=wait_random_exponential(min=5, max=60),
