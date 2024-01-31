@@ -69,7 +69,7 @@ class _BaseGPT(abc.ABC):
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
-        self._semaphore = None
+        self.semaphore = asyncio.Semaphore(self.max_parallel_calls)
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
@@ -103,22 +103,9 @@ class _BaseGPT(abc.ABC):
                 "propagate_semantic_cache_to_standard_cache is True, but no standard cache is provided. There will be no propagation."
             )
 
-    @property
-    def semaphore(self) -> asyncio.Semaphore:
-        if self._semaphore is None:
-            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
-        return self._semaphore
-
-    def refresh_semaphore(self, live_refresh: bool = False) -> None:
-        # By default, we are setting the semaphore to None rather than actively refresh it.
-        # This means that it will be reset upon first usage rather than now. Can be overwritten to a live refresh
-        if live_refresh:
-            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
-        else:
-            self._semaphore = None
 
     def request_setup(self):
-        self.refresh_semaphore()
+        pass
 
     @property
     def usage_cache_list(self) -> list[Usage]:
@@ -251,6 +238,7 @@ class _BaseGPT(abc.ABC):
             if out is not None:
                 # propagate to semantic cache if required
                 if self.propagate_standard_cache_to_semantic_cache:
+                    logger.debug("checking if the element exists in semantic cache")
                     try:
                         existing_item = await self.semantic_cache.query_cache(kwargs)
                     except Exception:
@@ -362,7 +350,9 @@ class _BaseGPT(abc.ABC):
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
 
-        async with (self.semaphore):
+        logger.debug('current semaphore value: ' + str(self.semaphore._value))
+
+        async with self.semaphore:
             return await self.unbound_cached_chat_completion(
                 logging_level=logging_level,
                 logging_exception=logging_exception,
