@@ -233,9 +233,10 @@ class _BaseGPT(abc.ABC):
 
     def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
+            logger.debug(f'trying to get {hashed} from standard cache')
             out = self.cache.get(hashed)
             if out is not None:
-                logger.debug("standard cache hit")
+                logger.debug(f'found request {hashed} in standard cache')
                 return model_parse(ChatCompletionAddition, json.loads(out))
 
     def _set_to_cache(self, hashed: str, value: ChatCompletionAddition):
@@ -246,12 +247,9 @@ class _BaseGPT(abc.ABC):
         self, hashed: str, **kwargs
     ) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
-            logger.debug(f'trying to get {hashed} from standard cache')
             out = self._get_from_cache(hashed)
             if out is not None:
                 # propagate to semantic cache if required
-                logger.debug(f'found request {hashed} in standard cache')
-
                 if self.propagate_standard_cache_to_semantic_cache:
                     try:
                         existing_item = await self.semantic_cache.query_cache(kwargs)
