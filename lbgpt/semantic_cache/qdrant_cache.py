@@ -75,10 +75,10 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             raise NotImplementedError(f"cannot process type {type(value)}")
 
-    # @tenacity.retry(
-    #    retry=(retry_if_exception_type(ResponseHandlingException)),
-    #    wait=wait_random_exponential(min=5, max=60),
-    # )
+    @tenacity.retry(
+       retry=(retry_if_exception_type(ResponseHandlingException)),
+       wait=wait_random_exponential(min=5, max=60),
+    )
     async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
