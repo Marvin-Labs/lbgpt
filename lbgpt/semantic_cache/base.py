@@ -49,6 +49,11 @@ class _SemanticCacheBase(abc.ABC):
         txt = self.messages_to_text(messages)
         return self.embeddings_model.embed_documents([txt])[0]
 
+    async def aembed_messages(self, messages: list[dict[str, Any]]) -> list[float]:
+        txt = self.messages_to_text(messages)
+        return await self.embeddings_model.aembed_query(txt)
+
+
     def non_message_dict(
         self,
         chat_completion_create: CompletionCreateParams | dict[str, Any],

@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from types import NoneType
 from typing import Any, Optional
@@ -28,6 +29,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
         api_key: Optional[str] = None,
         qdrant_properties: Optional[dict[str, Any]] = None,
         cosine_similarity_threshold: float = 0.99,
+        max_concurrent_requests=10,
     ):
         super().__init__(
             embedding_model=embedding_model,
@@ -63,6 +65,8 @@ class QdrantSemanticCache(_SemanticCacheBase):
                 ),
             )
 
+        self.semaphore = asyncio.Semaphore(max_concurrent_requests)
+
     def _create_filter_value(
         self, value: int | str | bool | NoneType
     ) -> int | str | bool:
@@ -73,10 +77,10 @@ class QdrantSemanticCache(_SemanticCacheBase):
         else:
             raise NotImplementedError(f"cannot process type {type(value)}")
 
-    #@tenacity.retry(
+    # @tenacity.retry(
     #    retry=(retry_if_exception_type(ResponseHandlingException)),
     #    wait=wait_random_exponential(min=5, max=60),
-    #)
+    # )
     async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
@@ -93,15 +97,16 @@ class QdrantSemanticCache(_SemanticCacheBase):
             ]
         )
 
-        res = await self.qdrant_client.search(
-            collection_name=self.collection_name,
-            query_vector=self.embed_messages(query["messages"]),
-            query_filter=query_filter,
-            with_payload=True,
-            with_vectors=False,
-            limit=1,
-            score_threshold=self.cosine_similarity_threshold,
-        )
+        async with self.semaphore:
+            res = await self.qdrant_client.search(
+                collection_name=self.collection_name,
+                query_vector=await self.aembed_messages(query["messages"]),
+                query_filter=query_filter,
+                with_payload=True,
+                with_vectors=False,
+                limit=1,
+                score_threshold=self.cosine_similarity_threshold,
+            )
 
         res = [r for r in res if r.score >= self.cosine_similarity_threshold]
 
@@ -128,7 +133,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
             points=[
                 PointStruct(
                     id=str(uuid.uuid4()),
-                    vector=self.embed_messages(query["messages"]),
+                    vector=await self.aembed_messages(query["messages"]),
                     payload={
                         "result": response.model_dump(
                             exclude={
