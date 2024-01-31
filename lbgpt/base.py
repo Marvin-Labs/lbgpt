@@ -69,7 +69,7 @@ class _BaseGPT(abc.ABC):
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
-        self.semaphore = asyncio.Semaphore(self.max_parallel_calls)
+        self._semaphore = None
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
@@ -104,8 +104,23 @@ class _BaseGPT(abc.ABC):
             )
 
 
+    @property
+    def semaphore(self) -> asyncio.Semaphore:
+        if self._semaphore is None:
+            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
+        return self._semaphore
+
+    def refresh_semaphore(self, live_refresh: bool = False) -> None:
+        # By default, we are setting the semaphore to None rather than actively refresh it.
+        # This means that it will be reset upon first usage rather than now. Can be overwritten to a live refresh
+        if live_refresh:
+            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
+        else:
+            self._semaphore = None
+
+
     def request_setup(self):
-        pass
+        self.refresh_semaphore()
 
     @property
     def usage_cache_list(self) -> list[Usage]:
