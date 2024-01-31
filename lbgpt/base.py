@@ -69,7 +69,6 @@ class _BaseGPT(abc.ABC):
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
-        self._semaphore = None
         self.stop_after_attempts = stop_after_attempts
         self.stop_on_exception = stop_on_exception
 
@@ -104,23 +103,9 @@ class _BaseGPT(abc.ABC):
             )
 
 
-    @property
-    def semaphore(self) -> asyncio.Semaphore:
-        if self._semaphore is None:
-            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
-        return self._semaphore
-
-    def refresh_semaphore(self, live_refresh: bool = False) -> None:
-        # By default, we are setting the semaphore to None rather than actively refresh it.
-        # This means that it will be reset upon first usage rather than now. Can be overwritten to a live refresh
-        if live_refresh:
-            self._semaphore = asyncio.Semaphore(self.max_parallel_calls)
-        else:
-            self._semaphore = None
-
 
     def request_setup(self):
-        self.refresh_semaphore()
+        pass
 
     @property
     def usage_cache_list(self) -> list[Usage]:
@@ -219,19 +204,20 @@ class _BaseGPT(abc.ABC):
         logging_exception: bool = False,
     ) -> Sequence[ChatCompletionAddition]:
         # we are setting up the semaphore here, so that we can refresh it if required
-        self.request_setup()
 
-        return await tqdm.gather(
-            *[
+        semaphore = asyncio.Semaphore(self.max_parallel_calls)
+
+        async with asyncio.TaskGroup() as tg:
+            tasks = [tg.create_task(
                 self.cached_chat_completion(
+                    semaphore=semaphore,
                     logging_level=logging_level,
                     logging_exception=logging_exception,
-                    **content,
+                    content=content,
                 )
-                for content in chatgpt_chat_completion_request_body_list
-            ],
-            disable=not show_progress,
-        )
+            ) for content in chatgpt_chat_completion_request_body_list]
+
+        return [t.result() for t in tasks]
 
     def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
@@ -357,19 +343,21 @@ class _BaseGPT(abc.ABC):
 
     async def cached_chat_completion(
         self,
-        logging_level: int = logging.WARNING,
+        semaphore: asyncio.Semaphore,
+            content: dict[str, Any],
+            logging_level: int = logging.WARNING,
         logging_exception: bool = False,
-        **kwargs,
+
     ) -> Optional[ChatCompletionAddition]:
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
 
-        logger.debug('current semaphore value: ' + str(self.semaphore._value))
+        logger.debug('current semaphore value: ' + str(semaphore._value))
 
-        async with self.semaphore:
+        async with semaphore:
             return await self.unbound_cached_chat_completion(
                 logging_level=logging_level,
                 logging_exception=logging_exception,
-                **kwargs,
+                **content,
             )
