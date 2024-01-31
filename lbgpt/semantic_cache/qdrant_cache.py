@@ -65,8 +65,6 @@ class QdrantSemanticCache(_SemanticCacheBase):
                 ),
             )
 
-        self.semaphore = asyncio.Semaphore(max_concurrent_requests)
-
     def _create_filter_value(
         self, value: int | str | bool | NoneType
     ) -> int | str | bool:
@@ -97,16 +95,17 @@ class QdrantSemanticCache(_SemanticCacheBase):
             ]
         )
 
-        async with self.semaphore:
-            res = await self.qdrant_client.search(
-                collection_name=self.collection_name,
-                query_vector=await self.aembed_messages(query["messages"]),
-                query_filter=query_filter,
-                with_payload=True,
-                with_vectors=False,
-                limit=1,
-                score_threshold=self.cosine_similarity_threshold,
-            )
+        embedding = await self.aembed_messages(query["messages"])
+
+        res = await self.qdrant_client.search(
+            collection_name=self.collection_name,
+            query_vector=embedding,
+            query_filter=query_filter,
+            with_payload=True,
+            with_vectors=False,
+            limit=1,
+            score_threshold=self.cosine_similarity_threshold,
+        )
 
         res = [r for r in res if r.score >= self.cosine_similarity_threshold]
 
@@ -126,6 +125,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
         query = get_completion_create_params(**query)
+        embedding = await self.aembed_messages(query["messages"])
 
         await self.qdrant_client.upsert(
             collection_name=self.collection_name,
@@ -133,7 +133,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
             points=[
                 PointStruct(
                     id=str(uuid.uuid4()),
-                    vector=await self.aembed_messages(query["messages"]),
+                    vector=embedding,
                     payload={
                         "result": response.model_dump(
                             exclude={
