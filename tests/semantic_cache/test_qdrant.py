@@ -75,7 +75,7 @@ def qdrant_cache(messages) -> QdrantSemanticCache:
         collection_name="".join(rng.choice(string.ascii_letters) for _ in range(20)),
     )
 
-    cache._sync_qdrant_client.upsert(
+    cache._QdrantClientConfig.get_sync_client().upsert(
         collection_name=cache.collection_name,
         wait=False,
         points=[
@@ -94,7 +94,7 @@ def qdrant_cache(messages) -> QdrantSemanticCache:
 @pytest.mark.asyncio
 async def test_exact(qdrant_cache, messages):
     message = messages[0]
-    res = await qdrant_cache.qdrant_client.search(
+    res = await qdrant_cache._QdrantClientConfig.get_async_client().search(
         collection_name=qdrant_cache.collection_name,
         query_vector=qdrant_cache.embed_messages([message]),
         with_payload=True,
@@ -115,7 +115,7 @@ async def test_close(qdrant_cache, messages):
 
     embedded = qdrant_cache.embed_messages([message])
 
-    res = await qdrant_cache.qdrant_client.search(
+    res = await qdrant_cache._QdrantClientConfig.get_async_client().search(
         collection_name=qdrant_cache.collection_name,
         query_vector=embedded,
         with_payload=True,
@@ -142,7 +142,7 @@ async def test_far(qdrant_cache, messages):
 
     embedded = qdrant_cache.embed_messages([message])
 
-    res = await qdrant_cache.qdrant_client.search(
+    res = await qdrant_cache._QdrantClientConfig.get_async_client().search(
         collection_name=qdrant_cache.collection_name,
         query_vector=embedded,
         with_payload=True,

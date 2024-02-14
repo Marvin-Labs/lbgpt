@@ -1,4 +1,3 @@
-import asyncio
 import uuid
 from types import NoneType
 from typing import Any, Optional
@@ -6,6 +5,7 @@ from typing import Any, Optional
 import tenacity
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import ChatCompletion, CompletionCreateParams
+from pydantic import BaseModel
 from qdrant_client import AsyncQdrantClient, QdrantClient
 from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
@@ -14,6 +14,44 @@ from tenacity import retry_if_exception_type, wait_random_exponential
 
 from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition
+
+
+class QdrantClientConfig(BaseModel):
+    host: Optional[str] = None
+    port: Optional[int] = 6333
+    url: Optional[str] = None
+    api_key: Optional[str] = None
+
+    class Config:
+        extra = "allow"
+
+    def get_async_client(self) -> AsyncQdrantClient:
+        if self.api_key == "":
+            api_key = None
+        else:
+            api_key = self.api_key
+
+        return AsyncQdrantClient(
+            host=self.host, port=self.port, url=self.url, api_key=api_key, **self.extra_fields
+        )
+
+    def get_sync_client(self) -> QdrantClient:
+        if self.api_key == "":
+            api_key = None
+        else:
+            api_key = self.api_key
+        return QdrantClient(
+            host=self.host, port=self.port, url=self.url, api_key=api_key, **self.extra_fields
+        )
+
+    @property
+    def extra_fields(self) -> dict[str, Any]:
+        field_names = set(self.__dict__) - set(self.__fields__)
+        return {
+            fn: getattr(self, fn)
+            for fn in field_names
+        }
+
 
 
 class QdrantSemanticCache(_SemanticCacheBase):
@@ -41,16 +79,13 @@ class QdrantSemanticCache(_SemanticCacheBase):
         # the synchroneous client is used for special operations like counting, listing, where we actually
         # care about precision
 
-        self.qdrant_client = AsyncQdrantClient(
-            host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
-        )
-        self._sync_qdrant_client = QdrantClient(
-            host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
-        )
-
         self.collection_name = collection_name
+        self._QdrantClientConfig = QdrantClientConfig(
+            host=host, port=port, url=url, api_key=api_key, **(qdrant_properties or {})
+        )
 
-        collection_result = self._sync_qdrant_client.get_collections()
+        client = self._QdrantClientConfig.get_sync_client()
+        collection_result = client.get_collections()
 
         existing_collection_names = [k.name for k in collection_result.collections]
         if collection_name not in existing_collection_names:
@@ -58,12 +93,14 @@ class QdrantSemanticCache(_SemanticCacheBase):
             # embedding a string here and then checking the length of the embedding
             _test_embedding = embedding_model.embed_query("test")
 
-            self._sync_qdrant_client.create_collection(
+            client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
                     size=len(_test_embedding), distance=Distance.COSINE
                 ),
             )
+        client.close()
+
 
     def _create_filter_value(
         self, value: int | str | bool | NoneType
@@ -76,8 +113,8 @@ class QdrantSemanticCache(_SemanticCacheBase):
             raise NotImplementedError(f"cannot process type {type(value)}")
 
     @tenacity.retry(
-       retry=(retry_if_exception_type(ResponseHandlingException)),
-       wait=wait_random_exponential(min=5, max=60),
+        retry=(retry_if_exception_type(ResponseHandlingException)),
+        wait=wait_random_exponential(min=5, max=60),
     )
     async def query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
@@ -97,7 +134,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
         embedding = await self.aembed_messages(query["messages"])
 
-        res = await self.qdrant_client.search(
+        res = await self._QdrantClientConfig.get_async_client().search(
             collection_name=self.collection_name,
             query_vector=embedding,
             query_filter=query_filter,
@@ -127,7 +164,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
         query = get_completion_create_params(**query)
         embedding = await self.aembed_messages(query["messages"])
 
-        await self.qdrant_client.upsert(
+        await self._QdrantClientConfig.get_async_client().upsert(
             collection_name=self.collection_name,
             wait=False,
             points=[
@@ -152,6 +189,6 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
     @property
     def count(self) -> int:
-        return self._sync_qdrant_client.count(
+        return self._QdrantClientConfig.get_sync_client().count(
             collection_name=self.collection_name
         ).count
