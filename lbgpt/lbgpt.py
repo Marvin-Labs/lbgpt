@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import asyncio
+import contextlib
 import datetime
 from asyncio import Timeout
 from logging import getLogger
@@ -60,17 +62,18 @@ class ChatGPT(_BaseGPT):
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
+        async with self.semaphore_chatgpt:
+            timeout = kwargs.pop("request_timeout", self.request_timeout)
 
-        timeout = kwargs.pop("request_timeout", self.request_timeout)
-
-        start = datetime.datetime.now()
-        out = (
-            await self.get_client()
-            .with_options(timeout=timeout)
-            .chat.completions.create(
-                **kwargs,
+            start = datetime.datetime.now()
+            out = (
+                await self.get_client()
+                .with_options(timeout=timeout)
+                .chat.completions.create(
+                    **kwargs,
+                )
             )
-        )
+
         self.add_usage_to_usage_cache(
             Usage(
                 input_tokens=out.usage.prompt_tokens,
@@ -143,13 +146,16 @@ class AzureGPT(_BaseGPT):
         timeout = kwargs.pop("request_timeout", self.request_timeout)
 
         start = datetime.datetime.now()
-        out = (
-            await self.get_client()
-            .with_options(timeout=timeout)
-            .chat.completions.create(
-                **kwargs,
+
+        async with self.semaphore_chatgpt:
+            out = (
+                await self.get_client()
+                .with_options(timeout=timeout)
+                .chat.completions.create(
+                    **kwargs,
+                )
             )
-        )
+
         self.add_usage_to_usage_cache(
             Usage(
                 input_tokens=out.usage.prompt_tokens,

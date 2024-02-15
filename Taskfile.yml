@@ -51,7 +51,9 @@ tasks:
   docker:start:
     desc: Starts docker containers
     cmds:
-      - docker-compose up -d
+      - cmd: docker-compose up -d
+        ignore_error: true
+
 
   docker:stop:
     desc: Stops docker containers

@@ -102,7 +102,9 @@ class _BaseGPT(abc.ABC):
                 "propagate_semantic_cache_to_standard_cache is True, but no standard cache is provided. There will be no propagation."
             )
 
-
+        self.semaphore_chatgpt = asyncio.Semaphore(self.max_parallel_calls)
+        self.semaphore_standard_cache = asyncio.Semaphore(self.max_parallel_calls)
+        self.semaphore_semantic_cache = asyncio.Semaphore(self.max_parallel_calls)
 
     def request_setup(self):
         pass
@@ -193,7 +195,7 @@ class _BaseGPT(abc.ABC):
         return min([headroom_tpm, headroom_rpm])
 
     @abc.abstractmethod
-    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
+    async def chat_completion(self, semaphore: Optional[asyncio.Semaphore] = None, **kwargs) -> ChatCompletionAddition:
         raise NotImplementedError
 
     async def chat_completion_list(
@@ -203,14 +205,14 @@ class _BaseGPT(abc.ABC):
         logging_level: int = logging.WARNING,
         logging_exception: bool = False,
     ) -> Sequence[ChatCompletionAddition]:
-        # we are setting up the semaphore here, so that we can refresh it if required
 
-        semaphore = asyncio.Semaphore(self.max_parallel_calls)
+        # we are setting up the semaphore here, so that we can refresh it if required
+        # we are rate limiting the three things we care about: gpt requests, standard cache requests,
+        # and semantic cache requests.
 
         async with asyncio.TaskGroup() as tg:
             tasks = [tg.create_task(
                 self.cached_chat_completion(
-                    semaphore=semaphore,
                     logging_level=logging_level,
                     logging_exception=logging_exception,
                     content=content,
@@ -235,7 +237,8 @@ class _BaseGPT(abc.ABC):
         self, hashed: str, **kwargs
     ) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
-            out = self._get_from_cache(hashed)
+            async with self.semaphore_standard_cache:
+                out = self._get_from_cache(hashed)
             if out is not None:
                 # propagate to semantic cache if required
                 if self.propagate_standard_cache_to_semantic_cache:
@@ -256,9 +259,11 @@ class _BaseGPT(abc.ABC):
         # we are currently only supporting semantic cache for FAISS models
         if self.semantic_cache is not None:
             logger.debug(f'trying to get {hashed} from semantic cache')
-            out: Optional[
-                ChatCompletionAddition
-            ] = await self.semantic_cache.query_cache(kwargs)
+            async with self.semaphore_semantic_cache:
+                out: Optional[
+                    ChatCompletionAddition
+                ] = await self.semantic_cache.query_cache(kwargs)
+
             if out is not None:
                 # propagate to standard cache (we know it is not in standard cache),
                 # otherwise we would not end up here
@@ -285,6 +290,7 @@ class _BaseGPT(abc.ABC):
         self,
         logging_level: int = logging.WARNING,
         logging_exception: bool = False,
+        semaphore: Optional[asyncio.Semaphore] = None,
         **kwargs,
     ) -> Optional[ChatCompletionAddition]:
 
@@ -317,35 +323,11 @@ class _BaseGPT(abc.ABC):
                 logger.exception(e)
                 return None
 
-    async def unbound_cached_chat_completion(
-        self,
-        logging_level: int = logging.WARNING,
-        logging_exception: bool = False,
-        **kwargs,
-    ) -> Optional[ChatCompletionAddition]:
-        """same as the bound cached completion but without a semaphore lock"""
-
-        hashed = make_hash_chatgpt_request(kwargs)
-
-        # accessing cache, returning if available, otherwise proceeding.
-        cached_result = await self.get_chat_completion_from_cache(hashed, **kwargs)
-        if cached_result is not None:
-            return cached_result
-
-        out = await self.retrying_chat_completion(
-            logging_level=logging_level, logging_exception=logging_exception, **kwargs
-        )
-        await self.set_chat_completion_to_cache(
-            hashed=hashed, out=out, request_params=kwargs
-        )
-
-        return out
 
     async def cached_chat_completion(
         self,
-        semaphore: asyncio.Semaphore,
-            content: dict[str, Any],
-            logging_level: int = logging.WARNING,
+        content: dict[str, Any],
+        logging_level: int = logging.WARNING,
         logging_exception: bool = False,
 
     ) -> Optional[ChatCompletionAddition]:
@@ -353,11 +335,21 @@ class _BaseGPT(abc.ABC):
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
 
-        logger.debug('current semaphore value: ' + str(semaphore._value))
+        hashed = make_hash_chatgpt_request(content)
 
-        async with semaphore:
-            return await self.unbound_cached_chat_completion(
-                logging_level=logging_level,
-                logging_exception=logging_exception,
-                **content,
-            )
+        # accessing cache, returning if available, otherwise proceeding.
+        cached_result = await self.get_chat_completion_from_cache(hashed, **content)
+        if cached_result is not None:
+            return cached_result
+
+        out = await self.retrying_chat_completion(
+            logging_level=logging_level, logging_exception=logging_exception, **content
+        )
+
+        await self.set_chat_completion_to_cache(
+            hashed=hashed, out=out, request_params=content
+        )
+
+        return out
+
+

@@ -122,6 +122,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
         query = get_completion_create_params(**query)
 
         filter_params = self.non_message_dict(query)
+
         query_filter = Filter(
             must=[
                 FieldCondition(
