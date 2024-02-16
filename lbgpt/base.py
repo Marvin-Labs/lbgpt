@@ -347,9 +347,10 @@ class _BaseGPT(abc.ABC):
             logging_level=logging_level, logging_exception=logging_exception, **content
         )
 
-        await self.set_chat_completion_to_cache(
-            hashed=hashed, out=out, request_params=content
-        )
+        if out is not None:
+            await self.set_chat_completion_to_cache(
+                hashed=hashed, out=out, request_params=content
+            )
 
         return out
 
