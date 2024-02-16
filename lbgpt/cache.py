@@ -29,7 +29,8 @@ def non_message_parameters_from_create(
 
 
 def make_hash_chatgpt_request(
-    chat_completion_create: CompletionCreateParams | dict[str, Any]
+    chat_completion_create: CompletionCreateParams | dict[str, Any],
+    include_messages: bool = True,
 ) -> str:
     """Converting a chatgpt request to a hash for caching and deduplication purposes"""
 
@@ -47,7 +48,8 @@ def make_hash_chatgpt_request(
 
     hasher = hashlib.sha256()
     hasher.update(repr(make_hashable(non_message_parameters)).encode())
-    hasher.update(repr(make_hashable(messages)).encode())
+    if include_messages:
+        hasher.update(repr(make_hashable(messages)).encode())
     return f"lbgpt_{base64.b64encode(hasher.digest()).decode()}"
 
 

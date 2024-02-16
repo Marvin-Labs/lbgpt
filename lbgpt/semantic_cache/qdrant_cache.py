@@ -8,6 +8,8 @@ from qdrant_client import AsyncQdrantClient, QdrantClient
 from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
 from qdrant_client.models import Distance, VectorParams
+
+from lbgpt.cache import make_hash_chatgpt_request
 from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition
 
@@ -137,20 +139,22 @@ class QdrantSemanticCache(_SemanticCacheBase):
             # we don't really care about errors here
             return
 
+    def hashed_query_payload(
+        self, query: CompletionCreateParams | dict[str, Any]
+    ) -> str:
+        return make_hash_chatgpt_request(query, include_messages=False)
+
     async def _query_cache(
         self, query: CompletionCreateParams | dict[str, Any]
     ) -> Optional[ChatCompletionAddition]:
         query = get_completion_create_params(**query)
-
-        filter_params = self.non_message_dict(query)
+        filter_params_hash = make_hash_chatgpt_request(query, include_messages=False)
 
         query_filter = Filter(
             must=[
                 FieldCondition(
-                    key=k, match=MatchValue(value=self._create_filter_value(v))
+                    key='hashed_model', match=MatchValue(value=filter_params_hash)
                 )
-                for k, v in filter_params.items()
-                if isinstance(v, self.ALLOWED_TYPES_FOR_PAYLOAD) or v is None
             ]
         )
 
@@ -181,6 +185,8 @@ class QdrantSemanticCache(_SemanticCacheBase):
         self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
     ) -> None:
         query = get_completion_create_params(**query)
+        filter_params_hash = make_hash_chatgpt_request(query, include_messages=False)
+
         embedding = await self.aembed_messages(query["messages"])
 
         await self._QdrantClientConfig.get_async_client().upsert(
@@ -196,11 +202,13 @@ class QdrantSemanticCache(_SemanticCacheBase):
                                 "is_exact",
                             }
                         ),
+                        'hashed': filter_params_hash,
                         **self.non_message_dict(
                             query,
                             allowed_types=self.ALLOWED_TYPES_FOR_PAYLOAD,
                             convert_not_allowed_to_empty=True,
                         ),
+
                     },
                 )
             ],
