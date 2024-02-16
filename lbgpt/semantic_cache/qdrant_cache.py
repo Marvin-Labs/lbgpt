@@ -202,7 +202,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
                                 "is_exact",
                             }
                         ),
-                        'hashed': filter_params_hash,
+                        'hashed_model': filter_params_hash,
                         **self.non_message_dict(
                             query,
                             allowed_types=self.ALLOWED_TYPES_FOR_PAYLOAD,
