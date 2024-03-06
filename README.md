@@ -19,7 +19,7 @@ Initiate asynchronous calls to the ChatGPT API using the following basic example
 
 ```python
 
-from src import lbgpt
+import lbgpt
 import asyncio
 
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY")
@@ -36,7 +36,7 @@ For users with an Azure account and proper OpenAI services setup, lbgpt offers a
 
 ```python
 
-from src import lbgpt
+import lbgpt
 import asyncio
 
 chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE",
@@ -142,7 +142,7 @@ Semantic caching looks for semantic variations of the request in the cache. For 
 ```python
 
 from src import lbgpt
-from src.lbgpt.semantic_cache import FaissSemanticCache
+from lbgpt.semantic_cache import FaissSemanticCache
 from langchain.embeddings import HuggingFaceEmbeddings
 
 import asyncio

@@ -11,7 +11,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from qdrant_client.http.models import PointStruct
 from sklearn.metrics.pairwise import cosine_similarity
 
-from src.lbgpt.semantic_cache import QdrantSemanticCache
+from lbgpt.semantic_cache import QdrantSemanticCache
 
 # for qdrant we want to get truly random names. However, it may be that the random seed is set somewhere else,
 # so we have to create an instance of random.Random with a new seed here.

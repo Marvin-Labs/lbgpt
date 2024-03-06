@@ -9,9 +9,9 @@ from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
 from qdrant_client.models import Distance, VectorParams
 
-from src.lbgpt.cache import make_hash_chatgpt_request
-from src.lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
-from src.lbgpt.types import ChatCompletionAddition
+from lbgpt.cache import make_hash_chatgpt_request
+from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
+from lbgpt.types import ChatCompletionAddition
 
 
 from logging import getLogger

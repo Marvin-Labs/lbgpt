@@ -7,8 +7,8 @@ from langchain_community.vectorstores.faiss import FAISS, dependable_faiss_impor
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import ChatCompletion, CompletionCreateParams
 
-from src.lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
-from src.lbgpt.types import ChatCompletionAddition
+from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
+from lbgpt.types import ChatCompletionAddition
 
 
 class FaissSemanticCache(_SemanticCacheBase):

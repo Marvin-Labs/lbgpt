@@ -7,13 +7,13 @@ from typing import Any, Optional, Sequence
 import openai
 from openai._types import NOT_GIVEN, NotGiven
 
-from src.lbgpt.allocation import (
+from lbgpt.allocation import (
     max_headroom_allocation_function,
     random_allocation_function,
 )
-from src.lbgpt.base import _BaseGPT
-from src.lbgpt.types import ChatCompletionAddition
-from src.lbgpt.usage import Usage
+from lbgpt.base import _BaseGPT
+from lbgpt.types import ChatCompletionAddition
+from lbgpt.usage import Usage
 
 logger = getLogger(__name__)
 

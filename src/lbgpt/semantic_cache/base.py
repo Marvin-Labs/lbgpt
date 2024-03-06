@@ -9,8 +9,8 @@ from openai.types.completion_create_params import (
     CompletionCreateParamsStreaming,
 )
 
-from src.lbgpt.cache import non_message_parameters_from_create
-from src.lbgpt.types import ChatCompletionAddition
+from lbgpt.cache import non_message_parameters_from_create
+from lbgpt.types import ChatCompletionAddition
 
 logger = logging.getLogger(__name__)
 

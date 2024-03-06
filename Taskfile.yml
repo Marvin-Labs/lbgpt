@@ -3,7 +3,7 @@
 version: '3'
 
 env:
-  PYTHONPATH: .
+  PYTHONPATH: ./src
 
 dotenv: ['.env']
 

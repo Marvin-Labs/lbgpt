@@ -6,9 +6,8 @@ import random
 import pytest
 from pytest_mock import MockerFixture
 
-from src.lbgpt import AzureGPT, ChatGPT, LoadBalancedGPT
-from src.lbgpt.lbgpt import MultiLoadBalancedGPT
-from src.lbgpt import ChatCompletionAddition
+from lbgpt import AzureGPT, ChatGPT, LoadBalancedGPT, MultiLoadBalancedGPT
+from lbgpt.types import ChatCompletionAddition
 
 
 @pytest.mark.vcr

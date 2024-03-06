@@ -21,10 +21,10 @@ from tenacity import (
 )
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from src.lbgpt.cache import make_hash_chatgpt_request
-from src.lbgpt.semantic_cache.base import _SemanticCacheBase
-from src.lbgpt.types import ChatCompletionAddition
-from src.lbgpt.usage import Usage, UsageStats
+from lbgpt.cache import make_hash_chatgpt_request
+from lbgpt.semantic_cache.base import _SemanticCacheBase
+from lbgpt.types import ChatCompletionAddition
+from lbgpt.usage import Usage, UsageStats
 
 logger = getLogger(__name__)
 

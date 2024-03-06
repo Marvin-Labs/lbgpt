@@ -1,4 +1,4 @@
-from src.lbgpt import make_hash_chatgpt_request
+from lbgpt.cache import make_hash_chatgpt_request
 
 
 def test_cache_immutability():
