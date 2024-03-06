@@ -55,7 +55,7 @@ For optimal performance and reliability, it's recommended to set up the `LoadBal
 
 ```python
 
-from src import lbgpt
+import lbgpt
 import asyncio
 
 chatgpt = lbgpt.LoadBalancedGPT(
@@ -70,7 +70,7 @@ res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 
 ```python
 
-from src import lbgpt
+import lbgpt
 import asyncio
 
 openai_chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY")
@@ -94,7 +94,7 @@ For example, if you have an OpenAI API key with a 5,000 TPM limit and an Azure A
 
 ```python
 
-from src import lbgpt
+import lbgpt
 import asyncio
 
 openai_chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", limit_tpm=5_000)
@@ -124,7 +124,7 @@ Take advantage of request caching to avoid redundant calls:
 
 ```python
 
-from src import lbgpt
+import lbgpt
 import asyncio
 import diskcache
 
@@ -141,7 +141,7 @@ Semantic caching looks for semantic variations of the request in the cache. For 
 
 ```python
 
-from src import lbgpt
+import lbgpt
 from lbgpt.semantic_cache import FaissSemanticCache
 from langchain.embeddings import HuggingFaceEmbeddings
 
