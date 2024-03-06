@@ -8,8 +8,8 @@ import pytest
 import redis
 from pytest_mock import MockerFixture
 
-from lbgpt import ChatGPT
-from lbgpt.types import ChatCompletionAddition
+from src.lbgpt import ChatGPT
+from src.lbgpt import ChatCompletionAddition
 
 redis_cache = redis.StrictRedis(
     host="localhost",

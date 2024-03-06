@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
-import asyncio
-import contextlib
 import datetime
 from asyncio import Timeout
 from logging import getLogger
 from typing import Any, Optional, Sequence
 
-import httpx
 import openai
 from openai._types import NOT_GIVEN, NotGiven
 
-from lbgpt.allocation import (
+from src.lbgpt.allocation import (
     max_headroom_allocation_function,
     random_allocation_function,
 )
-from lbgpt.base import _BaseGPT
-from lbgpt.types import ChatCompletionAddition
-from lbgpt.usage import Usage
+from src.lbgpt.base import _BaseGPT
+from src.lbgpt.types import ChatCompletionAddition
+from src.lbgpt.usage import Usage
 
 logger = getLogger(__name__)
 

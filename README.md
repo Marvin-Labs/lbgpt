@@ -18,11 +18,12 @@ pip install lbgpt
 Initiate asynchronous calls to the ChatGPT API using the following basic example:
 
 ```python
-import lbgpt
+
+from src import lbgpt
 import asyncio
 
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY")
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 The `chat_completion_list` function expects a list of dictionaries with fully-formed OpenAI ChatCompletion API requests. Refer to the [OpenAI API definition](https://platform.openai.com/docs/api-reference/chat/create) for more details. You can also use the `chat_completion` function for single requests.
@@ -34,11 +35,13 @@ By default, LBGPT processes five requests in parallel, but you can adjust this b
 For users with an Azure account and proper OpenAI services setup, lbgpt offers an interface for Azure, similar to the OpenAI API. Here's how you can use it:
 
 ```python
-import lbgpt
+
+from src import lbgpt
 import asyncio
 
-chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE", azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE",
+                         azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 
@@ -49,10 +52,10 @@ You can use the same request definition for both OpenAI and Azure. To ensure int
 For optimal performance and reliability, it's recommended to set up the `LoadBalancedGPT` or `MultiLoadBalancedGPT`. These classes automatically balance requests between OpenAI and Azure, and they also offer caching and automatic retries.
 
 `LoadBalancedGPT` offers load-balancing just between OpenAI and Azure models, but is slightly easier to set up. By default, 75% of requests are routed to the Azure API, while 25% go to the OpenAI API. You can customize this ratio by setting the `ratio_openai_to_azure` parameter in the constructor, taking into account that the Azure API is considerably faster.
-  
 
 ```python
-import lbgpt
+
+from src import lbgpt
 import asyncio
 
 chatgpt = lbgpt.LoadBalancedGPT(
@@ -60,26 +63,27 @@ chatgpt = lbgpt.LoadBalancedGPT(
     azure_api_key="YOUR_AZURE_API_KEY",
     azure_api_base="YOUR AZURE API BASE",
     azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 `MultiLoadBalancedGPT` offers load-balancing between multiple OpenAI and Azure models, and offers more flexibility in terms of the load balancing inputs. In order to achieve the same load balancing as the `LoadBalancedGPT`, you can use the following code:
 
 ```python
-import lbgpt
+
+from src import lbgpt
 import asyncio
 
 openai_chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY")
-azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE", azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
-
+azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE",
+                               azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
 
 chatgpt = lbgpt.MultiLoadBalancedGPT(
     gpts=[openai_chatgpt, azure_chatgpt],
     allocation_function_weights=[0.25, 0.75],
     allocation_function='random',
 )
-    
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 However, the MultiLoadBalancedGPT offers more flexibility in terms of the load balancing inputs, e.g. supporting multiple Azure instances or OpenAI keys. 
@@ -89,19 +93,20 @@ You can also select the allocation function `max_headroom` to automatically pick
 For example, if you have an OpenAI API key with a 5,000 TPM limit and an Azure API key with a 10,000 TPM limit, you can use the following code:
 
 ```python
-import lbgpt
+
+from src import lbgpt
 import asyncio
 
 openai_chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", limit_tpm=5_000)
-azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE", azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"}, limit_tpm=10_000)
-
+azure_chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE",
+                               azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"}, limit_tpm=10_000)
 
 chatgpt = lbgpt.MultiLoadBalancedGPT(
     gpts=[openai_chatgpt, azure_chatgpt],
     allocation_function='max_headroom',
 )
-    
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 ## Caching
@@ -118,13 +123,14 @@ Both caching methods can be combined. If both caches are used, requests are firs
 Take advantage of request caching to avoid redundant calls:
 
 ```python
-import lbgpt
+
+from src import lbgpt
 import asyncio
 import diskcache
 
 cache = diskcache.Cache("cache_dir")
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", cache=cache)
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 While LBGPT is tested only with [diskcache](https://pypi.org/project/diskcache/), it should work seamlessly with any cache that implements the `__getitem__` and `__setitem__` methods.
@@ -134,20 +140,21 @@ While LBGPT is tested only with [diskcache](https://pypi.org/project/diskcache/)
 Semantic caching looks for semantic variations of the request in the cache. For example, if the request message is "Hello, how are you?", the semantic cache will also return a cached response for "Hello, how are you doing?". The semantic cache uses embedding models supported by HuggingFace to determine semantic similarity.
 
 ```python
-import lbgpt
-from lbgpt.semantic_cache import FaissSemanticCache
+
+from src import lbgpt
+from src.lbgpt.semantic_cache import FaissSemanticCache
 from langchain.embeddings import HuggingFaceEmbeddings
 
 import asyncio
 
 semantic_cache = FaissSemanticCache(
-        embedding_model=HuggingFaceEmbeddings(model_name="bert-base-uncased"),
-        cosine_similarity_threshold=0.95,
-        path='cache_dir'
-    )
+    embedding_model=HuggingFaceEmbeddings(model_name="bert-base-uncased"),
+    cosine_similarity_threshold=0.95,
+    path='cache_dir'
+)
 
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", semantic_cache=semantic_cache)
-res = asyncio.run(chatgpt.chat_completion_list([ "your list of prompts" ]))
+res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
 ```
 
 Currently, the only supported semantic caches are [FAISS](https://faiss.ai/) (via the [langchain](https://www.langchain.com/) interface) and [Qdrant](https://qdrant.tech/). Please let us know if you would like to see support for other semantic caches. 

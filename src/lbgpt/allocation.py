@@ -3,7 +3,7 @@ import random
 from logging import getLogger
 from typing import Optional, Sequence
 
-from lbgpt.base import _BaseGPT
+from src.lbgpt.base import _BaseGPT
 
 logger = getLogger(__name__)
 

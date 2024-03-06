@@ -10,9 +10,9 @@ import pytest
 from langchain.embeddings import HuggingFaceEmbeddings
 from pytest_mock import MockerFixture
 
-from lbgpt import ChatGPT
-from lbgpt.semantic_cache import FaissSemanticCache, QdrantSemanticCache
-from lbgpt.types import ChatCompletionAddition
+from src.lbgpt import ChatGPT
+from src.lbgpt.semantic_cache import FaissSemanticCache, QdrantSemanticCache
+from src.lbgpt import ChatCompletionAddition
 
 # for qdrant we want to get truly random names. However, it may be that the random seed is set somewhere else,
 # so we have to create an instance of random.Random with a new seed here.
