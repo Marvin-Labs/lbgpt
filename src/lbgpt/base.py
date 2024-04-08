@@ -224,9 +224,13 @@ class _BaseGPT(abc.ABC):
         if self.cache is not None:
             logger.debug(f'trying to get {hashed} from standard cache')
             out = self.cache.get(hashed)
+
             if out is not None:
                 logger.debug(f'found request {hashed} in standard cache')
-                return model_parse(ChatCompletionAddition, json.loads(out))
+                out_dict = json.loads(out)
+                out_dict['is_cached'] = True
+
+                return model_parse(ChatCompletionAddition, out_dict)
 
     def _set_to_cache(self, hashed: str, value: ChatCompletionAddition):
         if self.cache is not None:

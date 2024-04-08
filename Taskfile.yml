@@ -42,10 +42,10 @@ tasks:
   lint:
     desc: Linting
     cmds:
-      - black lbgpt/
+      - black src/
       - black tests/
 
-      - isort lbgpt/ --profile black --filter-files
+      - isort src/ --profile black --filter-files
       - isort tests/ --profile black --filter-files
 
   docker:start:
