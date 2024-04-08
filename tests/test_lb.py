@@ -11,7 +11,7 @@ from lbgpt.types import ChatCompletionAddition
 
 
 @pytest.mark.vcr
-def test_lb_async_random(mocker: MockerFixture):
+async def test_lb_async_random(mocker: MockerFixture):
     random.seed(42)
 
     messages = [
@@ -40,9 +40,7 @@ def test_lb_async_random(mocker: MockerFixture):
     azure = mocker.spy(lb.azure, "chat_completion")
     openai = mocker.spy(lb.openai, "chat_completion")
 
-    res = asyncio.run(
-        lb.chat_completion_list([single_request_content] * 5, show_progress=False)
-    )
+    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
 
     assert len(res) == 5
     for k in res:
@@ -55,7 +53,7 @@ def test_lb_async_random(mocker: MockerFixture):
 
 
 @pytest.mark.vcr
-def test_lbgpt_max_headroom():
+async def test_lbgpt_max_headroom():
     random.seed(42)
 
     messages = [
@@ -93,13 +91,11 @@ def test_lbgpt_max_headroom():
         allocation_function="max_headroom",
     )
 
-    res = asyncio.run(
-        lb.chat_completion_list([single_request_content] * 5, show_progress=False)
-    )
-    assert len(lb.usage_cache_list) == 5
+    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
 
-    assert len(lb.gpts[0].usage_cache_list) == 5
-    assert len(lb.gpts[1].usage_cache_list) == 0
+    assert len(await lb.usage_cache_list) == 5
+    assert len(await lb.gpts[0].usage_cache_list) == 5
+    assert len(await lb.gpts[1].usage_cache_list) == 0
 
     assert len(res) == 5
     for k in res:
@@ -108,7 +104,7 @@ def test_lbgpt_max_headroom():
 
 
 @pytest.mark.vcr
-def test_chatgpt_async(mocker: MockerFixture):
+async def test_chatgpt_async(mocker: MockerFixture):
     messages = [
         {"role": "user", "content": "please respond with pong"},
     ]
@@ -131,11 +127,9 @@ def test_chatgpt_async(mocker: MockerFixture):
 
     openai = mocker.spy(lb, "chat_completion")
 
-    res = asyncio.run(
-        lb.chat_completion_list([single_request_content] * 5, show_progress=False)
-    )
+    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
 
-    assert len(lb.usage_cache_list) == 5
+    assert len(await lb.usage_cache_list) == 5
 
     assert len(res) == 5
     for k in res:
@@ -146,7 +140,7 @@ def test_chatgpt_async(mocker: MockerFixture):
 
 
 @pytest.mark.vcr
-def test_azure_async(mocker: MockerFixture):
+async def test_azure_async(mocker: MockerFixture):
     messages = [
         {"role": "user", "content": "please respond with pong"},
     ]
@@ -173,11 +167,9 @@ def test_azure_async(mocker: MockerFixture):
 
     azure = mocker.spy(lb, "chat_completion")
 
-    res = asyncio.run(
-        lb.chat_completion_list([single_request_content] * 5, show_progress=False)
-    )
+    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
 
-    assert len(lb.usage_cache_list) == 5
+    assert len(await lb.usage_cache_list) == 5
 
     assert len(res) == 5
     for k in res:

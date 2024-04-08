@@ -71,7 +71,7 @@ class ChatGPT(_BaseGPT):
                 )
             )
 
-        self.add_usage_to_usage_cache(
+        await self.add_usage_to_usage_cache(
             Usage(
                 input_tokens=out.usage.prompt_tokens,
                 output_tokens=out.usage.total_tokens,
@@ -153,7 +153,7 @@ class AzureGPT(_BaseGPT):
                 )
             )
 
-        self.add_usage_to_usage_cache(
+        await self.add_usage_to_usage_cache(
             Usage(
                 input_tokens=out.usage.prompt_tokens,
                 output_tokens=out.usage.total_tokens,
@@ -223,8 +223,8 @@ class MultiLoadBalancedGPT(_BaseGPT):
         super().request_setup()
 
     @property
-    def usage_cache_list(self) -> list[Usage]:
-        out = sum([gpt.usage_cache_list for gpt in self.gpts], [])
+    async def usage_cache_list(self) -> list[Usage]:
+        out = sum([await gpt.usage_cache_list for gpt in self.gpts], [])
         return out
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
