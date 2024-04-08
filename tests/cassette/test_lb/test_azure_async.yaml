@@ -35,7 +35,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtIeImxtDd1rGnTCXfjYb40QqKxP","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 
@@ -109,7 +109,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtIem0F3mrLpcY8bLbKnM8IbRCMT","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 
@@ -183,7 +183,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtIeCOf37wHKOf93mVkXtSDosgzk","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 
@@ -257,7 +257,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtIeytwIryORERypaFtwiPVnNPbU","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 
@@ -331,7 +331,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtIeMkb0KCWO7kA7x12wmQMIA5Dk","object":"chat.completion","created":1703088088,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 

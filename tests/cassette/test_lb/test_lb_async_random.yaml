@@ -139,7 +139,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtJqfrq3KttTe1cc01Awu8Re1cQw","object":"chat.completion","created":1703088162,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 
@@ -213,7 +213,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtJqI1r460hjzhNkZWyanX6gVwRM","object":"chat.completion","created":1703088162,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 
@@ -287,7 +287,7 @@ interactions:
       x-stainless-runtime-version:
       - 3.11.4
     method: POST
-    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2023-05-15
+    uri: https://openai-mlexperiment.openai.azure.com//openai/deployments/gpt-35-turbo-0613/chat/completions?api-version=2024-02-01
   response:
     content: '{"id":"chatcmpl-8XtJq11XAyMn9hlKo8owbKrc4Thqt","object":"chat.completion","created":1703088162,"model":"gpt-35-turbo","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Pong"}}],"usage":{"prompt_tokens":11,"completion_tokens":2,"total_tokens":13}}
 

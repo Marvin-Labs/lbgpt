@@ -18,4 +18,4 @@ class ChatCompletionAddition(ChatCompletion):
     def from_chat_completion(
             cls, chat_completion: ChatCompletion, model_class: str, is_exact: bool = True,
     ) -> Self:
-        return cls(**chat_completion.model_dump(), is_exact=is_exact)
+        return cls(**chat_completion.model_dump(), is_exact=is_exact, model_class=model_class)
