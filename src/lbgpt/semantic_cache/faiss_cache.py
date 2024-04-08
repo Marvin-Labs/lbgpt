@@ -58,8 +58,11 @@ class FaissSemanticCache(_SemanticCacheBase):
         res = [r for r in res if r[1] <= 1 - self.cosine_similarity_threshold]
 
         if len(res) > 0:
+            r = res[0][0].metadata["result"]
+            r = {k: v for k, v in r.items() if k not in ['is_exact', 'is_semantic_cached', 'is_cached']}
+
             return ChatCompletionAddition(
-                **res[0][0].metadata["result"], is_exact=res[0][1] <= 0.00001
+                **r, is_exact=res[0][1] <= 0.00001, is_semantic_cached=True
             )
         else:
             return

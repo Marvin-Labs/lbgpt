@@ -173,10 +173,15 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
         res = [r for r in res if r.score >= self.cosine_similarity_threshold]
 
+
         if len(res) > 0:
+            r = res[0].payload["result"]
+            r = {k: v for k, v in r.items() if k not in ['is_exact', 'is_semantic_cached', 'is_cached']}
+
             return ChatCompletionAddition(
-                **res[0].payload["result"],
+                **r,
                 is_exact=res[0].score >= 1 - 0.00001,
+                is_semantic_cached=True,
             )
         else:
             return

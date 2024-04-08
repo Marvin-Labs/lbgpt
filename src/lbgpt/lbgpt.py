@@ -80,7 +80,7 @@ class ChatGPT(_BaseGPT):
             )
         )
 
-        return ChatCompletionAddition.from_chat_completion(out)
+        return ChatCompletionAddition.from_chat_completion(out, model_class=self.__class__.__name__)
 
 
 class AzureGPT(_BaseGPT):
@@ -162,7 +162,7 @@ class AzureGPT(_BaseGPT):
             )
         )
 
-        return ChatCompletionAddition.from_chat_completion(out)
+        return ChatCompletionAddition.from_chat_completion(out, model_class=self.__class__.__name__)
 
 
 ALLOCATION_FUNCTIONS = {
