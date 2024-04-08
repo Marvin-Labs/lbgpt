@@ -93,7 +93,7 @@ class AzureGPT(_BaseGPT):
         semantic_cache: Optional[Any] = None,
         propagate_standard_cache_to_semantic_cache: bool = False,
         propagate_semantic_cache_to_standard_cache: bool = False,
-        azure_openai_version: str = "2023-05-15",
+        azure_openai_version: str = "2024-02-01",
         azure_openai_type: str = "azure",
         max_parallel_calls: int = 5,
         request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
