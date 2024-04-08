@@ -109,10 +109,10 @@ class _BaseGPT(abc.ABC):
         pass
 
     @property
-    def usage_cache_list(self) -> list[Usage]:
+    async def usage_cache_list(self) -> list[Usage]:
         return self._usage_cache_list
 
-    def add_usage_to_usage_cache(self, usage: Usage):
+    async def add_usage_to_usage_cache(self, usage: Usage):
         # evict if the list is too long. Do this to protect memory usage if required
         if (
             self.max_usage_cache_size
@@ -122,12 +122,12 @@ class _BaseGPT(abc.ABC):
 
         self._usage_cache_list.append(usage)
 
-    def usage_cache_list_after_start_datetime(
+    async def usage_cache_list_after_start_datetime(
         self, start_datetime: datetime.datetime
     ) -> list[Usage]:
         return [k for k in self._usage_cache_list if k.start_datetime > start_datetime]
 
-    def get_usage_stats(self, include_usage_reservation: bool = False) -> UsageStats:
+    async def get_usage_stats(self, include_usage_reservation: bool = False) -> UsageStats:
         current_usage_tokens = 0
         current_usage_requests = 0
 
@@ -135,11 +135,11 @@ class _BaseGPT(abc.ABC):
             # Estimating current usage as the expected number of tokens times the number of
             # currently outstanding requests (which are tracked in the semaphore)
             current_usage_tokens = (
-                self.semaphore._value * self.expected_tokens_per_request()
+                self.semaphore_chatgpt._value * await self.expected_tokens_per_request()
             )
-            current_usage_requests = self.semaphore._value
+            current_usage_requests = self.semaphore_chatgpt._value
 
-        cache_list_after_start_datetime = self.usage_cache_list_after_start_datetime(
+        cache_list_after_start_datetime = await self.usage_cache_list_after_start_datetime(
             datetime.datetime.now() - datetime.timedelta(seconds=60)
         )
 
@@ -154,7 +154,7 @@ class _BaseGPT(abc.ABC):
             requests=len(cache_list_after_start_datetime) + current_usage_requests,
         )
 
-    def expected_tokens_per_request(self) -> int:
+    async def expected_tokens_per_request(self) -> int:
         """Returns the expected number of tokens per usage
         We are returning the following (in subsequent order of preference):
         (1) the median number of tokens per usage in the cache
@@ -173,19 +173,19 @@ class _BaseGPT(abc.ABC):
         else:
             return 0
 
-    def headroom(self) -> int:
+    async def headroom(self) -> int:
         """Returns the number of tokens remaining in the current minute"""
-        cur_usage = self.get_usage_stats()
+        cur_usage = await self.get_usage_stats()
 
         if self.limit_tpm:
             headroom_tpm = (
-                self.limit_tpm - cur_usage.tokens - self.expected_tokens_per_request()
+                self.limit_tpm - cur_usage.tokens - await self.expected_tokens_per_request()
             )
         else:
             headroom_tpm = sys.maxsize
 
         if self.limit_rpm:
-            headroom_rpm = self.expected_tokens_per_request() * (
+            headroom_rpm = await self.expected_tokens_per_request() * (
                 self.limit_rpm - cur_usage.requests - 1
             )
         else:
