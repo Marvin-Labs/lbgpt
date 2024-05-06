@@ -19,7 +19,10 @@ redis_cache = redis.StrictRedis(
 redis_cache.flushdb()
 
 
-CACHES = [diskcache.Cache(tempfile.TemporaryDirectory().name), redis_cache]
+CACHES = [
+    diskcache.Cache(tempfile.TemporaryDirectory().name),
+    redis_cache
+]
 
 
 def _num_keys_in_cache(cache) -> int:

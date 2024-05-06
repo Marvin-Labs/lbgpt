@@ -220,10 +220,14 @@ class _BaseGPT(abc.ABC):
 
         return [t.result() for t in tasks]
 
-    def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
+    async def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
             logger.debug(f'trying to get {hashed} from standard cache')
-            out = self.cache.get(hashed)
+
+            if hasattr(self.cache, 'aget'):
+                out = await self.cache.aget(hashed)
+            else:
+                out = self.cache.get(hashed)
 
             if out is not None:
                 logger.debug(f'found request {hashed} in standard cache')
@@ -232,16 +236,19 @@ class _BaseGPT(abc.ABC):
 
                 return model_parse(ChatCompletionAddition, out_dict)
 
-    def _set_to_cache(self, hashed: str, value: ChatCompletionAddition):
+    async def _set_to_cache(self, hashed: str, value: ChatCompletionAddition):
         if self.cache is not None:
-            self.cache.set(hashed, json.dumps(model_dump(value)))
+            if hasattr(self.cache, 'aset'):
+                await self.cache.aset(hashed, json.dumps(model_dump(value)))
+            else:
+                self.cache.set(hashed, json.dumps(model_dump(value)))
 
     async def get_chat_completion_from_cache(
         self, hashed: str, **kwargs
     ) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
             async with self.semaphore_standard_cache:
-                out = self._get_from_cache(hashed)
+                out = await self._get_from_cache(hashed)
             if out is not None:
                 # propagate to semantic cache if required
                 if self.propagate_standard_cache_to_semantic_cache:
@@ -274,7 +281,7 @@ class _BaseGPT(abc.ABC):
 
                 if self.propagate_semantic_cache_to_standard_cache and out.is_exact:
                     logger.debug("propagating semantic cache to standard cache")
-                    self._set_to_cache(hashed, out)
+                    await self._set_to_cache(hashed, out)
 
                 return out
 
@@ -287,7 +294,7 @@ class _BaseGPT(abc.ABC):
 
         if self.cache is not None:
             logger.debug(f"adding request {hashed} to standard cache")
-            self._set_to_cache(hashed, out)
+            await self._set_to_cache(hashed, out)
 
     async def retrying_chat_completion(
         self,
