@@ -6,7 +6,8 @@ from openai.types.chat import ChatCompletion, CompletionCreateParams
 from pydantic import BaseModel
 from qdrant_client import AsyncQdrantClient, QdrantClient
 from qdrant_client.http.exceptions import ResponseHandlingException
-from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
+from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct, PayloadFieldSchema, \
+    PayloadSchemaType
 from qdrant_client.models import Distance, VectorParams
 
 from lbgpt.cache import make_hash_chatgpt_request
@@ -105,6 +106,13 @@ class QdrantSemanticCache(_SemanticCacheBase):
                     size=len(_test_embedding), distance=Distance.COSINE
                 ),
             )
+
+            client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name='hashed_model',
+                field_schema=PayloadSchemaType.TEXT
+            )
+
         client.close()
 
     def _create_filter_value(
