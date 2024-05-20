@@ -10,7 +10,7 @@ def non_message_parameters_from_create(
     chat_completion_create: CompletionCreateParams | dict[str, Any]
 ) -> dict[str, Any]:
     return dict(
-        model=chat_completion_create["model"],
+        model=chat_completion_create.get('model_name_cache_alias', chat_completion_create["model"]),
         frequency_penalty=chat_completion_create.get("frequency_penalty", 0.0),
         logit_bias=chat_completion_create.get("logit_bias"),
         n=chat_completion_create.get("n", 1),
