@@ -81,7 +81,7 @@ def qdrant_cache(messages) -> QdrantSemanticCache:
         points=[
             PointStruct(
                 id=str(uuid.uuid4()),
-                vector=cache.embed_messages([message]),
+                vector=cache.embed_messages([message], encoding_method='user_only'),
                 payload={"message": message},
             )
             for message in messages
@@ -96,7 +96,7 @@ async def test_exact(qdrant_cache, messages):
     message = messages[0]
     res = await qdrant_cache._QdrantClientConfig.get_async_client().search(
         collection_name=qdrant_cache.collection_name,
-        query_vector=qdrant_cache.embed_messages([message]),
+        query_vector=qdrant_cache.embed_messages([message], encoding_method='user_only'),
         with_payload=True,
         with_vectors=True,
         limit=1,
@@ -113,7 +113,7 @@ async def test_close(qdrant_cache, messages):
         "content": "Apple’s board of directors has declared a cash dividend of $0.53 per share of the Company’s common stock. The dividend is payable on March 12, 2019 to shareholders of record as of the close of business on March 10, 2019.",
     }
 
-    embedded = qdrant_cache.embed_messages([message])
+    embedded = qdrant_cache.embed_messages([message], encoding_method='user_only')
 
     res = await qdrant_cache._QdrantClientConfig.get_async_client().search(
         collection_name=qdrant_cache.collection_name,
@@ -126,7 +126,7 @@ async def test_close(qdrant_cache, messages):
     res_message = res[0].payload["message"]
     assert res_message == messages[0]
 
-    res_embedded = qdrant_cache.embed_messages([res_message])
+    res_embedded = qdrant_cache.embed_messages([res_message], encoding_method='user_only')
 
     cs = cosine_similarity([embedded], [res_embedded])
 
@@ -140,7 +140,7 @@ async def test_far(qdrant_cache, messages):
         "content": "The tolerance values are positive, typically very small numbers. The relative difference (rtol * abs(b)) and the absolute difference atol are added together to compare against the absolute difference between a and b.",
     }
 
-    embedded = qdrant_cache.embed_messages([message])
+    embedded = qdrant_cache.embed_messages([message], encoding_method='user_only')
 
     res = await qdrant_cache._QdrantClientConfig.get_async_client().search(
         collection_name=qdrant_cache.collection_name,
@@ -151,7 +151,7 @@ async def test_far(qdrant_cache, messages):
     )
 
     res_message = res[0].payload["message"]
-    res_embedded = qdrant_cache.embed_messages([res_message])
+    res_embedded = qdrant_cache.embed_messages([res_message], encoding_method='user_only')
 
     cs = cosine_similarity([embedded], [res_embedded])
 

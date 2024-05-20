@@ -13,9 +13,7 @@ from lbgpt.cache import make_hash_chatgpt_request
 from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition
 
-
 from logging import getLogger
-
 
 logger = getLogger(__name__)
 
@@ -66,16 +64,16 @@ class QdrantSemanticCache(_SemanticCacheBase):
     ALLOWED_TYPES_FOR_PAYLOAD = (int, str, bool)
 
     def __init__(
-        self,
-        embedding_model: Embeddings,
-        collection_name: str,
-        host: Optional[str] = None,
-        port: Optional[int] = 6333,
-        url: Optional[str] = None,
-        api_key: Optional[str] = None,
-        qdrant_properties: Optional[dict[str, Any]] = None,
-        cosine_similarity_threshold: float = 0.99,
-        max_concurrent_requests=10,
+            self,
+            embedding_model: Embeddings,
+            collection_name: str,
+            host: Optional[str] = None,
+            port: Optional[int] = 6333,
+            url: Optional[str] = None,
+            api_key: Optional[str] = None,
+            qdrant_properties: Optional[dict[str, Any]] = None,
+            cosine_similarity_threshold: float = 0.99,
+            max_concurrent_requests=10,
     ):
         super().__init__(
             embedding_model=embedding_model,
@@ -110,7 +108,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
         client.close()
 
     def _create_filter_value(
-        self, value: int | str | bool | NoneType
+            self, value: int | str | bool | NoneType
     ) -> int | str | bool:
         if isinstance(value, self.ALLOWED_TYPES_FOR_PAYLOAD):
             return value
@@ -120,32 +118,42 @@ class QdrantSemanticCache(_SemanticCacheBase):
             raise NotImplementedError(f"cannot process type {type(value)}")
 
     async def query_cache(
-        self, query: CompletionCreateParams | dict[str, Any]
+            self, query: CompletionCreateParams | dict[str, Any],
+            semantic_cache_encoding_method: Optional[str]
+
     ) -> Optional[ChatCompletionAddition]:
+        if semantic_cache_encoding_method is None:
+            return
+
         try:
-            return await self._query_cache(query=query)
+            return await self._query_cache(query=query, semantic_cache_encoding_method=semantic_cache_encoding_method)
         except ResponseHandlingException as e:
             logger.debug(f"Error querying cache, proceed anyways: {e}")
             # we don't really care about errors here
             return
 
     async def add_cache(
-        self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
+            self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion,
+            semantic_cache_encoding_method: Optional[str]
+
     ) -> None:
+        if semantic_cache_encoding_method is None:
+            return
+
         try:
-            return await self._add_cache(query=query, response=response)
+            return await self._add_cache(query=query, response=response, semantic_cache_encoding_method=semantic_cache_encoding_method)
         except ResponseHandlingException as e:
             logger.debug(f"Error querying cache, proceed anyways: {e}")
             # we don't really care about errors here
             return
 
     def hashed_query_payload(
-        self, query: CompletionCreateParams | dict[str, Any]
+            self, query: CompletionCreateParams | dict[str, Any]
     ) -> str:
         return make_hash_chatgpt_request(query, include_messages=False)
 
     async def _query_cache(
-        self, query: CompletionCreateParams | dict[str, Any]
+            self, query: CompletionCreateParams | dict[str, Any], semantic_cache_encoding_method: str
     ) -> Optional[ChatCompletionAddition]:
         query = get_completion_create_params(**query)
         filter_params_hash = make_hash_chatgpt_request(query, include_messages=False)
@@ -158,7 +166,7 @@ class QdrantSemanticCache(_SemanticCacheBase):
             ]
         )
 
-        embedding = await self.aembed_messages(query["messages"])
+        embedding = await self.aembed_messages(query["messages"], encoding_method=semantic_cache_encoding_method)
 
         res = await self._QdrantClientConfig.get_async_client().search(
             collection_name=self.collection_name,
@@ -173,7 +181,6 @@ class QdrantSemanticCache(_SemanticCacheBase):
 
         res = [r for r in res if r.score >= self.cosine_similarity_threshold]
 
-
         if len(res) > 0:
             r = res[0].payload["result"]
             r = {k: v for k, v in r.items() if k not in ['is_exact', 'is_semantic_cached', 'is_cached']}
@@ -187,12 +194,13 @@ class QdrantSemanticCache(_SemanticCacheBase):
             return
 
     async def _add_cache(
-        self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
+            self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion,
+            semantic_cache_encoding_method: str
     ) -> None:
         query = get_completion_create_params(**query)
         filter_params_hash = make_hash_chatgpt_request(query, include_messages=False)
 
-        embedding = await self.aembed_messages(query["messages"])
+        embedding = await self.aembed_messages(query["messages"], encoding_method=semantic_cache_encoding_method)
 
         await self._QdrantClientConfig.get_async_client().upsert(
             collection_name=self.collection_name,

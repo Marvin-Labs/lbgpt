@@ -35,8 +35,8 @@ interactions:
     method: POST
     uri: https://api.openai.com/v1/chat/completions
   response:
-    content: "{\n  \"id\": \"chatcmpl-9QwhOiRMlGXJvYMv7Rr8bwvFONQSu\",\n  \"object\":
-      \"chat.completion\",\n  \"created\": 1716209194,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+    content: "{\n  \"id\": \"chatcmpl-9Qwl8rBWX6IAJxrC75rHQ7Uu1SAcg\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1716209426,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
       \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
       \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
       null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
@@ -46,7 +46,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 886c6e287c000d9b-MRS
+      - 886c73cf8c43b476-DXB
       Connection:
       - keep-alive
       Content-Encoding:
@@ -54,14 +54,14 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Mon, 20 May 2024 12:46:34 GMT
+      - Mon, 20 May 2024 12:50:26 GMT
       Server:
       - cloudflare
       Set-Cookie:
-      - __cf_bm=VxyQWKSrJTP5o14Wzs7W82WMJdxQ2aObfa7Yf9Bmapo-1716209194-1.0.1.1-WoqgvIlW0hdayBe97jrhIg1Q2KLQuXr5o7og_Sg8EfmfTqV9DyWaHvhRx25.ildXEhOG0YHOPA2eU1mS4xY6JA;
-        path=/; expires=Mon, 20-May-24 13:16:34 GMT; domain=.api.openai.com; HttpOnly;
+      - __cf_bm=wxPH.URlsI1cMPt6cKh5AD9yKLgVL6HKwo3MHTFqT0U-1716209426-1.0.1.1-Ye.IvqmHpU_MwVYsK3kh4WebE1za3uku591DOS0Kp9MqBorED9MT8cRCJHp65yIbAtCy_E_1fDs__oWloeou3A;
+        path=/; expires=Mon, 20-May-24 13:20:26 GMT; domain=.api.openai.com; HttpOnly;
         Secure; SameSite=None
-      - _cfuvid=KcdbDwvCBbRqBXdYH.PsPCiVaV.2GVtD4nsz5uySsGk-1716209194836-0.0.1.1-604800000;
+      - _cfuvid=FXAvv7auuret9WXN03aSBO24_QGvuxh_w8oLL5skGw4-1716209426474-0.0.1.1-604800000;
         path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
       Transfer-Encoding:
       - chunked
@@ -70,7 +70,7 @@ interactions:
       openai-organization:
       - marvin-labs
       openai-processing-ms:
-      - '114'
+      - '108'
       openai-version:
       - '2020-10-01'
       strict-transport-security:
@@ -88,11 +88,11 @@ interactions:
       x-ratelimit-reset-tokens:
       - 1ms
       x-request-id:
-      - req_bd820e6ebb70de42ef5276c42f89a758
+      - req_3818e4ce9380de5ea27776af0fb04613
     http_version: HTTP/1.1
     status_code: 200
 - request:
-    body: '{"messages": [{"role": "user", "content": "please respond with test"}],
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
       "model": "gpt-3.5-turbo-0613", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
       0, "temperature": 0, "top_p": 1}'
     headers:
@@ -127,18 +127,18 @@ interactions:
     method: POST
     uri: https://api.openai.com/v1/chat/completions
   response:
-    content: "{\n  \"id\": \"chatcmpl-9QwhPA1P7bkxtcYjPHXRxhnGP5tAX\",\n  \"object\":
-      \"chat.completion\",\n  \"created\": 1716209195,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
+    content: "{\n  \"id\": \"chatcmpl-9Qwl9MFVA7Izzvmlkcfylvuz7M5JN\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1716209427,\n  \"model\": \"gpt-3.5-turbo-0613\",\n
       \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
-      \"assistant\",\n        \"content\": \"test\"\n      },\n      \"logprobs\":
+      \"assistant\",\n        \"content\": \"Pong\"\n      },\n      \"logprobs\":
       null,\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
-      11,\n    \"completion_tokens\": 1,\n    \"total_tokens\": 12\n  },\n  \"system_fingerprint\":
+      11,\n    \"completion_tokens\": 2,\n    \"total_tokens\": 13\n  },\n  \"system_fingerprint\":
       null\n}\n"
     headers:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 886c6e2d9d831266-DXB
+      - 886c73d5ea490c45-MRS
       Connection:
       - keep-alive
       Content-Encoding:
@@ -146,14 +146,14 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Mon, 20 May 2024 12:46:36 GMT
+      - Mon, 20 May 2024 12:50:27 GMT
       Server:
       - cloudflare
       Set-Cookie:
-      - __cf_bm=s_XgPOEk.OR2uoGJC_yQbkxaYGFloQxbKm28tEdsuhE-1716209196-1.0.1.1-tTOXvmQOU5Cp03aprSXuM6d5n928EoKZneWAqthlBxIbxk5zhYRIz8e7Bkt3XcxSqBYVvwGmFLguLHu3eFYNrA;
-        path=/; expires=Mon, 20-May-24 13:16:36 GMT; domain=.api.openai.com; HttpOnly;
+      - __cf_bm=Vx1dKh.7UnqkmT2MQ7zRTV3PH7m_Cy_taEixU_4VX4U-1716209427-1.0.1.1-ppXS.t_3pZ84vCezPyrYs0wsN5DprNws7.YzaN3vvxQdpvu6rNKi8DeZPBAUYlXjHwDw0qzRHcZ7J3oQIDYlBg;
+        path=/; expires=Mon, 20-May-24 13:20:27 GMT; domain=.api.openai.com; HttpOnly;
         Secure; SameSite=None
-      - _cfuvid=EXd8_5_nuHBX8tX8jeEfwsUGStD9xrZPldc32OTdtDY-1716209196063-0.0.1.1-604800000;
+      - _cfuvid=WdHluqymnwoacmfOra0fGw6bjEGmSt7oJxjELrriKdw-1716209427350-0.0.1.1-604800000;
         path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
       Transfer-Encoding:
       - chunked
@@ -162,7 +162,7 @@ interactions:
       openai-organization:
       - marvin-labs
       openai-processing-ms:
-      - '426'
+      - '92'
       openai-version:
       - '2020-10-01'
       strict-transport-security:
@@ -180,7 +180,7 @@ interactions:
       x-ratelimit-reset-tokens:
       - 1ms
       x-request-id:
-      - req_d458d9cbfa1eb076e558794b8e2699f8
+      - req_183b07de535aa8c3e55184f8457999a6
     http_version: HTTP/1.1
     status_code: 200
 version: 1

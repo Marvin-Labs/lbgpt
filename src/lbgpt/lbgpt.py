@@ -26,7 +26,6 @@ class ChatGPT(_BaseGPT):
         request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
-        propagate_standard_cache_to_semantic_cache: bool = False,
         propagate_semantic_cache_to_standard_cache: bool = False,
         stop_after_attempts: Optional[int] = 10,
         stop_on_exception: bool = False,
@@ -37,7 +36,6 @@ class ChatGPT(_BaseGPT):
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
-            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
@@ -61,6 +59,10 @@ class ChatGPT(_BaseGPT):
         # one request to the OpenAI API respecting their ratelimit
         async with self.semaphore_chatgpt:
             timeout = kwargs.pop("request_timeout", self.request_timeout)
+
+            # removing private parameters that are not being passed to ChatGPT
+            kwargs.pop("semantic_cache_encoding_method", None)
+            kwargs.pop("model_name_cache_alias", None)
 
             start = datetime.datetime.now()
             out = (
@@ -91,7 +93,6 @@ class AzureGPT(_BaseGPT):
         azure_model_map: dict[str, str],
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
-        propagate_standard_cache_to_semantic_cache: bool = False,
         propagate_semantic_cache_to_standard_cache: bool = False,
         azure_openai_version: str = "2024-02-01",
         azure_openai_type: str = "azure",
@@ -106,7 +107,6 @@ class AzureGPT(_BaseGPT):
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
-            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
             max_parallel_calls=max_parallel_calls,
             stop_after_attempts=stop_after_attempts,
@@ -210,7 +210,6 @@ class MultiLoadBalancedGPT(_BaseGPT):
         super().__init__(
             cache=cache,
             semantic_cache=semantic_cache,
-            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
             max_parallel_calls=max_parallel_requests,
             stop_after_attempts=stop_after_attempts,
@@ -250,7 +249,6 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
         azure_model_map: dict[str, str],
         cache: Optional[Any] = None,
         semantic_cache: Optional[Any] = None,
-        propagate_standard_cache_to_semantic_cache: bool = False,
         propagate_semantic_cache_to_standard_cache: bool = False,
         azure_openai_version: str = "2024-02-01",
         azure_openai_type: str = "azure",
@@ -264,7 +262,6 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             api_key=openai_api_key,
             cache=cache,
             semantic_cache=semantic_cache,
-            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
             max_parallel_calls=max_parallel_calls_openai,
             stop_after_attempts=stop_after_attempts,
@@ -279,7 +276,6 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             azure_openai_type=azure_openai_type,
             cache=cache,
             semantic_cache=semantic_cache,
-            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
             max_parallel_calls=max_parallel_calls_azure,
             stop_after_attempts=stop_after_attempts,
@@ -290,7 +286,6 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             gpts=[self.openai, self.azure],
             cache=cache,
             semantic_cache=semantic_cache,
-            propagate_standard_cache_to_semantic_cache=propagate_standard_cache_to_semantic_cache,
             allocation_function="random",
             allocation_function_weights=[
                 ratio_openai_to_azure,

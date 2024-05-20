@@ -18,7 +18,6 @@ from lbgpt.types import ChatCompletionAddition
 # so we have to create an instance of random.Random with a new seed here.
 rng = random.Random(time.time())
 
-
 TEST_EMBEDDING_MODEL = HuggingFaceEmbeddings(model_name="bert-base-uncased")
 
 SEMANTIC_CACHES = [
@@ -37,11 +36,12 @@ SEMANTIC_CACHES = [
 ]
 
 
-def get_single_request_content_for_test(user_message: str):
+def get_single_request_content_for_test(user_message: str, enable_encoding: bool = True):
     messages = [
         {"role": "user", "content": user_message},
     ]
-    return dict(
+
+    req = dict(
         messages=messages,
         model="gpt-3.5-turbo-0613",
         temperature=0,
@@ -50,7 +50,12 @@ def get_single_request_content_for_test(user_message: str):
         frequency_penalty=0,
         presence_penalty=0,
         request_timeout=10,
+
     )
+
+    if enable_encoding:
+        req['semantic_cache_encoding_method'] = 'user_only'
+    return req
 
 
 @pytest.mark.parametrize("semantic_cache", SEMANTIC_CACHES)
@@ -207,3 +212,55 @@ def test_chatgpt_cache_failed(mocker: MockerFixture, semantic_cache):
     assert hash(semantic_cache) == cache_stats["hash"]
 
     assert res_cache[0].is_exact is True
+
+
+@pytest.mark.parametrize("semantic_cache", SEMANTIC_CACHES)
+@pytest.mark.vcr
+def test_chatgpt_cache_exact_but_no_method_specified(mocker: MockerFixture, semantic_cache):
+    semantic_cache = semantic_cache()
+    single_request_content = get_single_request_content_for_test(
+        "please respond with pong",
+        enable_encoding=False
+    )
+
+    lb = ChatGPT(
+        api_key=os.environ["OPEN_AI_API_KEY"],
+        stop_after_attempts=1,
+        stop_on_exception=True,
+        semantic_cache=semantic_cache,
+    )
+
+    # Setting the cache
+    cache_interaction = mocker.spy(semantic_cache, "query_cache")
+
+    # run with an empty cache
+    res = asyncio.run(
+        lb.chat_completion_list([single_request_content], show_progress=False)
+    )
+
+    # asserting that the cache was not called
+    assert cache_interaction.call_count == 1
+    assert cache_interaction.spy_return is None
+
+    # some cache stats and hash
+    cache_stats = {"hash": hash(semantic_cache)}
+
+    if hasattr(semantic_cache, "count"):
+        cache_stats["count"] = semantic_cache.count
+
+    # Getting from cache
+    res_cache = asyncio.run(
+        lb.chat_completion_list([single_request_content], show_progress=False)
+    )
+
+    # asserting that the cache was called and returned the values
+    assert cache_interaction.call_count == 2
+    assert cache_interaction.spy_return is None
+
+    # asserting that no items were added to the cache
+    if hasattr(semantic_cache, "count"):
+        assert semantic_cache.count == cache_stats["count"]
+    assert hash(semantic_cache) == cache_stats["hash"]
+
+    assert res_cache[0].is_exact is True
+

@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, Callable
 
 from langchain_core.embeddings import Embeddings
 from openai.types.chat import ChatCompletion, CompletionCreateParams
@@ -10,6 +10,7 @@ from openai.types.completion_create_params import (
 )
 
 from lbgpt.cache import non_message_parameters_from_create
+from lbgpt.semantic_cache import encoding
 from lbgpt.types import ChatCompletionAddition
 
 logger = logging.getLogger(__name__)
@@ -22,42 +23,47 @@ def get_completion_create_params(**query) -> dict[str, Any]:
         return CompletionCreateParamsNonStreaming(**query)
 
 
+ENCODING_METHODS: dict[str, Callable[[list[encoding.RoleMessage]], str]] = {
+    'user_only': encoding.user_only,
+    'all': encoding.all_,
+    'system_only': encoding.system_only,
+}
+
+
 class _SemanticCacheBase(abc.ABC):
     def __init__(
-        self,
-        embedding_model: Embeddings,
-        cosine_similarity_threshold: float = 0.99,
-        converted_message_roles: Iterable[str] = ("user",),
+            self,
+            embedding_model: Embeddings,
+            cosine_similarity_threshold: float = 0.99,
     ):
         self.embeddings_model = embedding_model
         self.cosine_similarity_threshold = cosine_similarity_threshold
-        self.converted_message_roles = converted_message_roles
 
-    def message_to_text(self, message: [str, Any]) -> str:
-        return f'[{message["role"]}]: {message["content"].strip()}\n\n'
+    def encode_messages(self, messages: list[dict[str, Any]], encoding_method: str) -> str:
+        if encoding_method not in ENCODING_METHODS:
+            raise ValueError(f"Unknown encoding method: {encoding_method}")
 
-    def messages_to_text(self, messages: list[dict[str, Any]]) -> str:
-        txt = ""
-        for message in messages:
-            if message["role"] in self.converted_message_roles:
-                txt += self.message_to_text(message)
+        em = ENCODING_METHODS[encoding_method]
+        rm = [encoding.RoleMessage(
+            role=m['role'],
+            content=m['content'].strip()
+        ) for m in messages]
 
-        return txt
+        return em(rm)
 
-    def embed_messages(self, messages: list[dict[str, Any]]) -> list[float]:
-        txt = self.messages_to_text(messages)
+    def embed_messages(self, messages: list[dict[str, Any]], encoding_method: str) -> list[float]:
+        txt = self.encode_messages(messages, encoding_method)
         return self.embeddings_model.embed_documents([txt])[0]
 
-    async def aembed_messages(self, messages: list[dict[str, Any]]) -> list[float]:
-        txt = self.messages_to_text(messages)
+    async def aembed_messages(self, messages: list[dict[str, Any]], encoding_method: str) -> list[float]:
+        txt = self.encode_messages(messages, encoding_method)
         return await self.embeddings_model.aembed_query(txt)
 
-
     def non_message_dict(
-        self,
-        chat_completion_create: CompletionCreateParams | dict[str, Any],
-        allowed_types: Optional[Iterable] = None,
-        convert_not_allowed_to_empty: bool = True,
+            self,
+            chat_completion_create: CompletionCreateParams | dict[str, Any],
+            allowed_types: Optional[Iterable] = None,
+            convert_not_allowed_to_empty: bool = True,
     ) -> dict[str, Any]:
         res = non_message_parameters_from_create(
             chat_completion_create=chat_completion_create
@@ -78,13 +84,18 @@ class _SemanticCacheBase(abc.ABC):
 
     @abc.abstractmethod
     async def query_cache(
-        self, query: CompletionCreateParams | dict[str, Any]
+            self,
+            query: CompletionCreateParams | dict[str, Any],
+            semantic_cache_encoding_method: Optional[str]
     ) -> Optional[ChatCompletionAddition]:
         return None
 
     @abc.abstractmethod
     async def add_cache(
-        self, query: CompletionCreateParams | dict[str, Any], response: ChatCompletion
+            self,
+            query: CompletionCreateParams | dict[str, Any],
+            response: ChatCompletion,
+            semantic_cache_encoding_method: Optional[str]
     ) -> None:
         raise NotImplementedError()
 
