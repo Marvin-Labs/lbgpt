@@ -20,18 +20,18 @@ logger = getLogger(__name__)
 
 class ChatGPT(_BaseGPT):
     def __init__(
-        self,
-        api_key: str,
-        max_parallel_calls: int = 5,
-        request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
-        cache: Optional[Any] = None,
-        semantic_cache: Optional[Any] = None,
-        propagate_semantic_cache_to_standard_cache: bool = False,
-        stop_after_attempts: Optional[int] = 10,
-        stop_on_exception: bool = False,
-        max_usage_cache_size: Optional[int] = 1_000,
-        limit_tpm: Optional[int] = None,
-        limit_rpm: Optional[int] = None,
+            self,
+            api_key: str,
+            max_parallel_calls: int = 5,
+            request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
+            cache: Optional[Any] = None,
+            semantic_cache: Optional[Any] = None,
+            propagate_semantic_cache_to_standard_cache: bool = False,
+            stop_after_attempts: Optional[int] = 10,
+            stop_on_exception: bool = False,
+            max_usage_cache_size: Optional[int] = 1_000,
+            limit_tpm: Optional[int] = None,
+            limit_rpm: Optional[int] = None,
     ):
         super().__init__(
             cache=cache,
@@ -57,7 +57,7 @@ class ChatGPT(_BaseGPT):
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
-        async with self.semaphore_chatgpt:
+        async with (self.semaphore_chatgpt):
             timeout = kwargs.pop("request_timeout", self.request_timeout)
 
             # removing private parameters that are not being passed to ChatGPT
@@ -65,13 +65,12 @@ class ChatGPT(_BaseGPT):
             kwargs.pop("model_name_cache_alias", None)
 
             start = datetime.datetime.now()
-            out = (
-                await self.get_client()
-                .with_options(timeout=timeout)
-                .chat.completions.create(
+            async with self.get_client() as client:
+                out = (await client
+                       .with_options(timeout=timeout)
+                       .chat.completions.create(
                     **kwargs,
-                )
-            )
+                ))
 
         await self.add_usage_to_usage_cache(
             Usage(
@@ -87,22 +86,22 @@ class ChatGPT(_BaseGPT):
 
 class AzureGPT(_BaseGPT):
     def __init__(
-        self,
-        api_key: str,
-        azure_api_base: str,
-        azure_model_map: dict[str, str],
-        cache: Optional[Any] = None,
-        semantic_cache: Optional[Any] = None,
-        propagate_semantic_cache_to_standard_cache: bool = False,
-        azure_openai_version: str = "2024-02-01",
-        azure_openai_type: str = "azure",
-        max_parallel_calls: int = 5,
-        request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
-        stop_after_attempts: Optional[int] = 10,
-        stop_on_exception: bool = False,
-        max_usage_cache_size: Optional[int] = 1_000,
-        limit_tpm: Optional[int] = None,
-        limit_rpm: Optional[int] = None,
+            self,
+            api_key: str,
+            azure_api_base: str,
+            azure_model_map: dict[str, str],
+            cache: Optional[Any] = None,
+            semantic_cache: Optional[Any] = None,
+            propagate_semantic_cache_to_standard_cache: bool = False,
+            azure_openai_version: str = "2024-02-01",
+            azure_openai_type: str = "azure",
+            max_parallel_calls: int = 5,
+            request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
+            stop_after_attempts: Optional[int] = 10,
+            stop_on_exception: bool = False,
+            max_usage_cache_size: Optional[int] = 1_000,
+            limit_tpm: Optional[int] = None,
+            limit_rpm: Optional[int] = None,
     ):
         super().__init__(
             cache=cache,
@@ -173,18 +172,18 @@ ALLOCATION_FUNCTIONS = {
 
 class MultiLoadBalancedGPT(_BaseGPT):
     def __init__(
-        self,
-        gpts: list[_BaseGPT],
-        allocation_function: str = "random",
-        allocation_function_kwargs: Optional[dict] = None,
-        allocation_function_weights: Optional[Sequence] = None,
-        cache: Optional[Any] = None,
-        semantic_cache: Optional[Any] = None,
-        propagate_standard_cache_to_semantic_cache: bool = False,
-        propagate_semantic_cache_to_standard_cache: bool = False,
-        stop_after_attempts: Optional[int] = 10,
-        stop_on_exception: bool = False,
-        max_parallel_requests: Optional[int] = None,
+            self,
+            gpts: list[_BaseGPT],
+            allocation_function: str = "random",
+            allocation_function_kwargs: Optional[dict] = None,
+            allocation_function_weights: Optional[Sequence] = None,
+            cache: Optional[Any] = None,
+            semantic_cache: Optional[Any] = None,
+            propagate_standard_cache_to_semantic_cache: bool = False,
+            propagate_semantic_cache_to_standard_cache: bool = False,
+            stop_after_attempts: Optional[int] = 10,
+            stop_on_exception: bool = False,
+            max_parallel_requests: Optional[int] = None,
     ):
         self.gpts = gpts
 
@@ -242,21 +241,21 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
     """
 
     def __init__(
-        self,
-        openai_api_key: str,
-        azure_api_key: str,
-        azure_api_base: str,
-        azure_model_map: dict[str, str],
-        cache: Optional[Any] = None,
-        semantic_cache: Optional[Any] = None,
-        propagate_semantic_cache_to_standard_cache: bool = False,
-        azure_openai_version: str = "2024-02-01",
-        azure_openai_type: str = "azure",
-        max_parallel_calls_openai: int = 5,
-        max_parallel_calls_azure: int = 5,
-        ratio_openai_to_azure: float = 0.25,
-        stop_after_attempts: Optional[int] = 10,
-        stop_on_exception: bool = False,
+            self,
+            openai_api_key: str,
+            azure_api_key: str,
+            azure_api_base: str,
+            azure_model_map: dict[str, str],
+            cache: Optional[Any] = None,
+            semantic_cache: Optional[Any] = None,
+            propagate_semantic_cache_to_standard_cache: bool = False,
+            azure_openai_version: str = "2024-02-01",
+            azure_openai_type: str = "azure",
+            max_parallel_calls_openai: int = 5,
+            max_parallel_calls_azure: int = 5,
+            ratio_openai_to_azure: float = 0.25,
+            stop_after_attempts: Optional[int] = 10,
+            stop_on_exception: bool = False,
     ):
         self.openai = ChatGPT(
             api_key=openai_api_key,
