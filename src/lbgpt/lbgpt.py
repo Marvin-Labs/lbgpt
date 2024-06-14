@@ -4,6 +4,7 @@ from asyncio import Timeout
 from logging import getLogger
 from typing import Any, Optional, Sequence
 
+import httpx
 import openai
 from openai._types import NOT_GIVEN, NotGiven
 
@@ -48,11 +49,13 @@ class ChatGPT(_BaseGPT):
         self.api_key = api_key
         self.request_timeout = request_timeout
 
-    def get_client(self) -> openai.AsyncOpenAI:
-        return openai.AsyncOpenAI(
+        self.client = openai.AsyncOpenAI(
             api_key=self.api_key,
             timeout=self.request_timeout,
             max_retries=0,
+            http_client=httpx.AsyncClient(
+                limits=httpx.Limits(max_keepalive_connections=None, max_connections=None)
+            )
         )
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
@@ -65,12 +68,11 @@ class ChatGPT(_BaseGPT):
             kwargs.pop("model_name_cache_alias", None)
 
             start = datetime.datetime.now()
-            async with self.get_client() as client:
-                out = (await client
-                       .with_options(timeout=timeout)
-                       .chat.completions.create(
-                    **kwargs,
-                ))
+            out = (await self.client
+                   .with_options(timeout=timeout)
+                   .chat.completions.create(
+                **kwargs,
+            ))
 
         await self.add_usage_to_usage_cache(
             Usage(
