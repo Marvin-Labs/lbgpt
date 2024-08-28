@@ -237,10 +237,15 @@ class _BaseGPT(abc.ABC):
         if self.semantic_cache is not None:
             logger.debug(f'trying to get {hashed} from semantic cache')
             async with self.semaphore_semantic_cache:
-                out: Optional[
-                    ChatCompletionAddition
-                ] = await self.semantic_cache.query_cache(kwargs, semantic_cache_encoding_method=kwargs.get(
-                    'semantic_cache_encoding_method'))
+                try:
+                    out: Optional[
+                        ChatCompletionAddition
+                    ] = await self.semantic_cache.query_cache(kwargs, semantic_cache_encoding_method=kwargs.get(
+                        'semantic_cache_encoding_method'))
+                except Exception as e:
+                    # we are not stopping on exception here, but logging it instead
+                    logger.exception(e)
+                    out = None
 
             if out is not None:
                 # propagate to standard cache (we know it is not in standard cache),
