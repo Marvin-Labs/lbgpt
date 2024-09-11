@@ -1,7 +1,5 @@
 from pathlib import Path
 from typing import Any, Optional
-
-from langchain.vectorstores.utils import DistanceStrategy
 from langchain_community.docstore import InMemoryDocstore
 from langchain_community.vectorstores.faiss import FAISS, dependable_faiss_import
 from langchain_core.embeddings import Embeddings
@@ -9,6 +7,7 @@ from openai.types.chat import ChatCompletion, CompletionCreateParams
 
 from lbgpt.semantic_cache.base import _SemanticCacheBase, get_completion_create_params
 from lbgpt.types import ChatCompletionAddition
+from langchain_community.vectorstores.utils import DistanceStrategy
 
 
 class FaissSemanticCache(_SemanticCacheBase):
