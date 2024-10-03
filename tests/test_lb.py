@@ -40,7 +40,7 @@ async def test_lb_async_random(mocker: MockerFixture):
     azure = mocker.spy(lb.azure, "chat_completion")
     openai = mocker.spy(lb.openai, "chat_completion")
 
-    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
 
     assert len(res) == 5
     for k in res:
@@ -91,7 +91,7 @@ async def test_lbgpt_max_headroom():
         allocation_function="max_headroom",
     )
 
-    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
 
     assert len(await lb.usage_cache_list) == 5
     assert len(await lb.gpts[0].usage_cache_list) == 5
@@ -127,7 +127,7 @@ async def test_chatgpt_async(mocker: MockerFixture):
 
     openai = mocker.spy(lb, "chat_completion")
 
-    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
 
     assert len(await lb.usage_cache_list) == 5
 
@@ -167,7 +167,7 @@ async def test_azure_async(mocker: MockerFixture):
 
     azure = mocker.spy(lb, "chat_completion")
 
-    res = await lb.chat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
 
     assert len(await lb.usage_cache_list) == 5
 
@@ -204,11 +204,11 @@ def test_chatgpt_async_multiple_starts(mocker: MockerFixture):
     openai = mocker.spy(lb, "chat_completion")
 
     res = asyncio.run(
-        lb.chat_completion_list([single_request_content] * 2, show_progress=False)
+        lb.achat_completion_list([single_request_content] * 2, show_progress=False)
     )
 
     res2 = asyncio.run(
-        lb.chat_completion_list([single_request_content] * 2, show_progress=False)
+        lb.achat_completion_list([single_request_content] * 2, show_progress=False)
     )
 
     assert len(res) + len(res2) == 4

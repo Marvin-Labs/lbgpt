@@ -71,7 +71,7 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
     request_interaction = mocker.spy(lb, "chat_completion")
 
     # run with an empty cache
-    asyncio.run(lb.chat_completion_list([single_request_content], show_progress=False))
+    asyncio.run(lb.achat_completion_list([single_request_content], show_progress=False))
 
     # asserting that the cache was not called
     assert cache_interaction.call_count == 1
@@ -81,7 +81,7 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
     cache_stats = {"hash": hash(cache), "count": _num_keys_in_cache(cache)}
 
     # Getting from cache
-    asyncio.run(lb.chat_completion_list([single_request_content], show_progress=False))
+    asyncio.run(lb.achat_completion_list([single_request_content], show_progress=False))
 
     # asserting that the cache was called and returned the values
     assert cache_interaction.call_count == 2
@@ -126,7 +126,7 @@ def test_chatgpt_cache_with_name_alias(mocker: MockerFixture, cache):
     request_interaction = mocker.spy(lb, "chat_completion")
 
     # run with an empty cache
-    asyncio.run(lb.chat_completion_list([single_request_content_raw_name], show_progress=False))
+    asyncio.run(lb.achat_completion_list([single_request_content_raw_name], show_progress=False))
 
     # asserting that the cache was not called
     assert cache_interaction.call_count == 1
@@ -148,7 +148,7 @@ def test_chatgpt_cache_with_name_alias(mocker: MockerFixture, cache):
     )
 
     # Getting from cache
-    asyncio.run(lb.chat_completion_list([single_request_content_equivalent_name], show_progress=False))
+    asyncio.run(lb.achat_completion_list([single_request_content_equivalent_name], show_progress=False))
 
     # asserting that the cache was called and returned the values
     assert cache_interaction.call_count == 2

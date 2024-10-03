@@ -78,7 +78,7 @@ def test_chatgpt_cache_exact(mocker: MockerFixture, semantic_cache):
 
     # run with an empty cache
     res = asyncio.run(
-        lb.chat_completion_list([single_request_content], show_progress=False)
+        lb.achat_completion_list([single_request_content], show_progress=False)
     )
 
     # asserting that the cache was not called
@@ -93,7 +93,7 @@ def test_chatgpt_cache_exact(mocker: MockerFixture, semantic_cache):
 
     # Getting from cache
     res_cache = asyncio.run(
-        lb.chat_completion_list([single_request_content], show_progress=False)
+        lb.achat_completion_list([single_request_content], show_progress=False)
     )
 
     # asserting that the cache was called and returned the values
@@ -125,7 +125,7 @@ def test_chatgpt_cache_inexact(mocker: MockerFixture, semantic_cache):
 
     # run with an empty cache
     res = asyncio.run(
-        lb.chat_completion_list(
+        lb.achat_completion_list(
             [get_single_request_content_for_test("please respond with pong")],
             show_progress=False,
         )
@@ -143,7 +143,7 @@ def test_chatgpt_cache_inexact(mocker: MockerFixture, semantic_cache):
 
     # Getting from cache
     res_cache = asyncio.run(
-        lb.chat_completion_list(
+        lb.achat_completion_list(
             [get_single_request_content_for_test("please respond with pongo")],
             show_progress=False,
         )
@@ -178,7 +178,7 @@ def test_chatgpt_cache_failed(mocker: MockerFixture, semantic_cache):
 
     # run with an empty cache
     res = asyncio.run(
-        lb.chat_completion_list(
+        lb.achat_completion_list(
             [get_single_request_content_for_test("please respond with pong")],
             show_progress=False,
         )
@@ -196,7 +196,7 @@ def test_chatgpt_cache_failed(mocker: MockerFixture, semantic_cache):
 
     # Getting from cache
     res_cache = asyncio.run(
-        lb.chat_completion_list(
+        lb.achat_completion_list(
             [get_single_request_content_for_test("please respond with test")],
             show_progress=False,
         )
@@ -235,7 +235,7 @@ def test_chatgpt_cache_exact_but_no_method_specified(mocker: MockerFixture, sema
 
     # run with an empty cache
     res = asyncio.run(
-        lb.chat_completion_list([single_request_content], show_progress=False)
+        lb.achat_completion_list([single_request_content], show_progress=False)
     )
 
     # asserting that the cache was not called
@@ -250,7 +250,7 @@ def test_chatgpt_cache_exact_but_no_method_specified(mocker: MockerFixture, sema
 
     # Getting from cache
     res_cache = asyncio.run(
-        lb.chat_completion_list([single_request_content], show_progress=False)
+        lb.achat_completion_list([single_request_content], show_progress=False)
     )
 
     # asserting that the cache was called and returned the values

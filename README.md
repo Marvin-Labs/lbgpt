@@ -23,7 +23,7 @@ import lbgpt
 import asyncio
 
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY")
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 The `chat_completion_list` function expects a list of dictionaries with fully-formed OpenAI ChatCompletion API requests. Refer to the [OpenAI API definition](https://platform.openai.com/docs/api-reference/chat/create) for more details. You can also use the `chat_completion` function for single requests.
@@ -41,7 +41,7 @@ import asyncio
 
 chatgpt = lbgpt.AzureGPT(api_key="YOUR_API_KEY", azure_api_base="YOUR AZURE API BASE",
                          azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 
@@ -63,7 +63,7 @@ chatgpt = lbgpt.LoadBalancedGPT(
     azure_api_key="YOUR_AZURE_API_KEY",
     azure_api_base="YOUR AZURE API BASE",
     azure_model_map={"OPENAI_MODEL_NAME": "MODEL NAME IN AZURE"})
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 `MultiLoadBalancedGPT` offers load-balancing between multiple OpenAI and Azure models, and offers more flexibility in terms of the load balancing inputs. In order to achieve the same load balancing as the `LoadBalancedGPT`, you can use the following code:
@@ -83,7 +83,7 @@ chatgpt = lbgpt.MultiLoadBalancedGPT(
     allocation_function='random',
 )
 
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 However, the MultiLoadBalancedGPT offers more flexibility in terms of the load balancing inputs, e.g. supporting multiple Azure instances or OpenAI keys. 
@@ -106,7 +106,7 @@ chatgpt = lbgpt.MultiLoadBalancedGPT(
     allocation_function='max_headroom',
 )
 
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 ## Caching
@@ -130,7 +130,7 @@ import diskcache
 
 cache = diskcache.Cache("cache_dir")
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", cache=cache)
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 While LBGPT is tested only with [diskcache](https://pypi.org/project/diskcache/), it should work seamlessly with any cache that implements the `__getitem__` and `__setitem__` methods.
@@ -154,7 +154,7 @@ semantic_cache = FaissSemanticCache(
 )
 
 chatgpt = lbgpt.ChatGPT(api_key="YOUR_API_KEY", semantic_cache=semantic_cache)
-res = asyncio.run(chatgpt.chat_completion_list(["your list of prompts"]))
+res = asyncio.run(chatgpt.achat_completion_list(["your list of prompts"]))
 ```
 
 Currently, the only supported semantic caches are [FAISS](https://faiss.ai/) (via the [langchain](https://www.langchain.com/) interface) and [Qdrant](https://qdrant.tech/). Please let us know if you would like to see support for other semantic caches. 

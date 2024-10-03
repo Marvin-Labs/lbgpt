@@ -5,7 +5,6 @@ import datetime
 import json
 import logging
 import sys
-import warnings
 from logging import getLogger
 from statistics import median
 from typing import Any, Callable, Optional, Sequence
@@ -20,11 +19,13 @@ from tenacity import (
     wait_random_exponential,
 )
 from tqdm.contrib.logging import logging_redirect_tqdm
+from tqdm.asyncio import tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
 from lbgpt.semantic_cache.base import _SemanticCacheBase
 from lbgpt.types import ChatCompletionAddition
 from lbgpt.usage import Usage, UsageStats
+import nest_asyncio
 
 logger = getLogger(__name__)
 
@@ -173,10 +174,10 @@ class _BaseGPT(abc.ABC):
         return min([headroom_tpm, headroom_rpm])
 
     @abc.abstractmethod
-    async def chat_completion(self, semaphore: Optional[asyncio.Semaphore] = None, **kwargs) -> ChatCompletionAddition:
+    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         raise NotImplementedError
 
-    async def chat_completion_list(
+    async def achat_completion_list(
             self,
             chatgpt_chat_completion_request_body_list: list[dict],
             show_progress=True,
@@ -188,16 +189,29 @@ class _BaseGPT(abc.ABC):
         # we are rate limiting the three things we care about: gpt requests, standard cache requests,
         # and semantic cache requests.
 
-        async with asyncio.TaskGroup() as tg:
-            tasks = [tg.create_task(
+        tasks = [
                 self.cached_chat_completion(
                     logging_level=logging_level,
                     logging_exception=logging_exception,
                     content=content,
                 )
-            ) for content in chatgpt_chat_completion_request_body_list]
+                for content in chatgpt_chat_completion_request_body_list]
 
-        return [t.result() for t in tasks]
+        results: list[(ChatCompletionAddition | Exception | None)] = [None] * len(tasks)  # To store results in the correct order
+
+        # Use tqdm to track progress
+        for i, task in enumerate(tqdm.as_completed(tasks, total=len(tasks), disable=not show_progress)):
+            try:
+                result = await task
+                results[i] = result
+            except Exception as e:
+                results[i] = e
+
+        return results
+
+    def chat_completion_list(self, **kwargs):
+        nest_asyncio.apply()
+        return asyncio.run(self.achat_completion_list(**kwargs))
 
     async def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
