@@ -19,7 +19,7 @@ classifiers = [
 
 
 [build-system]
-requires = ["hatchling", "openai>=1.0", "tenacity"]
+requires = ["hatchling", "openai>=1.0", "tenacity", "cachetools"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]

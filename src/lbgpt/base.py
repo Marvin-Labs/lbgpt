@@ -62,9 +62,15 @@ class _BaseGPT(abc.ABC):
             limit_tpm: Optional[int] = None,
             limit_rpm: Optional[int] = None,
             propagate_semantic_cache_to_standard_cache: bool = False,
+            auto_cache: bool = True
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
+
+        if self.cache is None and auto_cache:
+            from cachetools import LRUCache
+            self.cache = LRUCache(maxsize=max_usage_cache_size * 100)
+
         self.semantic_cache: _SemanticCacheBase = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
