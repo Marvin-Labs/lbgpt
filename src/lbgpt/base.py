@@ -209,9 +209,9 @@ class _BaseGPT(abc.ABC):
 
         return results
 
-    def chat_completion_list(self, **kwargs):
+    def chat_completion_list(self, chatgpt_chat_completion_request_body_list, **kwargs):
         nest_asyncio.apply()
-        return asyncio.run(self.achat_completion_list(**kwargs))
+        return asyncio.run(self.achat_completion_list(chatgpt_chat_completion_request_body_list=chatgpt_chat_completion_request_body_list, **kwargs))
 
     async def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
         if self.cache is not None:
