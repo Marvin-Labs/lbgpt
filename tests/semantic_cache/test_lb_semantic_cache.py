@@ -71,6 +71,7 @@ def test_chatgpt_cache_exact(mocker: MockerFixture, semantic_cache):
         stop_after_attempts=1,
         stop_on_exception=True,
         semantic_cache=semantic_cache,
+        auto_cache=False,
     )
 
     # Setting the cache
@@ -228,6 +229,7 @@ def test_chatgpt_cache_exact_but_no_method_specified(mocker: MockerFixture, sema
         stop_after_attempts=1,
         stop_on_exception=True,
         semantic_cache=semantic_cache,
+        auto_cache=False,
     )
 
     # Setting the cache

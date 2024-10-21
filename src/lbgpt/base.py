@@ -225,8 +225,10 @@ class _BaseGPT(abc.ABC):
 
             if hasattr(self.cache, 'aget'):
                 out = await self.cache.aget(hashed)
-            else:
+            elif hasattr(self.cache, 'get'):
                 out = self.cache.get(hashed)
+            else:
+                out = self.cache[hashed]
 
             if out is not None:
                 logger.debug(f'found request {hashed} in standard cache')
@@ -239,8 +241,10 @@ class _BaseGPT(abc.ABC):
         if self.cache is not None:
             if hasattr(self.cache, 'aset'):
                 await self.cache.aset(hashed, json.dumps(model_dump(value)))
-            else:
+            elif hasattr(self.cache, 'set'):
                 self.cache.set(hashed, json.dumps(model_dump(value)))
+            else:
+                self.cache[hashed] = json.dumps(model_dump(value))
 
     async def get_chat_completion_from_cache(
             self, hashed: str, **kwargs

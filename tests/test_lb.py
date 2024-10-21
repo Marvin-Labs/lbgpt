@@ -35,6 +35,7 @@ async def test_lb_async_random(mocker: MockerFixture):
         azure_model_map={
             "gpt-3.5-turbo-0613": os.environ["OPENAI_AZURE_DEPLOYMENT_ID"]
         },
+        auto_cache=False
     )
 
     azure = mocker.spy(lb.azure, "chat_completion")
@@ -73,6 +74,7 @@ async def test_lbgpt_max_headroom():
     model_openai = ChatGPT(
         api_key=os.environ["OPEN_AI_API_KEY"],
         limit_tpm=1000,
+        auto_cache=False,
     )
 
     model_azure = AzureGPT(
@@ -84,11 +86,13 @@ async def test_lbgpt_max_headroom():
             "gpt-3.5-turbo-0613": os.environ["OPENAI_AZURE_DEPLOYMENT_ID"]
         },
         limit_tpm=100,
+        auto_cache=False,
     )
 
     lb = MultiLoadBalancedGPT(
         gpts=[model_openai, model_azure],
         allocation_function="max_headroom",
+        auto_cache=False,
     )
 
     res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
@@ -123,6 +127,7 @@ async def test_chatgpt_async(mocker: MockerFixture):
         api_key=os.environ["OPEN_AI_API_KEY"],
         stop_after_attempts=1,
         stop_on_exception=True,
+        auto_cache=False,
     )
 
     openai = mocker.spy(lb, "chat_completion")
@@ -163,6 +168,7 @@ async def test_azure_async(mocker: MockerFixture):
         azure_model_map={
             "gpt-3.5-turbo-0613": os.environ["OPENAI_AZURE_DEPLOYMENT_ID"]
         },
+        auto_cache=False,
     )
 
     azure = mocker.spy(lb, "chat_completion")

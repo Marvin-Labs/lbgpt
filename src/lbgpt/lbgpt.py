@@ -7,6 +7,7 @@ from typing import Any, Optional, Sequence
 import httpx
 import openai
 from openai._types import NOT_GIVEN, NotGiven
+from tornado.web import authenticated
 
 from lbgpt.allocation import (
     max_headroom_allocation_function,
@@ -33,6 +34,7 @@ class ChatGPT(_BaseGPT):
             max_usage_cache_size: Optional[int] = 1_000,
             limit_tpm: Optional[int] = None,
             limit_rpm: Optional[int] = None,
+            auto_cache=True,
     ):
         super().__init__(
             cache=cache,
@@ -44,6 +46,7 @@ class ChatGPT(_BaseGPT):
             max_usage_cache_size=max_usage_cache_size,
             limit_tpm=limit_tpm,
             limit_rpm=limit_rpm,
+            auto_cache=auto_cache,
         )
 
         self.api_key = api_key
@@ -104,6 +107,7 @@ class AzureGPT(_BaseGPT):
             max_usage_cache_size: Optional[int] = 1_000,
             limit_tpm: Optional[int] = None,
             limit_rpm: Optional[int] = None,
+            auto_cache=True,
     ):
         super().__init__(
             cache=cache,
@@ -115,6 +119,7 @@ class AzureGPT(_BaseGPT):
             max_usage_cache_size=max_usage_cache_size,
             limit_tpm=limit_tpm,
             limit_rpm=limit_rpm,
+            auto_cache=auto_cache,
         )
 
         self.api_key = api_key
@@ -186,6 +191,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
             stop_after_attempts: Optional[int] = 10,
             stop_on_exception: bool = False,
             max_parallel_requests: Optional[int] = None,
+            auto_cache=True,
     ):
         self.gpts = gpts
 
@@ -215,6 +221,7 @@ class MultiLoadBalancedGPT(_BaseGPT):
             max_parallel_calls=max_parallel_requests,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
+            auto_cache=auto_cache,
         )
 
     def request_setup(self):
@@ -258,6 +265,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             ratio_openai_to_azure: float = 0.25,
             stop_after_attempts: Optional[int] = 10,
             stop_on_exception: bool = False,
+            auto_cache: bool = True,
     ):
         self.openai = ChatGPT(
             api_key=openai_api_key,
@@ -267,6 +275,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             max_parallel_calls=max_parallel_calls_openai,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
+            auto_cache=False
         )
 
         self.azure = AzureGPT(
@@ -281,6 +290,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             max_parallel_calls=max_parallel_calls_azure,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
+            auto_cache=False
         )
 
         super().__init__(
@@ -294,4 +304,5 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             ],
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
+            auto_cache=auto_cache,
         )
