@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": [{"type": "text", "text": "What\u2019s in this image?"},
+      {"type": "image_url", "image_url": {"url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"}}]}],
+      "model": "gpt-4o"}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '390'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.30.1
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.30.1
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.10
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-AKm3cj3DoFg4PmUv8jSAyNE7AbQ3b\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1729514656,\n  \"model\": \"gpt-4o-2024-08-06\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"The image shows a scenic landscape with
+      a wooden boardwalk path leading through a lush, green grassy field. The sky
+      is bright blue with some scattered clouds, giving the scene a peaceful and natural
+      atmosphere. Trees and shrubs are visible in the distance, enhancing the serene
+      setting.\",\n        \"refusal\": null\n      },\n      \"logprobs\": null,\n
+      \     \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\":
+      1128,\n    \"completion_tokens\": 54,\n    \"total_tokens\": 1182,\n    \"prompt_tokens_details\":
+      {\n      \"cached_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n
+      \     \"reasoning_tokens\": 0\n    }\n  },\n  \"system_fingerprint\": \"fp_45c6de4934\"\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 8d615678fe290d81-MRS
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 21 Oct 2024 12:44:17 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=O9VPoBvYLNl6Ezz0WZKbEKk9Gu7Scqs4F0MIZE9OJqM-1729514657-1.0.1.1-gkk6B14qTtiV.GEQhT5M8nfu_VJctm3m0ShPuM5NUV2weCxPv4TT0w79oyEkwmVl4QiOVzt2AsiqWYj4XEgFyg;
+        path=/; expires=Mon, 21-Oct-24 13:14:17 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=.AMbLROqDguTzvctLCM9jLNdoZzXlwJzn1ux4Hnf4jY-1729514657975-0.0.1.1-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-expose-headers:
+      - X-Request-ID
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '3820'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains; preload
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '30000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '29999203'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 1ms
+      x-request-id:
+      - req_9f8981e2e2abaee075fa6fef015c1cf9
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
