@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import hashlib
+import uuid
 from collections.abc import Iterable
 from typing import Any
 
@@ -42,7 +43,7 @@ def convert_message(message: ChatCompletionMessageParam):
         content = ""
     elif isinstance(raw_content, Iterable):
         content = ""
-        for c in content:
+        for c in raw_content:
             if isinstance(c, dict):
                 if 'text' in c:
                     content += c['text'] + '\n\n'
@@ -55,6 +56,10 @@ def convert_message(message: ChatCompletionMessageParam):
 
     else:
         content = str(raw_content)
+
+    if content == '':
+        # if the content fails, we want to create a random key in order to avoid caching
+        content = str(uuid.uuid4())
     return {
         "content": content.strip(),
         "role": role,

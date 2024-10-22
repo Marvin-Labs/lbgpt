@@ -46,7 +46,18 @@ async def test_simple():
                          'role': 'user',
                          'content': [{
                              'type': 'text',
-                             'text': 'hi'
+                             'text': 'say dog'
+                         }]
+                     }
+                 ]
+                 },
+                {'model': 'gpt-4o',
+                 'messages': [
+                     {
+                         'role': 'user',
+                         'content': [{
+                             'type': 'text',
+                             'text': 'say cat'
                          }]
                      }
                  ]
@@ -63,3 +74,11 @@ async def test_simple():
     res = lb.chat_completion_list(requests)
     for r in res:
         assert not (isinstance(r, Exception))
+    assert 'dog' in res[0].choices[0].message.content.lower()
+    assert 'cat' in res[1].choices[0].message.content.lower()
+
+    res = lb.chat_completion_list(requests)
+    for r in res:
+        assert not (isinstance(r, Exception))
+    assert 'dog' in res[0].choices[0].message.content.lower()
+    assert 'cat' in res[1].choices[0].message.content.lower()
