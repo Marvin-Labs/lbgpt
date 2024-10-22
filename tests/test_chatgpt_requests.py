@@ -35,5 +35,31 @@ async def test_image_url():
 
     res = lb.chat_completion_list(requests)
     for r in res:
-        assert not(isinstance(r, Exception))
+        assert not (isinstance(r, Exception))
 
+
+@pytest.mark.vcr
+async def test_simple():
+    requests = [{'model': 'gpt-4o',
+                 'messages': [
+                     {
+                         'role': 'user',
+                         'content': [{
+                             'type': 'text',
+                             'text': 'hi'
+                         }]
+                     }
+                 ]
+                 }
+                ]
+
+    lb = ChatGPT(
+        api_key=os.environ["OPEN_AI_API_KEY"],
+        stop_after_attempts=1,
+        stop_on_exception=True,
+        auto_cache=True,
+    )
+
+    res = lb.chat_completion_list(requests)
+    for r in res:
+        assert not (isinstance(r, Exception))
