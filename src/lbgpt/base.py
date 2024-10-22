@@ -196,22 +196,21 @@ class _BaseGPT(abc.ABC):
         # and semantic cache requests.
 
         tasks = [
-                self.cached_chat_completion(
+                self._cached_chat_completion_with_index(
                     logging_level=logging_level,
                     logging_exception=logging_exception,
                     content=content,
+                    index=index,
                 )
-                for content in chatgpt_chat_completion_request_body_list]
+                for index, content in enumerate(chatgpt_chat_completion_request_body_list)]
 
         results: list[(ChatCompletionAddition | Exception | None)] = [None] * len(tasks)  # To store results in the correct order
 
         # Use tqdm to track progress
-        for i, task in enumerate(tqdm.as_completed(tasks, total=len(tasks), disable=not show_progress)):
-            try:
-                result = await task
-                results[i] = result
-            except Exception as e:
-                results[i] = e
+        for task in tqdm.as_completed(tasks, total=len(tasks), disable=not show_progress):
+            result_with_index = await task
+            index, result = result_with_index
+            results[index] = result
 
         return results
 
@@ -359,3 +358,11 @@ class _BaseGPT(abc.ABC):
             )
 
         return out
+
+    async def _cached_chat_completion_with_index(self, index: int, **kwargs) -> tuple[int, Optional[ChatCompletionAddition] | Exception]:
+        try:
+            res = await self.cached_chat_completion(**kwargs)
+        except Exception as e:
+            res = e
+
+        return index, res
