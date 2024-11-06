@@ -22,7 +22,6 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 from tqdm.asyncio import tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
-from lbgpt.semantic_cache.base import _SemanticCacheBase
 from lbgpt.types import ChatCompletionAddition
 from lbgpt.usage import Usage, UsageStats
 import nest_asyncio
@@ -71,7 +70,7 @@ class _BaseGPT(abc.ABC):
             from cachetools import LRUCache
             self.cache = LRUCache(maxsize=max_usage_cache_size * 100)
 
-        self.semantic_cache: _SemanticCacheBase = semantic_cache
+        self.semantic_cache = semantic_cache
 
         self.max_parallel_calls = max_parallel_calls
         self.stop_after_attempts = stop_after_attempts
