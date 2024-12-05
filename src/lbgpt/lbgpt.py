@@ -326,7 +326,6 @@ class LiteLlmRouter(_BaseGPT):
             limit_tpm: Optional[int] = None,
             limit_rpm: Optional[int] = None,
             auto_cache=True,
-            litellm_params: dict = None,
     ):
         super().__init__(
             cache=cache,
@@ -346,7 +345,7 @@ class LiteLlmRouter(_BaseGPT):
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
         async with (self.semaphore_chatgpt):
-            timeout = kwargs.pop("request_timeout")
+            timeout = kwargs.pop("request_timeout", None)
 
             # removing private parameters that are not being passed to ChatGPT
             kwargs.pop("semantic_cache_encoding_method", None)
