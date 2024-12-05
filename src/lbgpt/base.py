@@ -306,6 +306,7 @@ class _BaseGPT(abc.ABC):
                             retry_if_exception_type(openai.APIConnectionError)
                             | retry_if_exception_type(openai.RateLimitError)
                             | retry_if_exception_type(openai.InternalServerError)
+                            | retry_if_exception_type(asyncio.TimeoutError)
                             # shall also retry for bad gateway error (502)
                             # profile the error when it comes up again
                     ),

@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import datetime
 from asyncio import Timeout
 from logging import getLogger
+from pathlib import Path
 from typing import Any, Optional, Sequence
 
 import httpx
 import openai
+from litellm import Router
+from litellm.types.router import DeploymentTypedDict
+from litellm.types.utils import ModelResponse
 from openai._types import NOT_GIVEN, NotGiven
-from tornado.web import authenticated
 
 from lbgpt.allocation import (
     max_headroom_allocation_function,
@@ -306,3 +310,60 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             stop_on_exception=stop_on_exception,
             auto_cache=auto_cache,
         )
+
+
+class LiteLlmRouter(_BaseGPT):
+    def __init__(
+            self,
+            model_list: list[DeploymentTypedDict | dict[str, Any]],
+            max_parallel_calls: int = 5,
+            cache: Optional[Any] = None,
+            semantic_cache: Optional[Any] = None,
+            propagate_semantic_cache_to_standard_cache: bool = False,
+            stop_after_attempts: Optional[int] = 10,
+            stop_on_exception: bool = False,
+            max_usage_cache_size: Optional[int] = 1_000,
+            limit_tpm: Optional[int] = None,
+            limit_rpm: Optional[int] = None,
+            auto_cache=True,
+            litellm_params: dict = None,
+    ):
+        super().__init__(
+            cache=cache,
+            semantic_cache=semantic_cache,
+            propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
+            max_parallel_calls=max_parallel_calls,
+            stop_after_attempts=stop_after_attempts,
+            stop_on_exception=stop_on_exception,
+            max_usage_cache_size=max_usage_cache_size,
+            limit_tpm=limit_tpm,
+            limit_rpm=limit_rpm,
+            auto_cache=auto_cache,
+        )
+
+        self.router = Router(model_list=model_list, default_max_parallel_requests=max_parallel_calls, num_retries=0)
+
+    async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
+        # one request to the OpenAI API respecting their ratelimit
+        async with (self.semaphore_chatgpt):
+            timeout = kwargs.pop("request_timeout")
+
+            # removing private parameters that are not being passed to ChatGPT
+            kwargs.pop("semantic_cache_encoding_method", None)
+            kwargs.pop("model_name_cache_alias", None)
+
+            start = datetime.datetime.now()
+            async with asyncio.timeout(timeout):
+                out: ModelResponse = await self.router.acompletion(**kwargs)
+
+
+        await self.add_usage_to_usage_cache(
+            Usage(
+                input_tokens=out.usage.prompt_tokens,
+                output_tokens=out.usage.total_tokens,
+                start_datetime=start,
+                end_datetime=datetime.datetime.now(),
+            )
+        )
+
+        return ChatCompletionAddition.from_litellm_model_response(out, model_class=self.__class__.__name__)

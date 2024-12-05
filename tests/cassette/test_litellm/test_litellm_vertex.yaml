@@ -1,0 +1,119 @@
+interactions:
+- request:
+    body: assertion=eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiZGY4NzI0MWQ0Zjk3OWFiMDJjY2UzYzE2ODI0NjA5YTE3MzdmY2QyZCJ9.eyJpYXQiOiAxNzMzNDI0NDEyLCAiZXhwIjogMTczMzQyODAxMiwgImlzcyI6ICJtbC12ZXJ0ZXgtZGV2QHByYWN0aWNhbC1yYW5nZS00NDM4MTQtaTMuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCAiYXVkIjogImh0dHBzOi8vb2F1dGgyLmdvb2dsZWFwaXMuY29tL3Rva2VuIiwgInNjb3BlIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvY2xvdWQtcGxhdGZvcm0ifQ.Y8T1cWfuEoLnnZz03AxqcjJwm4nrta10YsDoaIUXXTGNaPd419TyWNT_13wK5BMwhn30iUIN4Ik1_xgFXyr_kWb9HnRU3a61YC2a0TUcOPqwKEvt5C21YkLxiKVozyiHRs2itaRC4waoE3KNBrfc3sxkpvx6ISYyudkvh26LWar1vcuXiyK8IZaldNCASZeOGdPLBpMucGeBxdrya5j6dD2ROqrSrzBZN_a-ClHmpbutyuqTgD8wuqMYaHqxgQOeANQ_rYcfe6zA1SmqKilZs-T69LAU4Kl1D8LhmzfIauyazUYYsyy_7pZ8Xg3Zki7MjPk995gLQRpkKY2VpijRaw&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '817'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.31.0
+      x-goog-api-client:
+      - gl-python/3.11.10 auth/2.36.0 auth-request-type/at cred-type/sa
+    method: POST
+    uri: https://oauth2.googleapis.com/token
+  response:
+    body:
+      string: '{"access_token":"ya29.c.c0ASRK0GZd6Tbkpv62bUYPojpDKVNuxvJZBx0IFGkn3l-2eI6e78Txip75Vwl07hW27Hgro608gQ3Oo3XRyWaDFpqh-jFQ3lXq3i-AAWMv2yoblaw_wVHxAX_21djDjuSz8azKsCzkvZVcb4Cc3TRP9XmziL-iDds0bdkQtHyC1JTC0dR4QtFT68_q-slwTYJNH08AjLCqEaslmwZC8Um0JfQFssIKrj73HaR3b5JOgM9anliKx2MdGPFoYYJI7IDL7kQIyQpefPOyrlZESZm2ejllm0LSJyaMedLgCkXQTfcNDYuay9V-1PWN-cpUB0pXtwWx0t1hap5Ms3ZHvICe7GCaoEzsHqSoNfposhxEnwkzkZFcg4pCTIQN384K1bM66cjo0pJfcoUMxr5QmqBMpOtaJnnw8if_7xX-h_X2Z-iy_-MI5z6rSZ6e9kYJxw6x_uOb5voX9YUcVuwJ_lSScli95UJmayBaZRBZdBbSQ5ygjVIO__dyJoIdVafMRs5p0fbFg49MVZ5RwlMIm1B4i5S11oUsu2jZZYQ-1eFoybt1uX7x0p-qkpX_SwYsS9-J-tf_Bbtq8OlFwvBqtgOz_uRyhyfoXXkMrdpq6d2kxcy-z3SM-Rzz1WeZdwWIVfhaeflOfVvVcUxhoOil8yk_kYiQYa4_idr858VcsnXZZ2R5snfkYwt6YIkZZ8vrv4pO_lB4SRO72pbg8dJSt5ley4VjrsSXht2e90F6SYlpi3sj9i2fb5d0tBpOrQtw7drFRjZuXI5J2ccI2VpRraIW6ls1Mliwz5jjxh83JJsY-mguXOj647Xr__a3bhUQjJ2RB-OlSmFoqQ3W5Qqt4aJgmMJmURXB7hiSqyreBWr3QXr__9rZ4wgxtat3aJjgX79F-JyO29XYIO6l3Vw18g68iXVgblxpfnV2xVarihSx4J4zi-Y09okeOJt90mpW8oW9Q59fwh6xIynu6frqabxUYV2Z80k6OvpSyi7S3a8qlq8J5QIim01rOxI","expires_in":3599,"token_type":"Bearer"}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - private
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Thu, 05 Dec 2024 18:46:53 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"contents": [{"role": "user", "parts": [{"text": "please respond with
+      pong"}]}], "generationConfig": {"temperature": 0, "top_p": 1, "max_output_tokens":
+      50}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '158'
+      content-type:
+      - application/json
+      host:
+      - us-central1-aiplatform.googleapis.com
+      user-agent:
+      - litellm/1.53.7
+    method: POST
+    uri: https://us-central1-aiplatform.googleapis.com/v1/projects/practical-range-443814-i3/locations/us-central1/publishers/google/models/gemini-1.5-flash:generateContent
+  response:
+    content: "{\n  \"candidates\": [\n    {\n      \"content\": {\n        \"role\":
+      \"model\",\n        \"parts\": [\n          {\n            \"text\": \"Pong!
+      \U0001F3D3 \\n\"\n          }\n        ]\n      },\n      \"finishReason\":
+      \"STOP\",\n      \"safetyRatings\": [\n        {\n          \"category\": \"HARM_CATEGORY_HATE_SPEECH\",\n
+      \         \"probability\": \"NEGLIGIBLE\",\n          \"probabilityScore\":
+      0.05102539,\n          \"severity\": \"HARM_SEVERITY_NEGLIGIBLE\",\n          \"severityScore\":
+      0.07080078\n        },\n        {\n          \"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\",\n
+      \         \"probability\": \"NEGLIGIBLE\",\n          \"probabilityScore\":
+      0.13085938,\n          \"severity\": \"HARM_SEVERITY_LOW\",\n          \"severityScore\":
+      0.27148438\n        },\n        {\n          \"category\": \"HARM_CATEGORY_HARASSMENT\",\n
+      \         \"probability\": \"NEGLIGIBLE\",\n          \"probabilityScore\":
+      0.12011719,\n          \"severity\": \"HARM_SEVERITY_NEGLIGIBLE\",\n          \"severityScore\":
+      0.087402344\n        },\n        {\n          \"category\": \"HARM_CATEGORY_SEXUALLY_EXPLICIT\",\n
+      \         \"probability\": \"NEGLIGIBLE\",\n          \"probabilityScore\":
+      0.12792969,\n          \"severity\": \"HARM_SEVERITY_NEGLIGIBLE\",\n          \"severityScore\":
+      0.071777344\n        }\n      ],\n      \"avgLogprobs\": -0.080892115831375122\n
+      \   }\n  ],\n  \"usageMetadata\": {\n    \"promptTokenCount\": 4,\n    \"candidatesTokenCount\":
+      6,\n    \"totalTokenCount\": 10\n  },\n  \"modelVersion\": \"gemini-1.5-flash-001\"\n}\n"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - private
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Thu, 05 Dec 2024 18:46:54 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
