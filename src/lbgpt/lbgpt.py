@@ -7,10 +7,12 @@ from pathlib import Path
 from typing import Any, Optional, Sequence
 
 import httpx
+import litellm
 import openai
 from litellm import Router
+from litellm.litellm_core_utils.streaming_handler import CustomStreamWrapper
 from litellm.types.router import DeploymentTypedDict
-from litellm.types.utils import ModelResponse
+from litellm.types.utils import ModelResponse, ModelResponseStream
 from openai._types import NOT_GIVEN, NotGiven
 
 from lbgpt.allocation import (
@@ -353,8 +355,12 @@ class LiteLlmRouter(_BaseGPT):
 
             start = datetime.datetime.now()
             async with asyncio.timeout(timeout):
-                out: ModelResponse = await self.router.acompletion(**kwargs)
+                out: ModelResponse | CustomStreamWrapper  = await self.router.acompletion(**kwargs)
 
+                # if the response is a stream, we need to consume it and build it up
+                # we are not exposing streamed responses to the user
+                if isinstance(out, CustomStreamWrapper):
+                    out = litellm.stream_chunk_builder([chunk async for chunk in out], messages=kwargs["messages"])
 
         await self.add_usage_to_usage_cache(
             Usage(
