@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import datetime
+import logging
 from asyncio import Timeout
 from logging import getLogger
-from pathlib import Path
 from typing import Any, Optional, Sequence
 
 import httpx
@@ -12,7 +12,7 @@ import openai
 from litellm import Router
 from litellm.litellm_core_utils.streaming_handler import CustomStreamWrapper
 from litellm.types.router import DeploymentTypedDict
-from litellm.types.utils import ModelResponse, ModelResponseStream
+from litellm.types.utils import ModelResponse
 from openai._types import NOT_GIVEN, NotGiven
 
 from lbgpt.allocation import (
@@ -320,55 +320,47 @@ class LiteLlmRouter(_BaseGPT):
             model_list: list[DeploymentTypedDict | dict[str, Any]],
             max_parallel_calls: int = 5,
             cache: Optional[Any] = None,
-            semantic_cache: Optional[Any] = None,
-            propagate_semantic_cache_to_standard_cache: bool = False,
             stop_after_attempts: Optional[int] = 10,
             stop_on_exception: bool = False,
-            max_usage_cache_size: Optional[int] = 1_000,
-            limit_tpm: Optional[int] = None,
-            limit_rpm: Optional[int] = None,
             auto_cache=True,
+            **kwargs,
     ):
         super().__init__(
             cache=cache,
-            semantic_cache=semantic_cache,
-            propagate_semantic_cache_to_standard_cache=propagate_semantic_cache_to_standard_cache,
             max_parallel_calls=max_parallel_calls,
-            stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
-            max_usage_cache_size=max_usage_cache_size,
-            limit_tpm=limit_tpm,
-            limit_rpm=limit_rpm,
-            auto_cache=auto_cache,
         )
 
-        self.router = Router(model_list=model_list, default_max_parallel_requests=max_parallel_calls, num_retries=0)
+        self.router = Router(
+            model_list=model_list,
+            default_max_parallel_requests=max_parallel_calls,
+            num_retries=stop_after_attempts,
+            cache_responses=auto_cache,
+            **kwargs
+        )
+
+    async def retrying_chat_completion(
+            self,
+            logging_level: int = logging.WARNING,
+            logging_exception: bool = False,
+            **kwargs,
+    ) -> Optional[ChatCompletionAddition]:
+        return await self.chat_completion(**kwargs)
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
-        async with (self.semaphore_chatgpt):
-            timeout = kwargs.pop("request_timeout", None)
+        timeout = kwargs.pop("request_timeout", None)
 
-            # removing private parameters that are not being passed to ChatGPT
-            kwargs.pop("semantic_cache_encoding_method", None)
-            kwargs.pop("model_name_cache_alias", None)
+        # removing private parameters that are not being passed to ChatGPT
+        kwargs.pop("semantic_cache_encoding_method", None)
+        kwargs.pop("model_name_cache_alias", None)
 
-            start = datetime.datetime.now()
-            async with asyncio.timeout(timeout):
-                out: ModelResponse | CustomStreamWrapper  = await self.router.acompletion(**kwargs)
+        async with asyncio.timeout(timeout):
+            out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(**kwargs)
 
-                # if the response is a stream, we need to consume it and build it up
-                # we are not exposing streamed responses to the user
-                if isinstance(out, CustomStreamWrapper):
-                    out = litellm.stream_chunk_builder([chunk async for chunk in out], messages=kwargs["messages"])
-
-        await self.add_usage_to_usage_cache(
-            Usage(
-                input_tokens=out.usage.prompt_tokens,
-                output_tokens=out.usage.total_tokens,
-                start_datetime=start,
-                end_datetime=datetime.datetime.now(),
-            )
-        )
+            # if the response is a stream, we need to consume it and build it up
+            # we are not exposing streamed responses to the user
+            if isinstance(out, CustomStreamWrapper):
+                out = litellm.stream_chunk_builder([chunk async for chunk in out], messages=kwargs["messages"])
 
         return ChatCompletionAddition.from_litellm_model_response(out, model_class=self.__class__.__name__)
