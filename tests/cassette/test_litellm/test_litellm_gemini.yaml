@@ -19,7 +19,7 @@ interactions:
       user-agent:
       - litellm/1.53.7
     method: POST
-    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCmCgcoTV3Y3IPXp6sBuRBhFvxNO5RgjrU
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
   response:
     content: "{\n  \"candidates\": [\n    {\n      \"content\": {\n        \"parts\":
       [\n          {\n            \"text\": \"pong\\n\"\n          }\n        ],\n
@@ -35,11 +35,11 @@ interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Thu, 05 Dec 2024 18:32:18 GMT
+      - Sat, 04 Jan 2025 12:35:47 GMT
       Server:
       - scaffolding on HTTPServer2
       Server-Timing:
-      - gfet4t7; dur=1533
+      - gfet4t7; dur=1493
       Transfer-Encoding:
       - chunked
       Vary:

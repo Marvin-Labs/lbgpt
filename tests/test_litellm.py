@@ -39,7 +39,7 @@ async def test_litellm_chatgpt():
     assert res.model_class == 'LiteLlmRouter'
 
 
-@pytest.mark.vcr
+@pytest.mark.vcr(filter_query_parameters=['key'])
 async def test_litellm_gemini():
     model_list: list[DeploymentTypedDict] = [
         {
