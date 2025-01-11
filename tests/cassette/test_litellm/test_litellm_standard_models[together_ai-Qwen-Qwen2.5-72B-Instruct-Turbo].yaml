@@ -1,0 +1,103 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "Qwen/Qwen2.5-72B-Instruct-Turbo", "max_tokens": 50, "stream": false,
+      "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '180'
+      content-type:
+      - application/json
+      host:
+      - api.together.xyz
+      user-agent:
+      - AsyncOpenAI/Python 1.56.2
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.56.2
+      x-stainless-raw-response:
+      - 'true'
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.10
+    method: POST
+    uri: https://api.together.xyz/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"90042bd5a9425f9b\",\n  \"object\": \"chat.completion\",\n
+      \ \"created\": 1736590795,\n  \"model\": \"Qwen/Qwen2.5-72B-Instruct-Turbo\",\n
+      \ \"prompt\": [],\n  \"choices\": [\n    {\n      \"finish_reason\": \"eos\",\n
+      \     \"seed\": 15599559054040404000,\n      \"logprobs\": null,\n      \"index\":
+      0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\":
+      \"pong\",\n        \"tool_calls\": []\n      }\n    }\n  ],\n  \"usage\": {\n
+      \   \"prompt_tokens\": 33,\n    \"completion_tokens\": 2,\n    \"total_tokens\":
+      35\n  }\n}"
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-Ray:
+      - 90042bd5a9425f9b-MRS
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 11 Jan 2025 10:19:56 GMT
+      ETag:
+      - W/"1ea-a/WzZi2LRgU57RtdugHn38ZsA7Y"
+      Retry-After:
+      - '2'
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      x-amzn-trace-id:
+      - 0dd1dda4-06e7-4ef3-b069-0006266f4238-noamzn
+      x-api-call-end:
+      - '2025-01-11T10:19:56.071Z'
+      x-api-call-start:
+      - '2025-01-11T10:19:55.742Z'
+      x-api-received:
+      - '2025-01-11T10:19:55.636Z'
+      x-inference-version:
+      - v2
+      x-ratelimit:
+      - 'false'
+      x-ratelimit-limit:
+      - '1'
+      x-ratelimit-limit-tokens:
+      - '1000'
+      x-ratelimit-remaining:
+      - '1'
+      x-ratelimit-remaining-tokens:
+      - '1000'
+      x-ratelimit-reset:
+      - '2'
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

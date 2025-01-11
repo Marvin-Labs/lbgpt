@@ -1,0 +1,66 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "meta-llama/Llama-3.2-1B-Instruct", "max_tokens": 50, "stream": false,
+      "temperature": 0, "top_p": 1, "custom_llm_provider ": "nebius"}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '215'
+      content-type:
+      - application/json
+      host:
+      - api.studio.nebius.ai
+      user-agent:
+      - AsyncOpenAI/Python 1.56.2
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.56.2
+      x-stainless-raw-response:
+      - 'true'
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.10
+    method: POST
+    uri: https://api.studio.nebius.ai/v1/chat/completions
+  response:
+    content: '{"id":"chatcmpl-b3638aae0a1143e2973a6dd96dffad06","choices":[{"finish_reason":"stop","index":0,"logprobs":null,"message":{"content":"Pong","role":"assistant","function_call":null,"tool_calls":[]},"stop_reason":null}],"created":1736587331,"model":"meta-llama/Llama-3.2-1B-Instruct","object":"chat.completion","service_tier":null,"system_fingerprint":null,"usage":{"completion_tokens":3,"prompt_tokens":39,"total_tokens":42,"prompt_tokens_details":null},"prompt_logprobs":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '475'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 11 Jan 2025 09:22:11 GMT
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '600'
+      x-ratelimit-limit-tokens:
+      - '400000'
+      x-ratelimit-remaining-requests:
+      - '599'
+      x-ratelimit-remaining-tokens:
+      - '400000'
+      x-ratelimit-reset-requests:
+      - 1s
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

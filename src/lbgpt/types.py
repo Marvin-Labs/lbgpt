@@ -29,4 +29,14 @@ class ChatCompletionAddition(ChatCompletion):
 
     @classmethod
     def from_litellm_model_response(cls, chat_completion: ModelResponse, model_class: str, is_exact: bool = True):
-        return cls(**chat_completion.model_dump(), is_exact=is_exact, model_class=model_class)
+        res = chat_completion.model_dump()
+
+        # update finish reason to replace eos with finished
+        choices = []
+        for choice in res['choices']:
+            if choice['finish_reason'] == 'eos':
+                choice['finish_reason'] = 'stop'
+            choices.append(choice)
+        res['choices'] = choices
+
+        return cls(**res, is_exact=is_exact, model_class=model_class)

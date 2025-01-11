@@ -19,42 +19,42 @@ single_request_content = dict(
     request_timeout=10,
 )
 
-
-@pytest.mark.vcr
-async def test_litellm_chatgpt():
-    model_list: list[DeploymentTypedDict] = [
-        {
-            'model_name': '*',
-            'litellm_params': {
-                'model': 'openai/*',
-                'api_key': environ["OPEN_AI_API_KEY"]
-            }
-        }
-    ]
-
-    lb = LiteLlmRouter(model_list)
-    res = await lb.chat_completion(model='gpt-4o', **single_request_content)
-    assert isinstance(res, ChatCompletionAddition)
-    assert res.model == 'gpt-4o-2024-08-06'
-    assert res.model_class == 'LiteLlmRouter'
+STANDARD_MODEL_TESTS = [
+    ('openai/gpt-4o', 'OPEN_AI_API_KEY', 'gpt-4o-2024-08-06', None),
+    ('gemini/gemini-1.5-flash', 'GEMINI_API_KEY', 'gemini-1.5-flash', None),
+    ('deepseek/deepseek-chat', 'DEEPSEEK_API_KEY', 'deepseek/deepseek-chat', None),
+    ('openai/meta-llama/Llama-3.2-1B-Instruct', 'NEBIUS_API_KEY', 'meta-llama/Llama-3.2-1B-Instruct',
+     {'api_base': 'https://api.studio.nebius.ai/v1', 'custom_llm_provider ': 'nebius'}),
+    ('openai/Qwen/Qwen2.5-72B-Instruct', 'NEBIUS_API_KEY', 'Qwen/Qwen2.5-72B-Instruct',
+     {'api_base': 'https://api.studio.nebius.ai/v1', 'custom_llm_provider ': 'nebius'}),
+    ('together_ai/Qwen/Qwen2.5-7B-Instruct-Turbo', 'TOGETHER_AI_API_KEY', 'together_ai/Qwen/Qwen2.5-7B-Instruct-Turbo', None),
+    ('together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo', 'TOGETHER_AI_API_KEY', 'together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo', None),
+]
 
 
+@pytest.mark.parametrize('model_name, api_key, expected_model, params', STANDARD_MODEL_TESTS,
+                         ids=[x[0] for x in STANDARD_MODEL_TESTS])
 @pytest.mark.vcr(filter_query_parameters=['key'])
-async def test_litellm_gemini():
+async def test_litellm_standard_models(model_name, api_key, expected_model, params):
+    if params is None:
+        params = {}
     model_list: list[DeploymentTypedDict] = [
         {
-            'model_name': 'gemini/*',
+            'model_name': model_name,
             'litellm_params': {
-                'model': 'gemini/*',
-                'api_key': environ["GEMINI_API_KEY"]
+                'model': model_name,
+                'api_key': environ.get(api_key, api_key),
+                'max_retries': 0,
+                **params,
+
             }
         }
     ]
 
     lb = LiteLlmRouter(model_list)
-    res = await lb.chat_completion(model='gemini/gemini-1.5-flash', **single_request_content)
+    res = await lb.chat_completion(model=model_name, **single_request_content)
     assert isinstance(res, ChatCompletionAddition)
-    assert res.model == 'gemini-1.5-flash'
+    assert res.model == expected_model
     assert res.model_class == 'LiteLlmRouter'
 
 
@@ -75,4 +75,3 @@ async def test_litellm_vertex():
     assert isinstance(res, ChatCompletionAddition)
     assert res.model == 'gemini-1.5-flash'
     assert res.model_class == 'LiteLlmRouter'
-

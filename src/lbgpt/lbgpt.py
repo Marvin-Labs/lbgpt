@@ -24,6 +24,7 @@ from lbgpt.types import ChatCompletionAddition
 from lbgpt.usage import Usage
 
 logger = getLogger(__name__)
+litellm.suppress_debug_info = True
 
 
 class ChatGPT(_BaseGPT):

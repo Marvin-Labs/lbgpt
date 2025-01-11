@@ -1,0 +1,66 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "Qwen/Qwen2.5-72B-Instruct", "max_tokens": 50, "stream": false, "temperature":
+      0, "top_p": 1, "custom_llm_provider ": "nebius"}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '208'
+      content-type:
+      - application/json
+      host:
+      - api.studio.nebius.ai
+      user-agent:
+      - AsyncOpenAI/Python 1.56.2
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.56.2
+      x-stainless-raw-response:
+      - 'true'
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.10
+    method: POST
+    uri: https://api.studio.nebius.ai/v1/chat/completions
+  response:
+    content: '{"id":"chatcmpl-2cf20d4c7aab4a18adbff79395d750db","choices":[{"finish_reason":"stop","index":0,"logprobs":null,"message":{"content":"pong","role":"assistant","function_call":null,"tool_calls":[]},"stop_reason":null}],"created":1736587386,"model":"Qwen/Qwen2.5-72B-Instruct","object":"chat.completion","service_tier":null,"system_fingerprint":null,"usage":{"completion_tokens":2,"prompt_tokens":33,"total_tokens":35,"prompt_tokens_details":null},"prompt_logprobs":null}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '468'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 11 Jan 2025 09:23:06 GMT
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+      x-ratelimit-limit-requests:
+      - '600'
+      x-ratelimit-limit-tokens:
+      - '1000000'
+      x-ratelimit-remaining-requests:
+      - '599'
+      x-ratelimit-remaining-tokens:
+      - '1000000'
+      x-ratelimit-reset-requests:
+      - 1s
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
