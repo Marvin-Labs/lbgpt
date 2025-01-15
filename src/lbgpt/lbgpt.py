@@ -14,12 +14,13 @@ from litellm.litellm_core_utils.streaming_handler import CustomStreamWrapper
 from litellm.types.router import DeploymentTypedDict
 from litellm.types.utils import ModelResponse
 from openai._types import NOT_GIVEN, NotGiven
+from tenacity import retry_if_exception_type, AsyncRetrying, wait_random_exponential, stop_after_attempt
 
 from lbgpt.allocation import (
     max_headroom_allocation_function,
     random_allocation_function,
 )
-from lbgpt.base import _BaseGPT
+from lbgpt.base import _BaseGPT, after_logging
 from lbgpt.types import ChatCompletionAddition
 from lbgpt.usage import Usage
 
@@ -346,6 +347,32 @@ class LiteLlmRouter(_BaseGPT):
             logging_exception: bool = False,
             **kwargs,
     ) -> Optional[ChatCompletionAddition]:
+        try:
+            async for attempt in AsyncRetrying(
+                    retry=(
+                            retry_if_exception_type(TimeoutError) |
+                            retry_if_exception_type(asyncio.TimeoutError)
+                    ),
+                    wait=wait_random_exponential(min=5, max=60),
+                    stop=stop_after_attempt(3)
+                    if self.stop_after_attempts is not None
+                    else None,
+                    after=after_logging(
+                        logger_level=logging_level, logger_exception=logging_exception
+                    ),
+            ):
+                with attempt:
+                    out: ChatCompletionAddition = await self.chat_completion(**kwargs)
+                    logger.debug('got chat completion for GPT model')
+                    return out
+
+        except Exception as e:
+            if self.stop_on_exception:
+                raise e
+            else:
+                logger.exception(e)
+                return None
+
         return await self.chat_completion(**kwargs)
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
