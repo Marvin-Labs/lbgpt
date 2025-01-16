@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-import base64
 import hashlib
 import uuid
 from collections.abc import Iterable
 from typing import Any
 
-from openai.types import CompletionCreateParams
+from openai.types import CompletionCreateParams, EmbeddingCreateParams
 from openai.types.chat import ChatCompletionMessageParam
 
 
 def non_message_parameters_from_create(
-    chat_completion_create: CompletionCreateParams | dict[str, Any]
+        chat_completion_create: CompletionCreateParams | dict[str, Any]
 ) -> dict[str, Any]:
     return dict(
         model=chat_completion_create.get(
@@ -69,8 +68,8 @@ def convert_message(message: ChatCompletionMessageParam):
 
 
 def make_hash_chatgpt_request(
-    chat_completion_create: CompletionCreateParams | dict[str, Any],
-    include_messages: bool = True,
+        chat_completion_create: CompletionCreateParams,
+        include_messages: bool = True,
 ) -> str:
     """Converting a chatgpt request to a hash for caching and deduplication purposes"""
 
@@ -88,6 +87,30 @@ def make_hash_chatgpt_request(
         hasher.update(repr(make_hashable(messages)).encode())
 
     return f"lbgpt_{hasher.digest().hex()}"
+
+
+def _make_hash_single_embedding(
+        massaged_embedding_create: dict,
+        input_text: str
+) -> str:
+    hasher = hashlib.sha256()
+
+    hasher.update(repr(make_hashable(massaged_embedding_create)).encode())
+    hasher.update(input_text.encode())
+
+    return f"lbgpte_{hasher.digest().hex()}"
+
+
+def make_hash_embedding_request(request: EmbeddingCreateParams) -> list[str]:
+    """Converting an embedding request to a hash for caching and deduplication purposes"""
+    massaged_request = dict(request)
+    input_texts = massaged_request.pop("input")
+
+    return [
+        _make_hash_single_embedding(massaged_request, input_text=input_text)
+        for input_text in input_texts
+    ]
+
 
 
 def make_hashable(o):

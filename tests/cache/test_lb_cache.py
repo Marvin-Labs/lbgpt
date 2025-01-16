@@ -13,6 +13,7 @@ from pytest_mock import MockerFixture
 from lbgpt import ChatGPT
 from lbgpt.caches.s3 import S3Cache
 from lbgpt.types import ChatCompletionAddition
+from cachetools import Cache
 
 
 def setup_redis():
@@ -27,6 +28,10 @@ def setup_redis():
 
 def setup_diskcache():
     return diskcache.Cache(tempfile.TemporaryDirectory().name)
+
+
+def setup_cachetools():
+    return Cache(maxsize=1_000)
 
 
 def setup_s3_cache():
@@ -62,14 +67,14 @@ def setup_s3_cache():
     except Exception as e:
         print(f"Error when deleting objects: {str(e)}")
 
-
     return S3Cache(s3_client=s3_client, bucket=bucket, prefix=prefix)
 
 
 CACHES = [
-    #setup_diskcache,
-    #setup_redis,
-    setup_s3_cache
+    setup_cachetools,
+    setup_diskcache,
+    setup_redis,
+    setup_s3_cache,
 ]
 
 
@@ -80,6 +85,13 @@ def _num_keys_in_cache(cache) -> Optional[int]:
         return cache.count
     else:
         return None
+
+
+def _hash_in_cache(cache) -> Optional[int]:
+    try:
+        return hash(cache)
+    except TypeError:
+        return cache.currsize
 
 
 @pytest.mark.parametrize("cache", CACHES)
@@ -120,7 +132,7 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
     assert cache_interaction.spy_return is None
 
     # some cache stats and hash
-    cache_stats = {"hash": hash(cache), "count": _num_keys_in_cache(cache)}
+    cache_stats = {"hash": _hash_in_cache(cache), "count": _num_keys_in_cache(cache)}
 
     # Getting from cache
     asyncio.run(lb.cached_chat_completion(single_request_content))
@@ -130,7 +142,7 @@ def test_chatgpt_cache(mocker: MockerFixture, cache):
     assert isinstance(cache_interaction.spy_return, ChatCompletionAddition)
 
     # asserting that no items were added to the cache
-    assert hash(cache) == cache_stats["hash"]
+    assert _hash_in_cache(cache) == cache_stats["hash"]
     assert _num_keys_in_cache(cache) == cache_stats["count"]
 
     # assert that chatgpt was requested only once
@@ -175,7 +187,7 @@ def test_chatgpt_cache_with_name_alias(mocker: MockerFixture, cache):
     assert cache_interaction.spy_return is None
 
     # some cache stats and hash
-    cache_stats = {"hash": hash(cache), "count": _num_keys_in_cache(cache)}
+    cache_stats = {"hash": _hash_in_cache(cache), "count": _num_keys_in_cache(cache)}
 
     single_request_content_equivalent_name = dict(
         messages=messages,
@@ -197,7 +209,7 @@ def test_chatgpt_cache_with_name_alias(mocker: MockerFixture, cache):
     assert isinstance(cache_interaction.spy_return, ChatCompletionAddition)
 
     # asserting that no items were added to the cache
-    assert hash(cache) == cache_stats["hash"]
+    assert _hash_in_cache(cache) == cache_stats["hash"]
 
     if cache_stats['count']:
         assert _num_keys_in_cache(cache) == cache_stats["count"]

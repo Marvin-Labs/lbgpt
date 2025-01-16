@@ -49,16 +49,21 @@ class ChatCompletionAddition(ChatCompletion):
         return cls(**res, is_exact=is_exact, model_class=model_class)
 
 
-class EmbeddingResponseAddition(CreateEmbeddingResponse):
-    is_exact: bool = True
-    is_cached: bool = False
-    is_semantic_cached: bool = False
+class EmbeddingAddition(BaseModel):
+    embedding: list[float]
+    is_cached: bool = True
+    index: int
 
+
+class EmbeddingResponseAddition(CreateEmbeddingResponse):
     model_class: Optional[str] = None
+    object: str = 'embedding'
+    data: list[EmbeddingAddition]
+    usage: Usage
 
     model_config = ConfigDict(
         protected_namespaces=(),  # Allow fields starting with "model_"
-        # extra='ignore'
+        extra='ignore'
     )
 
     @classmethod
@@ -66,11 +71,15 @@ class EmbeddingResponseAddition(CreateEmbeddingResponse):
         cls,
         embedding_response: EmbeddingResponse,
         model_class: str,
-        is_exact: bool = True,
     ) -> Self:
         res = embedding_response.model_dump()
-        res["object"] = "embedding"
-        return cls(**res, is_exact=is_exact, model_class=model_class)
+        res.pop('object', None)
+
+        data = [
+            EmbeddingAddition(embedding=data['embedding'], is_cached=False, index=data['index']) for data in res.pop('data')
+        ]
+
+        return cls(**res, model_class=model_class, data=data)
 
 
 ResponseTypes = ChatCompletionAddition | EmbeddingResponseAddition

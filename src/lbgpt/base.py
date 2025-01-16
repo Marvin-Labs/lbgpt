@@ -11,8 +11,7 @@ from typing import Any, Callable, Optional, Sequence
 
 import nest_asyncio
 import openai
-from black.linegen import bracket_split_succeeded_or_raise
-from openai._compat import model_dump, model_parse
+from openai._compat import model_parse
 from tenacity import (
     AsyncRetrying,
     RetryCallState,
@@ -24,8 +23,9 @@ from tqdm.asyncio import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
-from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition, ResponseTypes
+from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition, ResponseTypes, EmbeddingAddition
 from lbgpt.usage import Usage, UsageStats
+from lbgpt.utils import convert_to_dictionary
 
 logger = getLogger(__name__)
 
@@ -234,7 +234,7 @@ class _BaseGPT(abc.ABC):
             )
         )
 
-    async def _get_from_standard_cache(self, hashed: str) -> Optional[ResponseTypes]:
+    async def _get_from_standard_cache(self, hashed: str) -> Optional[ResponseTypes | dict]:
         if self.cache is not None:
             logger.debug(f"trying to get {hashed} from standard cache")
 
@@ -255,21 +255,21 @@ class _BaseGPT(abc.ABC):
                 if out_type == "chat.completion":
                     return model_parse(ChatCompletionAddition, out_dict)
                 elif out_type == "embedding":
-                    return model_parse(EmbeddingResponseAddition, out_dict)
+                    return out_dict
                 else:
                     logger.warning(f"Unknown object type {out_type}")
                     return
 
-    async def _set_to_standard_cache(self, hashed: str, value: ResponseTypes):
+    async def _set_to_standard_cache(self, hashed: str, value: ResponseTypes | dict):
         if self.cache is not None:
             if hasattr(self.cache, "aset"):
-                await self.cache.aset(hashed, json.dumps(model_dump(value)))
+                await self.cache.aset(hashed, json.dumps(convert_to_dictionary(value)))
             elif hasattr(self.cache, "set"):
-                self.cache.set(hashed, json.dumps(model_dump(value)))
+                self.cache.set(hashed, json.dumps(convert_to_dictionary(value)))
             else:
-                self.cache[hashed] = json.dumps(model_dump(value))
+                self.cache[hashed] = json.dumps(convert_to_dictionary(value))
 
-    async def get_from_cache(self, hashed: str, **kwargs) -> Optional[ResponseTypes]:
+    async def get_from_cache(self, hashed: str, **kwargs) -> Optional[ResponseTypes | dict]:
         if self.cache is not None:
             async with self.semaphore_standard_cache:
                 out = await self._get_from_standard_cache(hashed)

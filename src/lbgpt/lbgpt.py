@@ -11,15 +11,19 @@ from litellm import Router
 from litellm.litellm_core_utils.streaming_handler import CustomStreamWrapper
 from litellm.types.router import DeploymentTypedDict
 from litellm.types.utils import ModelResponse
-from openai._types import NOT_GIVEN, NotGiven   # noqa
+from openai._types import NOT_GIVEN, NotGiven  # noqa
+from openai.types import EmbeddingCreateParams
 
 from lbgpt.allocation import (
     max_headroom_allocation_function,
     random_allocation_function,
 )
 from lbgpt.base import _BaseGPT
-from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition
+from lbgpt.cache import make_hash_embedding_request
+from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition, EmbeddingAddition
 from lbgpt.usage import Usage
+from litellm.types.utils import Usage as LitellmUsage
+
 
 logger = getLogger(__name__)
 litellm.suppress_debug_info = True
@@ -62,8 +66,10 @@ class ChatGPT(_BaseGPT):
             timeout=self.request_timeout,
             max_retries=0,
             http_client=httpx.AsyncClient(
-                limits=httpx.Limits(max_keepalive_connections=None, max_connections=None)
-            )
+                limits=httpx.Limits(
+                    max_keepalive_connections=None, max_connections=None
+                )
+            ),
         )
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
@@ -76,11 +82,11 @@ class ChatGPT(_BaseGPT):
             kwargs.pop("model_name_cache_alias", None)
 
             start = datetime.datetime.now()
-            out = (await self.client
-                   .with_options(timeout=timeout)
-                   .chat.completions.create(
+            out = await self.client.with_options(
+                timeout=timeout
+            ).chat.completions.create(
                 **kwargs,
-            ))
+            )
 
         await self.add_usage_to_usage_cache(
             Usage(
@@ -91,7 +97,9 @@ class ChatGPT(_BaseGPT):
             )
         )
 
-        return ChatCompletionAddition.from_chat_completion(out, model_class=self.__class__.__name__)
+        return ChatCompletionAddition.from_chat_completion(
+            out, model_class=self.__class__.__name__
+        )
 
 
 class AzureGPT(_BaseGPT):
@@ -173,7 +181,9 @@ class AzureGPT(_BaseGPT):
             )
         )
 
-        return ChatCompletionAddition.from_chat_completion(out, model_class=self.__class__.__name__)
+        return ChatCompletionAddition.from_chat_completion(
+            out, model_class=self.__class__.__name__
+        )
 
 
 ALLOCATION_FUNCTIONS = {
@@ -280,7 +290,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             max_parallel_calls=max_parallel_calls_openai,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
-            auto_cache=False
+            auto_cache=False,
         )
 
         self.azure = AzureGPT(
@@ -295,7 +305,7 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
             max_parallel_calls=max_parallel_calls_azure,
             stop_after_attempts=stop_after_attempts,
             stop_on_exception=stop_on_exception,
-            auto_cache=False
+            auto_cache=False,
         )
 
         super().__init__(
@@ -335,7 +345,7 @@ class LiteLlmRouter(_BaseGPT):
             default_max_parallel_requests=max_parallel_calls,
             num_retries=stop_after_attempts,
             cache_responses=auto_cache,
-            **kwargs
+            **kwargs,
         )
 
     def _prepare_private_args(self, request_arguments: dict) -> dict:
@@ -347,25 +357,104 @@ class LiteLlmRouter(_BaseGPT):
 
         return {
             **request_arguments,
-            'timeout': timeout,
+            "timeout": timeout,
         }
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
 
         request_arguments = self._prepare_private_args(kwargs)
-        out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(**request_arguments)
+        out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(
+            **request_arguments
+        )
 
         # if the response is a stream, we need to consume it and build it up
         # we are not exposing streamed responses to the user
         if isinstance(out, CustomStreamWrapper):
-            out = litellm.stream_chunk_builder([chunk async for chunk in out], messages=kwargs["messages"])
+            out = litellm.stream_chunk_builder(
+                [chunk async for chunk in out], messages=kwargs["messages"]
+            )
 
-        return ChatCompletionAddition.from_litellm_model_response(out, model_class=self.__class__.__name__)
+        return ChatCompletionAddition.from_litellm_model_response(
+            out, model_class=self.__class__.__name__
+        )
 
     async def embedding(self, model: str, **kwargs) -> EmbeddingResponseAddition:
         request_arguments = self._prepare_private_args(kwargs)
 
         out = await self.router.aembedding(model=model, **request_arguments)
 
-        return EmbeddingResponseAddition.from_litellm_model_response(out, model_class=self.__class__.__name__)
+        return EmbeddingResponseAddition.from_litellm_model_response(
+            out, model_class=self.__class__.__name__
+        )
+
+    async def cached_embedding(self, model: str, **kwargs) -> EmbeddingResponseAddition:
+        # the request accepts a string input, but we want to make sure to convert it to a list
+        if isinstance(kwargs['input'], str):
+            kwargs['input'] = [kwargs['input']]
+
+        request = EmbeddingCreateParams(model=model, **kwargs)
+
+        inputs = kwargs.pop("input")
+        hasheds: list[str] = make_hash_embedding_request(request)
+
+        cached_results = [
+            await self._get_from_standard_cache(hashed) for hashed in hasheds
+        ]
+
+        logger.info(f'Found {len([k for k in cached_results if k])} of {len(inputs)} in cache')
+
+        missing_results = [input_text for input_text, cached_result in zip(inputs, cached_results) if not cached_result]
+        missing_hashed = [hash_ for hash_, cached_result in zip(hasheds, cached_results) if not cached_result]
+
+        model_name = 'unknown'
+
+        usage = LitellmUsage()
+
+        if len(missing_results) > 0:
+            logger.debug(f'Fetching {len(missing_results)} missing results')
+            missing_request = EmbeddingCreateParams(model=model, input=missing_results, **kwargs)
+            missing_response = await self.embedding(**missing_request)
+
+            usage = missing_response.usage
+
+            for hashed, result in zip(missing_hashed, missing_response.data):
+                await self._set_to_standard_cache(hashed=hashed, value={
+                    'model': model,
+                    'embedding': result.embedding,
+                    'object': 'embedding'
+                })
+
+            model_name = missing_response.model
+
+        elif len(cached_results) > 0:
+            model_name = cached_results[0]['model']
+
+        return_data: list[EmbeddingAddition] = list()
+        misses = 0
+        for i, cached_result in enumerate(cached_results):
+            if cached_result:
+                # this is a cached result
+                return_data.append(EmbeddingAddition(
+                    embedding=cached_result['embedding'],
+                    is_cached=True,
+                    index=i
+                ))
+            else:
+                # this is a cache miss
+                return_data.append(
+                    EmbeddingAddition(
+                        embedding=missing_response.data[misses].embedding, # noqa
+                        is_cached=False,
+                        index=i
+                    )
+                )
+                misses += 1
+
+        return EmbeddingResponseAddition(
+            model_class=self.__class__.__name__,
+            data=return_data,
+            usage=usage,
+            model=model_name,
+        )
+
