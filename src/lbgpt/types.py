@@ -1,8 +1,9 @@
 import sys
 
-from litellm.types.utils import ModelResponse
+from litellm.types.utils import ModelResponse, EmbeddingResponse, Usage
+from openai.types import CreateEmbeddingResponse
 from openai.types.chat import ChatCompletion
-from pydantic import ConfigDict
+from pydantic import ConfigDict, BaseModel
 
 if sys.version_info >= (3, 11):
     from typing import Self, Optional
@@ -39,4 +40,28 @@ class ChatCompletionAddition(ChatCompletion):
             choices.append(choice)
         res['choices'] = choices
 
+        return cls(**res, is_exact=is_exact, model_class=model_class)
+
+
+class EmbeddingResponseAddition(CreateEmbeddingResponse):
+    is_exact: bool = True
+    is_cached: bool = False
+    is_semantic_cached: bool = False
+
+    model_class: Optional[str] = None
+
+    model_config = ConfigDict(
+        protected_namespaces=(),  # Allow fields starting with "model_"
+        #extra='ignore'
+    )
+
+    @classmethod
+    def from_litellm_model_response(
+            cls,
+            embedding_response: EmbeddingResponse,
+            model_class: str,
+            is_exact: bool = True,
+    ) -> Self:
+
+        res = embedding_response.model_dump()
         return cls(**res, is_exact=is_exact, model_class=model_class)

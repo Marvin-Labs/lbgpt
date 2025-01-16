@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import asyncio
 import datetime
-import logging
 from asyncio import Timeout
 from logging import getLogger
 from typing import Any, Optional, Sequence
@@ -13,15 +11,14 @@ from litellm import Router
 from litellm.litellm_core_utils.streaming_handler import CustomStreamWrapper
 from litellm.types.router import DeploymentTypedDict
 from litellm.types.utils import ModelResponse
-from openai._types import NOT_GIVEN, NotGiven
-from tenacity import retry_if_exception_type, AsyncRetrying, wait_random_exponential, stop_after_attempt
+from openai._types import NOT_GIVEN, NotGiven   # noqa
 
 from lbgpt.allocation import (
     max_headroom_allocation_function,
     random_allocation_function,
 )
-from lbgpt.base import _BaseGPT, after_logging
-from lbgpt.types import ChatCompletionAddition
+from lbgpt.base import _BaseGPT
+from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition
 from lbgpt.usage import Usage
 
 logger = getLogger(__name__)
@@ -341,54 +338,34 @@ class LiteLlmRouter(_BaseGPT):
             **kwargs
         )
 
-    async def retrying_chat_completion(
-            self,
-            logging_level: int = logging.WARNING,
-            logging_exception: bool = False,
-            **kwargs,
-    ) -> Optional[ChatCompletionAddition]:
-        try:
-            async for attempt in AsyncRetrying(
-                    retry=(
-                            retry_if_exception_type(TimeoutError) |
-                            retry_if_exception_type(asyncio.TimeoutError)
-                    ),
-                    wait=wait_random_exponential(min=5, max=60),
-                    stop=stop_after_attempt(3)
-                    if self.stop_after_attempts is not None
-                    else None,
-                    after=after_logging(
-                        logger_level=logging_level, logger_exception=logging_exception
-                    ),
-            ):
-                with attempt:
-                    out: ChatCompletionAddition = await self.chat_completion(**kwargs)
-                    logger.debug('got chat completion for GPT model')
-                    return out
+    def _prepare_private_args(self, request_arguments: dict) -> dict:
+        timeout = request_arguments.pop("request_timeout", None)
 
-        except Exception as e:
-            if self.stop_on_exception:
-                raise e
-            else:
-                logger.exception(e)
-                return None
+        # removing private parameters that are not being passed to ChatGPT
+        request_arguments.pop("semantic_cache_encoding_method", None)
+        request_arguments.pop("model_name_cache_alias", None)
 
-        return await self.chat_completion(**kwargs)
+        return {
+            **request_arguments,
+            'timeout': timeout,
+        }
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
         # one request to the OpenAI API respecting their ratelimit
-        timeout = kwargs.pop("request_timeout", None)
 
-        # removing private parameters that are not being passed to ChatGPT
-        kwargs.pop("semantic_cache_encoding_method", None)
-        kwargs.pop("model_name_cache_alias", None)
+        request_arguments = self._prepare_private_args(kwargs)
+        out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(**request_arguments)
 
-        async with asyncio.timeout(timeout):
-            out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(**kwargs)
-
-            # if the response is a stream, we need to consume it and build it up
-            # we are not exposing streamed responses to the user
-            if isinstance(out, CustomStreamWrapper):
-                out = litellm.stream_chunk_builder([chunk async for chunk in out], messages=kwargs["messages"])
+        # if the response is a stream, we need to consume it and build it up
+        # we are not exposing streamed responses to the user
+        if isinstance(out, CustomStreamWrapper):
+            out = litellm.stream_chunk_builder([chunk async for chunk in out], messages=kwargs["messages"])
 
         return ChatCompletionAddition.from_litellm_model_response(out, model_class=self.__class__.__name__)
+
+    async def embedding(self, model: str, **kwargs) -> EmbeddingResponseAddition:
+        request_arguments = self._prepare_private_args(kwargs)
+
+        out = await self.router.aembedding(model=model, **request_arguments)
+
+        return EmbeddingResponseAddition.from_litellm_model_response(out, model_class=self.__class__.__name__)

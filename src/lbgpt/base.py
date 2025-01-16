@@ -336,7 +336,6 @@ class _BaseGPT(abc.ABC):
             content: dict[str, Any],
             logging_level: int = logging.WARNING,
             logging_exception: bool = False,
-
     ) -> Optional[ChatCompletionAddition]:
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
