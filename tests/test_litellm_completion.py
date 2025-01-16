@@ -67,7 +67,7 @@ STANDARD_MODEL_TESTS = [
     STANDARD_MODEL_TESTS,
     ids=[x[0] for x in STANDARD_MODEL_TESTS],
 )
-@pytest.mark.vcr(filter_query_parameters=["key"])
+@pytest.mark.vcr(filter_query_parameters=["key"], match_on=("method", "scheme", "host", "port", "path", "query"))
 async def test_litellm_standard_models(model_name, api_key, expected_model, params):
     if params is None:
         params = {}

@@ -16,7 +16,7 @@ def test_cache_immutability():
         request_timeout=10,
     )
 
-    res_base = "lbgpt_PSez9z+xC/CxkHTYJ/4mMKic9Fdg6oRyRVeXu8AAtRI="
+    res_base = "lbgpt_3d27b3f73fb10bf0b19074d827fe2630a89cf45760ea8472455797bbc000b512"
 
     for _ in range(20):
         res_next_pass = make_hash_chatgpt_request(single_request_content)
