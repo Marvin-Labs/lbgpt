@@ -9,7 +9,9 @@ from logging import getLogger
 from statistics import median
 from typing import Any, Callable, Optional, Sequence
 
+import nest_asyncio
 import openai
+from black.linegen import bracket_split_succeeded_or_raise
 from openai._compat import model_dump, model_parse
 from tenacity import (
     AsyncRetrying,
@@ -18,20 +20,19 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,
 )
-from tqdm.contrib.logging import logging_redirect_tqdm
 from tqdm.asyncio import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
-from lbgpt.types import ChatCompletionAddition
+from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition, ResponseTypes
 from lbgpt.usage import Usage, UsageStats
-import nest_asyncio
 
 logger = getLogger(__name__)
 
 
 def after_logging(
-        logger_level: int = logging.WARNING,
-        logger_exception: bool = True,
+    logger_level: int = logging.WARNING,
+    logger_exception: bool = True,
 ) -> Callable[[RetryCallState], None]:
     def logging_function(retry_state: RetryCallState) -> None:
         with logging_redirect_tqdm():
@@ -51,23 +52,24 @@ def after_logging(
 
 class _BaseGPT(abc.ABC):
     def __init__(
-            self,
-            max_parallel_calls: int,
-            cache: Optional[Any] = None,
-            semantic_cache: Optional[Any] = None,
-            stop_after_attempts: Optional[int] = 10,
-            stop_on_exception: bool = False,
-            max_usage_cache_size: Optional[int] = 1_000,
-            limit_tpm: Optional[int] = None,
-            limit_rpm: Optional[int] = None,
-            propagate_semantic_cache_to_standard_cache: bool = False,
-            auto_cache: bool = True
+        self,
+        max_parallel_calls: int,
+        cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+        max_usage_cache_size: Optional[int] = 1_000,
+        limit_tpm: Optional[int] = None,
+        limit_rpm: Optional[int] = None,
+        propagate_semantic_cache_to_standard_cache: bool = False,
+        auto_cache: bool = True,
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
 
         if self.cache is None and auto_cache:
             from cachetools import LRUCache
+
             self.cache = LRUCache(maxsize=max_usage_cache_size * 100)
 
         self.semantic_cache = semantic_cache
@@ -100,19 +102,21 @@ class _BaseGPT(abc.ABC):
     async def add_usage_to_usage_cache(self, usage: Usage):
         # evict if the list is too long. Do this to protect memory usage if required
         if (
-                self.max_usage_cache_size
-                and len(self._usage_cache_list) > self.max_usage_cache_size
+            self.max_usage_cache_size
+            and len(self._usage_cache_list) > self.max_usage_cache_size
         ):
             self._usage_cache_list.pop(0)
 
         self._usage_cache_list.append(usage)
 
     async def usage_cache_list_after_start_datetime(
-            self, start_datetime: datetime.datetime
+        self, start_datetime: datetime.datetime
     ) -> list[Usage]:
         return [k for k in self._usage_cache_list if k.start_datetime > start_datetime]
 
-    async def get_usage_stats(self, include_usage_reservation: bool = False) -> UsageStats:
+    async def get_usage_stats(
+        self, include_usage_reservation: bool = False
+    ) -> UsageStats:
         current_usage_tokens = 0
         current_usage_requests = 0
 
@@ -120,12 +124,14 @@ class _BaseGPT(abc.ABC):
             # Estimating current usage as the expected number of tokens times the number of
             # currently outstanding requests (which are tracked in the semaphore)
             current_usage_tokens = (
-                    self.semaphore_chatgpt._value * await self.expected_tokens_per_request()
+                self.semaphore_chatgpt._value * await self.expected_tokens_per_request()
             )
             current_usage_requests = self.semaphore_chatgpt._value
 
-        cache_list_after_start_datetime = await self.usage_cache_list_after_start_datetime(
-            datetime.datetime.now() - datetime.timedelta(seconds=60)
+        cache_list_after_start_datetime = (
+            await self.usage_cache_list_after_start_datetime(
+                datetime.datetime.now() - datetime.timedelta(seconds=60)
+            )
         )
 
         return UsageStats(
@@ -135,7 +141,7 @@ class _BaseGPT(abc.ABC):
                     for k in cache_list_after_start_datetime
                 ]
             )
-                   + current_usage_tokens,
+            + current_usage_tokens,
             requests=len(cache_list_after_start_datetime) + current_usage_requests,
         )
 
@@ -164,14 +170,16 @@ class _BaseGPT(abc.ABC):
 
         if self.limit_tpm:
             headroom_tpm = (
-                    self.limit_tpm - cur_usage.tokens - await self.expected_tokens_per_request()
+                self.limit_tpm
+                - cur_usage.tokens
+                - await self.expected_tokens_per_request()
             )
         else:
             headroom_tpm = sys.maxsize
 
         if self.limit_rpm:
             headroom_rpm = await self.expected_tokens_per_request() * (
-                    self.limit_rpm - cur_usage.requests - 1
+                self.limit_rpm - cur_usage.requests - 1
             )
         else:
             headroom_rpm = sys.maxsize
@@ -183,30 +191,34 @@ class _BaseGPT(abc.ABC):
         raise NotImplementedError
 
     async def achat_completion_list(
-            self,
-            chatgpt_chat_completion_request_body_list: list[dict],
-            show_progress=True,
-            logging_level: int = logging.WARNING,
-            logging_exception: bool = False,
+        self,
+        chatgpt_chat_completion_request_body_list: list[dict],
+        show_progress=True,
+        logging_level: int = logging.WARNING,
+        logging_exception: bool = False,
     ) -> Sequence[ChatCompletionAddition]:
-
         # we are setting up the semaphore here, so that we can refresh it if required
         # we are rate limiting the three things we care about: gpt requests, standard cache requests,
         # and semantic cache requests.
 
         tasks = [
-                self._cached_chat_completion_with_index(
-                    logging_level=logging_level,
-                    logging_exception=logging_exception,
-                    content=content,
-                    index=index,
-                )
-                for index, content in enumerate(chatgpt_chat_completion_request_body_list)]
+            self._cached_chat_completion_with_index(
+                logging_level=logging_level,
+                logging_exception=logging_exception,
+                content=content,
+                index=index,
+            )
+            for index, content in enumerate(chatgpt_chat_completion_request_body_list)
+        ]
 
-        results: list[(ChatCompletionAddition | Exception | None)] = [None] * len(tasks)  # To store results in the correct order
+        results: list[(ChatCompletionAddition | Exception | None)] = [None] * len(
+            tasks
+        )  # To store results in the correct order
 
         # Use tqdm to track progress
-        for task in tqdm.as_completed(tasks, total=len(tasks), disable=not show_progress):
+        for task in tqdm.as_completed(
+            tasks, total=len(tasks), disable=not show_progress
+        ):
             result_with_index = await task
             index, result = result_with_index
             results[index] = result
@@ -215,41 +227,52 @@ class _BaseGPT(abc.ABC):
 
     def chat_completion_list(self, chatgpt_chat_completion_request_body_list, **kwargs):
         nest_asyncio.apply()
-        return asyncio.run(self.achat_completion_list(chatgpt_chat_completion_request_body_list=chatgpt_chat_completion_request_body_list, **kwargs))
+        return asyncio.run(
+            self.achat_completion_list(
+                chatgpt_chat_completion_request_body_list=chatgpt_chat_completion_request_body_list,
+                **kwargs,
+            )
+        )
 
-    async def _get_from_cache(self, hashed: str) -> Optional[ChatCompletionAddition]:
+    async def _get_from_standard_cache(self, hashed: str) -> Optional[ResponseTypes]:
         if self.cache is not None:
-            logger.debug(f'trying to get {hashed} from standard cache')
+            logger.debug(f"trying to get {hashed} from standard cache")
 
-            if hasattr(self.cache, 'aget'):
+            if hasattr(self.cache, "aget"):
                 out = await self.cache.aget(hashed)
-            elif hasattr(self.cache, 'get'):
+            elif hasattr(self.cache, "get"):
                 out = self.cache.get(hashed)
             else:
                 out = self.cache[hashed]
 
             if out is not None:
-                logger.debug(f'found request {hashed} in standard cache')
+                logger.debug(f"found request {hashed} in standard cache")
                 out_dict = json.loads(out)
-                out_dict['is_cached'] = True
+                out_dict["is_cached"] = True
 
-                return model_parse(ChatCompletionAddition, out_dict)
+                out_type = out_dict.get("object")
 
-    async def _set_to_cache(self, hashed: str, value: ChatCompletionAddition):
+                if out_type == "chat.completion":
+                    return model_parse(ChatCompletionAddition, out_dict)
+                elif out_type == "embedding":
+                    return model_parse(EmbeddingResponseAddition, out_dict)
+                else:
+                    logger.warning(f"Unknown object type {out_type}")
+                    return
+
+    async def _set_to_standard_cache(self, hashed: str, value: ResponseTypes):
         if self.cache is not None:
-            if hasattr(self.cache, 'aset'):
+            if hasattr(self.cache, "aset"):
                 await self.cache.aset(hashed, json.dumps(model_dump(value)))
-            elif hasattr(self.cache, 'set'):
+            elif hasattr(self.cache, "set"):
                 self.cache.set(hashed, json.dumps(model_dump(value)))
             else:
                 self.cache[hashed] = json.dumps(model_dump(value))
 
-    async def get_chat_completion_from_cache(
-            self, hashed: str, **kwargs
-    ) -> Optional[ChatCompletionAddition]:
+    async def get_from_cache(self, hashed: str, **kwargs) -> Optional[ResponseTypes]:
         if self.cache is not None:
             async with self.semaphore_standard_cache:
-                out = await self._get_from_cache(hashed)
+                out = await self._get_from_standard_cache(hashed)
             if out is not None:
                 # but return in any case
                 return out
@@ -257,13 +280,17 @@ class _BaseGPT(abc.ABC):
         # if the item is not in the standard cache, we are trying the semantic cache (if available)
         # we are currently only supporting semantic cache for FAISS models
         if self.semantic_cache is not None:
-            logger.debug(f'trying to get {hashed} from semantic cache')
+            logger.debug(f"trying to get {hashed} from semantic cache")
             async with self.semaphore_semantic_cache:
                 try:
                     out: Optional[
-                        ChatCompletionAddition
-                    ] = await self.semantic_cache.query_cache(kwargs, semantic_cache_encoding_method=kwargs.get(
-                        'semantic_cache_encoding_method'))
+                        ResponseTypes
+                    ] = await self.semantic_cache.query_cache(
+                        kwargs,
+                        semantic_cache_encoding_method=kwargs.get(
+                            "semantic_cache_encoding_method"
+                        ),
+                    )
                 except Exception as e:
                     # we are not stopping on exception here, but logging it instead
                     logger.exception(e)
@@ -272,56 +299,60 @@ class _BaseGPT(abc.ABC):
             if out is not None:
                 # propagate to standard cache (we know it is not in standard cache),
                 # otherwise we would not end up here
-                logger.debug(f'found request {hashed} in semantic cache')
+                logger.debug(f"found request {hashed} in semantic cache")
 
                 if self.propagate_semantic_cache_to_standard_cache and out.is_exact:
                     logger.debug("propagating semantic cache to standard cache")
-                    await self._set_to_cache(hashed, out)
+                    await self._set_to_standard_cache(hashed, out)
 
                 return out
 
-    async def set_chat_completion_to_cache(
-            self, hashed: str, out: ChatCompletionAddition, request_params: dict[str, Any]
+    async def set_to_cache(
+        self, hashed: str, out: ResponseTypes, request_params: dict[str, Any]
     ) -> None:
         if self.semantic_cache is not None:
             logger.debug(f"adding request {hashed} to semantic cache")
-            await self.semantic_cache.add_cache(request_params, out, semantic_cache_encoding_method=request_params.get(
-                'semantic_cache_encoding_method'))
+            await self.semantic_cache.add_cache(
+                request_params,
+                out,
+                semantic_cache_encoding_method=request_params.get(
+                    "semantic_cache_encoding_method"
+                ),
+            )
 
         if self.cache is not None:
             logger.debug(f"adding request {hashed} to standard cache")
-            await self._set_to_cache(hashed, out)
+            await self._set_to_standard_cache(hashed, out)
 
     async def retrying_chat_completion(
-            self,
-            logging_level: int = logging.WARNING,
-            logging_exception: bool = False,
-            **kwargs,
+        self,
+        logging_level: int = logging.WARNING,
+        logging_exception: bool = False,
+        **kwargs,
     ) -> Optional[ChatCompletionAddition]:
-
-        logger.debug('requesting chat completion for GPT model')
+        logger.debug("requesting chat completion for GPT model")
         try:
             async for attempt in AsyncRetrying(
-                    retry=(
-                            retry_if_exception_type(openai.APIConnectionError)
-                            | retry_if_exception_type(openai.RateLimitError)
-                            | retry_if_exception_type(openai.InternalServerError)
-                            | retry_if_exception_type(asyncio.TimeoutError)
-                            | retry_if_exception_type(TimeoutError)
-                            # shall also retry for bad gateway error (502)
-                            # profile the error when it comes up again
-                    ),
-                    wait=wait_random_exponential(min=5, max=60),
-                    stop=stop_after_attempt(self.stop_after_attempts)
-                    if self.stop_after_attempts is not None
-                    else None,
-                    after=after_logging(
-                        logger_level=logging_level, logger_exception=logging_exception
-                    ),
+                retry=(
+                    retry_if_exception_type(openai.APIConnectionError)
+                    | retry_if_exception_type(openai.RateLimitError)
+                    | retry_if_exception_type(openai.InternalServerError)
+                    | retry_if_exception_type(asyncio.TimeoutError)
+                    | retry_if_exception_type(TimeoutError)
+                    # shall also retry for bad gateway error (502)
+                    # profile the error when it comes up again
+                ),
+                wait=wait_random_exponential(min=5, max=60),
+                stop=stop_after_attempt(self.stop_after_attempts)
+                if self.stop_after_attempts is not None
+                else None,
+                after=after_logging(
+                    logger_level=logging_level, logger_exception=logging_exception
+                ),
             ):
                 with attempt:
                     out: ChatCompletionAddition = await self.chat_completion(**kwargs)
-                    logger.debug('got chat completion for GPT model')
+                    logger.debug("got chat completion for GPT model")
                     return out
 
         except Exception as e:
@@ -332,10 +363,10 @@ class _BaseGPT(abc.ABC):
                 return None
 
     async def cached_chat_completion(
-            self,
-            content: dict[str, Any],
-            logging_level: int = logging.WARNING,
-            logging_exception: bool = False,
+        self,
+        content: dict[str, Any],
+        logging_level: int = logging.WARNING,
+        logging_exception: bool = False,
     ) -> Optional[ChatCompletionAddition]:
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
@@ -344,7 +375,8 @@ class _BaseGPT(abc.ABC):
         hashed = make_hash_chatgpt_request(content)
 
         # accessing cache, returning if available, otherwise proceeding.
-        cached_result = await self.get_chat_completion_from_cache(hashed, **content)
+        cached_result = await self.get_from_cache(hashed, **content)
+
         if cached_result is not None:
             return cached_result
 
@@ -353,13 +385,13 @@ class _BaseGPT(abc.ABC):
         )
 
         if out is not None:
-            await self.set_chat_completion_to_cache(
-                hashed=hashed, out=out, request_params=content
-            )
+            await self.set_to_cache(hashed=hashed, out=out, request_params=content)
 
         return out
 
-    async def _cached_chat_completion_with_index(self, index: int, **kwargs) -> tuple[int, Optional[ChatCompletionAddition] | Exception]:
+    async def _cached_chat_completion_with_index(
+        self, index: int, **kwargs
+    ) -> tuple[int, Optional[ChatCompletionAddition] | Exception]:
         try:
             res = await self.cached_chat_completion(**kwargs)
         except Exception as e:

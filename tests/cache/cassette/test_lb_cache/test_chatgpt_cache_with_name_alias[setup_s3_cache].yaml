@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "please respond with pong"}],
+      "model": "gpt-4o", "frequency_penalty": 0, "max_tokens": 50, "presence_penalty":
+      0, "temperature": 0, "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '185'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.56.2
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.56.2
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.10
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-AqIWqGQtXGksSGcJlv0Taj5MKbETq\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1737027644,\n  \"model\": \"gpt-4o-2024-08-06\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": \"pong\",\n        \"refusal\": null\n
+      \     },\n      \"logprobs\": null,\n      \"finish_reason\": \"stop\"\n    }\n
+      \ ],\n  \"usage\": {\n    \"prompt_tokens\": 11,\n    \"completion_tokens\":
+      2,\n    \"total_tokens\": 13,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\":
+      0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n
+      \     \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\":
+      0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\":
+      \"default\",\n  \"system_fingerprint\": \"fp_50cad350e4\"\n}\n"
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 902dd519bcc0b482-DXB
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 16 Jan 2025 11:40:45 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=L5GF9xHCAxH74Pr0A7y7rsCEQvSINUGa0bdhXEAFK9I-1737027645-1.0.1.1-OGskwxU8jEs_hqXlMM3a1IM9_X0PR6Q2k5oTfojW_FP1DVK7.BEuIzh_IwkWWRBjx_yCvS2PktOmthcrLhmo2g;
+        path=/; expires=Thu, 16-Jan-25 12:10:45 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=CR8fHI7t94NXSbwou_PM77.C1cEo0XffQ1XS_g.WzqE-1737027645043-0.0.1.1-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-expose-headers:
+      - X-Request-ID
+      alt-svc:
+      - h3=":443"; ma=86400
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '316'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains; preload
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '30000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '29999942'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 0s
+      x-request-id:
+      - req_b8edb5ce99cafb63ff7649cc24bae4f2
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

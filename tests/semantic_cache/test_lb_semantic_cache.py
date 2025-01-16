@@ -36,7 +36,9 @@ SEMANTIC_CACHES = [
 ]
 
 
-def get_single_request_content_for_test(user_message: str, enable_encoding: bool = True):
+def get_single_request_content_for_test(
+    user_message: str, enable_encoding: bool = True
+):
     messages = [
         {"role": "user", "content": user_message},
     ]
@@ -50,11 +52,10 @@ def get_single_request_content_for_test(user_message: str, enable_encoding: bool
         frequency_penalty=0,
         presence_penalty=0,
         request_timeout=10,
-
     )
 
     if enable_encoding:
-        req['semantic_cache_encoding_method'] = 'user_only'
+        req["semantic_cache_encoding_method"] = "user_only"
     return req
 
 
@@ -217,11 +218,12 @@ def test_chatgpt_cache_failed(mocker: MockerFixture, semantic_cache):
 
 @pytest.mark.parametrize("semantic_cache", SEMANTIC_CACHES)
 @pytest.mark.vcr
-def test_chatgpt_cache_exact_but_no_method_specified(mocker: MockerFixture, semantic_cache):
+def test_chatgpt_cache_exact_but_no_method_specified(
+    mocker: MockerFixture, semantic_cache
+):
     semantic_cache = semantic_cache()
     single_request_content = get_single_request_content_for_test(
-        "please respond with pong",
-        enable_encoding=False
+        "please respond with pong", enable_encoding=False
     )
 
     lb = ChatGPT(
@@ -265,4 +267,3 @@ def test_chatgpt_cache_exact_but_no_method_specified(mocker: MockerFixture, sema
     assert hash(semantic_cache) == cache_stats["hash"]
 
     assert res_cache[0].is_exact is True
-

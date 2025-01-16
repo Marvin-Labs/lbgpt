@@ -3,6 +3,7 @@ services:
     image: qdrant/qdrant:latest
     ports:
       - "6333:6333"
+
   redis:
     image: redis:7.0.11
     restart: always
@@ -10,3 +11,28 @@ services:
       # just to avoid port conflicts with existing redis instances, we are moving down the port to 6378
       - "6378:6379"
     command: "redis-server"
+
+  minio:
+    image: minio/minio
+    container_name: minio-lbgpt
+    environment:
+      MINIO_ROOT_USER: minioadmin  # Default root user
+      MINIO_ROOT_PASSWORD: minioadmin  # Default root password
+    ports:
+      - "19900:19900"  # Port for S3 API
+      - "19901:19901"  # Port for MinIO Console
+    command: server /data --console-address ":19901" --address ":19900"
+
+  # Optional service for MinIO client (mc) for administrative tasks
+  minio_mc:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set local http://minio-lbgpt:19900 minioadmin minioadmin;
+      
+      mc mb local/data.lbgpt.com;
+      mc policy set public local/data.lbgpt.com;
+      "

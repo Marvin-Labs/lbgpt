@@ -9,7 +9,10 @@ from lbgpt.lbgpt import LiteLlmRouter
 from lbgpt.types import ChatCompletionAddition
 
 messages = [
-    {"role": "user", "content": "please return the first 50 words of the US declaration of independence"},
+    {
+        "role": "user",
+        "content": "please return the first 50 words of the US declaration of independence",
+    },
 ]
 single_request_content = dict(
     messages=messages,
@@ -23,16 +26,18 @@ single_request_content = dict(
 async def test_streaming():
     model_list: list[DeploymentTypedDict] = [
         {
-            'model_name': '*',
-            'litellm_params': {
-                'model': 'openai/*',
-                'api_key': environ["OPEN_AI_API_KEY"]
-            }
+            "model_name": "*",
+            "litellm_params": {
+                "model": "openai/*",
+                "api_key": environ["OPEN_AI_API_KEY"],
+            },
         }
     ]
 
     lb = LiteLlmRouter(model_list)
-    res = await lb.chat_completion(model='gpt-4o', stream=True, **single_request_content)
+    res = await lb.chat_completion(
+        model="gpt-4o", stream=True, **single_request_content
+    )
     assert isinstance(res, ChatCompletionAddition)
-    assert res.model == 'gpt-4o'
-    assert res.model_class == 'LiteLlmRouter'
+    assert res.model == "gpt-4o"
+    assert res.model_class == "LiteLlmRouter"

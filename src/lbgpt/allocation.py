@@ -24,7 +24,9 @@ async def max_headroom_allocation_function(
     even if there is no allocation left available. Otherwise, we are waiting here until the overallocation is resolved
     """
     gpts_with_headroom = [(await gpt.headroom(), gpt) for gpt in gpts]
-    best_headroom, best_alternative = max(gpts_with_headroom, key=lambda gpt: (gpt[0], random.random()))
+    best_headroom, best_alternative = max(
+        gpts_with_headroom, key=lambda gpt: (gpt[0], random.random())
+    )
 
     if overallocate:
         return best_alternative

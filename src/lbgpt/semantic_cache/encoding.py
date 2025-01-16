@@ -7,19 +7,17 @@ class RoleMessage(BaseModel):
     content: str
 
     def to_text(self) -> str:
-        return f'[{self.role}]: {self.content.strip()}'
+        return f"[{self.role}]: {self.content.strip()}"
 
 
 def user_only(role_messages: list[RoleMessage]) -> str:
-    return '\n\n'.join([
-        message.to_text() for message in role_messages if message.role == "user"
-    ])
+    return "\n\n".join(
+        [message.to_text() for message in role_messages if message.role == "user"]
+    )
 
 
 def all_(role_messages: list[RoleMessage]) -> str:
-    return '\n\n'.join([
-        message.to_text() for message in role_messages
-    ])
+    return "\n\n".join([message.to_text() for message in role_messages])
 
 
 def system_only(role_messages: list[RoleMessage]) -> str:

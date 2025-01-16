@@ -35,13 +35,15 @@ async def test_lb_async_random(mocker: MockerFixture):
         azure_model_map={
             "gpt-3.5-turbo-0613": os.environ["OPENAI_AZURE_DEPLOYMENT_ID"]
         },
-        auto_cache=False
+        auto_cache=False,
     )
 
     azure = mocker.spy(lb.azure, "chat_completion")
     openai = mocker.spy(lb.openai, "chat_completion")
 
-    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list(
+        [single_request_content] * 5, show_progress=False
+    )
 
     assert len(res) == 5
     for k in res:
@@ -95,7 +97,9 @@ async def test_lbgpt_max_headroom():
         auto_cache=False,
     )
 
-    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list(
+        [single_request_content] * 5, show_progress=False
+    )
 
     assert len(await lb.usage_cache_list) == 5
     assert len(await lb.gpts[0].usage_cache_list) == 5
@@ -132,7 +136,9 @@ async def test_chatgpt_async(mocker: MockerFixture):
 
     openai = mocker.spy(lb, "chat_completion")
 
-    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list(
+        [single_request_content] * 5, show_progress=False
+    )
 
     assert len(await lb.usage_cache_list) == 5
 
@@ -173,7 +179,9 @@ async def test_azure_async(mocker: MockerFixture):
 
     azure = mocker.spy(lb, "chat_completion")
 
-    res = await lb.achat_completion_list([single_request_content] * 5, show_progress=False)
+    res = await lb.achat_completion_list(
+        [single_request_content] * 5, show_progress=False
+    )
 
     assert len(await lb.usage_cache_list) == 5
 

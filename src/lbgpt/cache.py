@@ -10,10 +10,12 @@ from openai.types.chat import ChatCompletionMessageParam
 
 
 def non_message_parameters_from_create(
-        chat_completion_create: CompletionCreateParams | dict[str, Any]
+    chat_completion_create: CompletionCreateParams | dict[str, Any]
 ) -> dict[str, Any]:
     return dict(
-        model=chat_completion_create.get('model_name_cache_alias', chat_completion_create["model"]),
+        model=chat_completion_create.get(
+            "model_name_cache_alias", chat_completion_create["model"]
+        ),
         frequency_penalty=chat_completion_create.get("frequency_penalty", 0.0),
         logit_bias=chat_completion_create.get("logit_bias"),
         n=chat_completion_create.get("n", 1),
@@ -45,19 +47,19 @@ def convert_message(message: ChatCompletionMessageParam):
         content = ""
         for c in raw_content:
             if isinstance(c, dict):
-                if 'text' in c:
-                    content += c['text'] + '\n\n'
-                elif 'image_url' in c:
-                    image_url = c['image_url']
-                    url = image_url['url']
-                    detail = image_url.get('detail')
+                if "text" in c:
+                    content += c["text"] + "\n\n"
+                elif "image_url" in c:
+                    image_url = c["image_url"]
+                    url = image_url["url"]
+                    detail = image_url.get("detail")
 
                     content += f"![image]({url}) {detail}\n\n"
 
     else:
         content = str(raw_content)
 
-    if content == '':
+    if content == "":
         # if the content fails, we want to create a random key in order to avoid caching
         content = str(uuid.uuid4())
     return {
@@ -67,8 +69,8 @@ def convert_message(message: ChatCompletionMessageParam):
 
 
 def make_hash_chatgpt_request(
-        chat_completion_create: CompletionCreateParams | dict[str, Any],
-        include_messages: bool = True,
+    chat_completion_create: CompletionCreateParams | dict[str, Any],
+    include_messages: bool = True,
 ) -> str:
     """Converting a chatgpt request to a hash for caching and deduplication purposes"""
 
@@ -77,15 +79,15 @@ def make_hash_chatgpt_request(
     )
 
     messages = [
-        convert_message(message)
-        for message in chat_completion_create["messages"]
+        convert_message(message) for message in chat_completion_create["messages"]
     ]
 
     hasher = hashlib.sha256()
     hasher.update(repr(make_hashable(non_message_parameters)).encode())
     if include_messages:
         hasher.update(repr(make_hashable(messages)).encode())
-    return f"lbgpt_{base64.b64encode(hasher.digest()).decode()}"
+
+    return f"lbgpt_{hasher.digest().hex()}"
 
 
 def make_hashable(o):
