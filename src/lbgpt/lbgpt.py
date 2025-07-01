@@ -363,11 +363,12 @@ class LiteLlmRouter(_BaseGPT):
         }
 
     async def chat_completion(self, **kwargs) -> ChatCompletionAddition:
-        # one request to the OpenAI API respecting their ratelimit
+        """one request to the OpenAI API respecting their ratelimit"""
+        request_tools = kwargs.pop("tools", [])
 
         request_arguments = self._prepare_private_args(kwargs)
         out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(
-            tools=self.tools,
+            tools=self.tools + request_tools,
             **request_arguments
         )
 
