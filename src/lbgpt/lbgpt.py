@@ -331,13 +331,15 @@ class LiteLlmRouter(_BaseGPT):
             cache: Optional[Any] = None,
             stop_after_attempts: Optional[int] = 10,
             stop_on_exception: bool = False,
-            auto_cache=True,
+            auto_cache: bool=True,
+            tools: Optional[list[dict[str, Any]]] = None,
             **kwargs,
     ):
         super().__init__(
             cache=cache,
             max_parallel_calls=max_parallel_calls,
             stop_on_exception=stop_on_exception,
+            tools=tools,
         )
 
         self.router = Router(
@@ -365,6 +367,7 @@ class LiteLlmRouter(_BaseGPT):
 
         request_arguments = self._prepare_private_args(kwargs)
         out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(
+            tools=self.tools,
             **request_arguments
         )
 

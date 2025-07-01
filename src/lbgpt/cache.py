@@ -2,15 +2,26 @@
 import hashlib
 import uuid
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, Optional
 
 from openai.types import CompletionCreateParams, EmbeddingCreateParams
 from openai.types.chat import ChatCompletionMessageParam
 
 
 def non_message_parameters_from_create(
-        chat_completion_create: CompletionCreateParams | dict[str, Any]
+        chat_completion_create: CompletionCreateParams | dict[str, Any],
+        tools: Optional[list[dict[str, Any]]] = None,
 ) -> dict[str, Any]:
+    if tools is None:
+        tool_hash = None
+    else:
+        tool_hash = [{
+            'name': tool['name'],
+            'description': tool.get('description'),
+            'parameters': tool.get('parameters', {}),
+            'strict': tool.get('strict', False),
+        } for tool in tools]
+
     return dict(
         model=chat_completion_create.get(
             "model_name_cache_alias", chat_completion_create["model"]
@@ -25,7 +36,7 @@ def non_message_parameters_from_create(
         stream=chat_completion_create.get("stream", False),
         temperature=chat_completion_create.get("temperature", 1.0),
         top_p=chat_completion_create.get("top_p", 1.0),
-        tools=chat_completion_create.get("tools"),
+        tools=tool_hash,
         tool_choice=chat_completion_create.get("tool_choice"),
         function_call=chat_completion_create.get("function_call"),
         functions=chat_completion_create.get("functions"),
@@ -70,11 +81,12 @@ def convert_message(message: ChatCompletionMessageParam):
 def make_hash_chatgpt_request(
         chat_completion_create: CompletionCreateParams,
         include_messages: bool = True,
+        tools: Optional[list[dict[str, Any]]] = None,
 ) -> str:
     """Converting a chatgpt request to a hash for caching and deduplication purposes"""
 
     non_message_parameters = non_message_parameters_from_create(
-        chat_completion_create=chat_completion_create
+        chat_completion_create=chat_completion_create, tools=tools
     )
 
     messages = [

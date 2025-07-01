@@ -1,0 +1,115 @@
+interactions:
+- request:
+    body: '{"messages": [{"role": "user", "content": "Roll a few dice!"}], "model":
+      "gpt-4o", "max_tokens": 200, "stream": false, "temperature": 0, "tools": [{"type":
+      "function", "function": {"name": "roll_dice", "description": "Roll `n_dice`
+      6-sided dice and return the results.", "inputSchema": {"properties": {"n_dice":
+      {"title": "N Dice", "type": "integer"}}, "required": ["n_dice"], "type": "object"},
+      "annotations": null}}], "top_p": 1}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '431'
+      content-type:
+      - application/json
+      host:
+      - api.openai.com
+      user-agent:
+      - AsyncOpenAI/Python 1.56.2
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - Linux
+      x-stainless-package-version:
+      - 1.56.2
+      x-stainless-raw-response:
+      - 'true'
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.12
+    method: POST
+    uri: https://api.openai.com/v1/chat/completions
+  response:
+    content: "{\n  \"id\": \"chatcmpl-BoYTr8Qk17C4iZn17KvWWZ7uQUyVO\",\n  \"object\":
+      \"chat.completion\",\n  \"created\": 1751388643,\n  \"model\": \"gpt-4o-2024-08-06\",\n
+      \ \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\":
+      \"assistant\",\n        \"content\": null,\n        \"tool_calls\": [\n          {\n
+      \           \"id\": \"call_ZUivrsz2iyuHTSc6YnUBGNPc\",\n            \"type\":
+      \"function\",\n            \"function\": {\n              \"name\": \"roll_dice\",\n
+      \             \"arguments\": \"{}\"\n            }\n          }\n        ],\n
+      \       \"refusal\": null,\n        \"annotations\": []\n      },\n      \"logprobs\":
+      null,\n      \"finish_reason\": \"tool_calls\"\n    }\n  ],\n  \"usage\": {\n
+      \   \"prompt_tokens\": 52,\n    \"completion_tokens\": 11,\n    \"total_tokens\":
+      63,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\":
+      0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\":
+      0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\":
+      0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\":
+      \"fp_07871e2ad8\"\n}\n"
+    headers:
+      CF-RAY:
+      - 9587676b0efadddb-DXB
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 01 Jul 2025 16:50:44 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=WZaNcnX2xsIo9qXH8DpD.nibKRMRKbvaUV5CMK2gMP8-1751388644-1.0.1.1-gURZ_34v1PBN_RE8VZvLDZkcqKWHF9vuwxVPoMYf1bZ5QCSGzjAy9Eyfqmx94Pplp9eXjrMp5CDWU3.cnp_8fq5CZKk10S5UE8d1rNl6pes;
+        path=/; expires=Tue, 01-Jul-25 17:20:44 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=pGKjMjRxbPDd7dQwqSN_6U2x1ENHb400Wz82_2T7ceA-1751388644384-0.0.1.1-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-expose-headers:
+      - X-Request-ID
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      openai-organization:
+      - marvin-labs
+      openai-processing-ms:
+      - '519'
+      openai-version:
+      - '2020-10-01'
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains; preload
+      x-envoy-upstream-service-time:
+      - '525'
+      x-ratelimit-limit-requests:
+      - '10000'
+      x-ratelimit-limit-tokens:
+      - '30000000'
+      x-ratelimit-remaining-requests:
+      - '9999'
+      x-ratelimit-remaining-tokens:
+      - '29999994'
+      x-ratelimit-reset-requests:
+      - 6ms
+      x-ratelimit-reset-tokens:
+      - 0s
+      x-request-id:
+      - req_f9a6d724cd4f712e8c114803e25d5d7d
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

@@ -63,6 +63,7 @@ class _BaseGPT(abc.ABC):
         limit_rpm: Optional[int] = None,
         propagate_semantic_cache_to_standard_cache: bool = False,
         auto_cache: bool = True,
+        tools: Optional[list[dict[str, Any]]] = None,
     ):
         # this is standard cache, i.e. it only checks for equal items
         self.cache = cache
@@ -91,6 +92,15 @@ class _BaseGPT(abc.ABC):
         self.semaphore_chatgpt = asyncio.Semaphore(self.max_parallel_calls)
         self.semaphore_standard_cache = asyncio.Semaphore(self.max_parallel_calls)
         self.semaphore_semantic_cache = asyncio.Semaphore(self.max_parallel_calls)
+
+        if tools is not None:
+            # checking if tools are provided and if they are in the correct format
+            assert all(k.get('type') == 'function' for k in tools), 'All tools must be of type "function"'
+            assert all(k.get('function') is not None for k in tools), 'All tools must have a function defined'
+
+        self.tools = tools
+
+
 
     def request_setup(self):
         pass
@@ -367,18 +377,19 @@ class _BaseGPT(abc.ABC):
         content: dict[str, Any],
         logging_level: int = logging.WARNING,
         logging_exception: bool = False,
+        use_cache: bool = True,
     ) -> Optional[ChatCompletionAddition]:
         # we want to stagger even the cache access a bit, otherwise all requests immediately hit cache
         # but do not see if a later request is putting anything into the cache.
         # Thus, we are limiting the number of parallel executions here
+        hashed = make_hash_chatgpt_request(content, tools=self.tools)
 
-        hashed = make_hash_chatgpt_request(content)
+        if use_cache:
+            # accessing cache, returning if available, otherwise proceeding.
+            cached_result = await self.get_from_cache(hashed, **content)
 
-        # accessing cache, returning if available, otherwise proceeding.
-        cached_result = await self.get_from_cache(hashed, **content)
-
-        if cached_result is not None:
-            return cached_result
+            if cached_result is not None:
+                return cached_result
 
         out = await self.retrying_chat_completion(
             logging_level=logging_level, logging_exception=logging_exception, **content
