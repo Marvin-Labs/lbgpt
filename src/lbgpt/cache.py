@@ -16,10 +16,10 @@ def non_message_parameters_from_create(
         tool_hash = None
     else:
         tool_hash = [{
-            'name': tool['name'],
-            'description': tool.get('description'),
-            'parameters': tool.get('parameters', {}),
-            'strict': tool.get('strict', False),
+            'name': tool['function']['name'],
+            'description': tool['function'].get('description'),
+            'parameters': tool['function'].get('parameters', {}),
+            'strict': tool['function'].get('strict', False),
         } for tool in tools]
 
     return dict(

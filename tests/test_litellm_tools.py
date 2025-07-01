@@ -1,3 +1,4 @@
+import json
 from os import environ
 from pathlib import Path
 from typing import Any
@@ -9,7 +10,7 @@ from lbgpt.lbgpt import LiteLlmRouter
 from lbgpt.types import ChatCompletionAddition
 
 messages = [
-    {"role": "user", "content": "Roll a few dice!"},
+    {"role": "user", "content": "Roll one dice!"},
 ]
 single_request_content = dict(
     messages=messages,
@@ -30,7 +31,7 @@ STANDARD_MODEL_TESTS = [
     STANDARD_MODEL_TESTS,
     ids=[x[0] for x in STANDARD_MODEL_TESTS],
 )
-@pytest.mark.vcr(filter_query_parameters=["key"], match_on=("method", "scheme", "host", "port", "path", "query"))
+# @pytest.mark.vcr(filter_query_parameters=["key"], match_on=("method", "scheme", "host", "port", "path", "query"), record_mode='new_episodes')
 async def test_litellm_with_tools(model_name, api_key, expected_model, params):
     if params is None:
         params = {}
@@ -52,8 +53,9 @@ async def test_litellm_with_tools(model_name, api_key, expected_model, params):
     lb = LiteLlmRouter(model_list, tools=[{
         'type': 'function',
         'function':
-        {'name': 'roll_dice', 'description': 'Roll `n_dice` 6-sided dice and return the results.', 'inputSchema': {'properties': {'n_dice': {'title': 'N Dice', 'type': 'integer'}}, 'required': ['n_dice'], 'type': 'object'}, 'annotations': None}}])
+        {'name': 'roll_dice', 'description': 'Roll `n_dice` 6-sided dice and return the results.', 'parameters': {'properties': {'n_dice': {'title': 'N Dice', 'type': 'integer'}}, 'required': ['n_dice'], 'type': 'object'}, 'annotations': None}}])
     res = await lb.chat_completion(model=model_name, **single_request_content)
     assert isinstance(res, ChatCompletionAddition)
     assert res.choices[0].message.tool_calls[0].function.name == "roll_dice"
+    assert json.loads(res.choices[0].message.tool_calls[0].function.arguments).get("n_dice") == 1
     assert res.choices[0].finish_reason == "tool_calls"
