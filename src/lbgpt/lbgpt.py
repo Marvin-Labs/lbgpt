@@ -368,7 +368,7 @@ class LiteLlmRouter(_BaseGPT):
 
         request_arguments = self._prepare_private_args(kwargs)
         out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(
-            tools=self.tools + request_tools,
+            tools=(self.tools or []) + request_tools,
             **request_arguments
         )
 
