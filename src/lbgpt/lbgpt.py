@@ -356,6 +356,7 @@ class LiteLlmRouter(_BaseGPT):
         # removing private parameters that are not being passed to ChatGPT
         request_arguments.pop("semantic_cache_encoding_method", None)
         request_arguments.pop("model_name_cache_alias", None)
+        request_arguments.pop("ml_lbgpt_tag", None)
 
         return {
             **request_arguments,
