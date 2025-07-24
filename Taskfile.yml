@@ -17,7 +17,7 @@ tasks:
     desc: Generation of requirements.txt from requirements.in
     cmds:
       - task: update-pip-build-tools
-      - pip-compile requirements-testing.in --output-file requirements-testing.txt --resolver=backtracking -q --strip-extras
+      - uv pip compile requirements-testing.in --output-file requirements-testing.txt --resolver=backtracking -q --strip-extras
     sources:
       - requirements-testing.in
     generates:

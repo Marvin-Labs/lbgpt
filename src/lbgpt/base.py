@@ -9,7 +9,6 @@ from logging import getLogger
 from statistics import median
 from typing import Any, Callable, Optional, Sequence
 
-import nest_asyncio
 import openai
 from openai._compat import model_parse
 from tenacity import (
@@ -23,7 +22,7 @@ from tqdm.asyncio import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lbgpt.cache import make_hash_chatgpt_request
-from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition, ResponseTypes, EmbeddingAddition
+from lbgpt.types import ChatCompletionAddition, ResponseTypes
 from lbgpt.usage import Usage, UsageStats
 from lbgpt.utils import convert_to_dictionary
 
@@ -236,7 +235,6 @@ class _BaseGPT(abc.ABC):
         return results
 
     def chat_completion_list(self, chatgpt_chat_completion_request_body_list, **kwargs):
-        nest_asyncio.apply()
         return asyncio.run(
             self.achat_completion_list(
                 chatgpt_chat_completion_request_body_list=chatgpt_chat_completion_request_body_list,

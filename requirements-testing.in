@@ -7,7 +7,6 @@ faiss-cpu
 pydantic<2.0
 qdrant-client
 redis
-nest_asyncio
 litellm
 
 # testing related
