@@ -8,12 +8,12 @@ import boto3
 import diskcache
 import pytest
 import redis
+from cachetools import Cache
 from pytest_mock import MockerFixture
 
 from lbgpt import ChatGPT
 from lbgpt.caches.s3 import S3Cache
 from lbgpt.types import ChatCompletionAddition
-from cachetools import Cache
 
 
 def setup_redis():
@@ -40,7 +40,7 @@ def setup_s3_cache():
 
     s3_client = boto3.client(
         "s3",
-        endpoint_url=' http://localhost:19900',
+        endpoint_url=" http://localhost:19900",
         aws_access_key_id="minioadmin",
         aws_secret_access_key="minioadmin",
     )
@@ -59,7 +59,7 @@ def setup_s3_cache():
                 for i in range(0, len(keys_to_delete), delete_batch_size):
                     response = s3_client.delete_objects(
                         Bucket=bucket,
-                        Delete={"Objects": keys_to_delete[i:i + delete_batch_size]},
+                        Delete={"Objects": keys_to_delete[i : i + delete_batch_size]},
                     )
                     deleted = response.get("Deleted", [])
                     print(f"Deleted {len(deleted)} objects from bucket '{bucket}'.")
@@ -211,7 +211,7 @@ def test_chatgpt_cache_with_name_alias(mocker: MockerFixture, cache):
     # asserting that no items were added to the cache
     assert _hash_in_cache(cache) == cache_stats["hash"]
 
-    if cache_stats['count']:
+    if cache_stats["count"]:
         assert _num_keys_in_cache(cache) == cache_stats["count"]
 
     # assert that chatgpt was requested only once

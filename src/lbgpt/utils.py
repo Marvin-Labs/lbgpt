@@ -11,4 +11,3 @@ def convert_to_dictionary(value: Any) -> dict:
         return model_dump(value)
     except AttributeError:
         raise NotImplementedError(f"Cannot convert {value} to dictionary")
-

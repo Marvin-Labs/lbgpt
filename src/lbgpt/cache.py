@@ -9,18 +9,21 @@ from openai.types.chat import ChatCompletionMessageParam
 
 
 def non_message_parameters_from_create(
-        chat_completion_create: CompletionCreateParams | dict[str, Any],
-        tools: Optional[list[dict[str, Any]]] = None,
+    chat_completion_create: CompletionCreateParams | dict[str, Any],
+    tools: Optional[list[dict[str, Any]]] = None,
 ) -> dict[str, Any]:
     if tools is None:
         tool_hash = None
     else:
-        tool_hash = [{
-            'name': tool['function']['name'],
-            'description': tool['function'].get('description'),
-            'parameters': tool['function'].get('parameters', {}),
-            'strict': tool['function'].get('strict', False),
-        } for tool in tools]
+        tool_hash = [
+            {
+                "name": tool["function"]["name"],
+                "description": tool["function"].get("description"),
+                "parameters": tool["function"].get("parameters", {}),
+                "strict": tool["function"].get("strict", False),
+            }
+            for tool in tools
+        ]
 
     return dict(
         model=chat_completion_create.get(
@@ -79,9 +82,9 @@ def convert_message(message: ChatCompletionMessageParam):
 
 
 def make_hash_chatgpt_request(
-        chat_completion_create: CompletionCreateParams,
-        include_messages: bool = True,
-        tools: Optional[list[dict[str, Any]]] = None,
+    chat_completion_create: CompletionCreateParams,
+    include_messages: bool = True,
+    tools: Optional[list[dict[str, Any]]] = None,
 ) -> str:
     """Converting a chatgpt request to a hash for caching and deduplication purposes"""
 
@@ -102,8 +105,7 @@ def make_hash_chatgpt_request(
 
 
 def _make_hash_single_embedding(
-        massaged_embedding_create: dict,
-        input_text: str
+    massaged_embedding_create: dict, input_text: str
 ) -> str:
     hasher = hashlib.sha256()
 
@@ -122,7 +124,6 @@ def make_hash_embedding_request(request: EmbeddingCreateParams) -> list[str]:
         _make_hash_single_embedding(massaged_request, input_text=input_text)
         for input_text in input_texts
     ]
-
 
 
 def make_hashable(o):

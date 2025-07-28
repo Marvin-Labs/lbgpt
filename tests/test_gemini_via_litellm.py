@@ -25,27 +25,27 @@ def test_gemini_via_litellm_sync():
                 "messages": [
                     {"role": "user", "content": [{"type": "text", "text": prompt}]}
                 ],
-                **single_request_content
+                **single_request_content,
             }
             for prompt in list_of_prompt
         ]
 
-    model_name = 'gemini/gemini-2.0-flash'
+    model_name = "gemini/gemini-2.0-flash"
     model_list: list[DeploymentTypedDict] = [
         {
             "model_name": model_name,
             "litellm_params": {
-        "model": model_name,
-        "max_retries": 0,
-        'api_key': environ.get('GEMINI_API_KEY', None),
-    },
+                "model": model_name,
+                "max_retries": 0,
+                "api_key": environ.get("GEMINI_API_KEY", None),
+            },
         }
     ]
 
     lb = LiteLlmRouter(model_list)
     prompts = [
-        'ping',
-        'ping ping',
+        "ping",
+        "ping ping",
     ]
 
     res = lb.chat_completion_list(prompt_to_request(prompts, model_name))

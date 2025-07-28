@@ -50,12 +50,33 @@ async def test_litellm_with_tools(model_name, api_key, expected_model, params):
         }
     ]
 
-    lb = LiteLlmRouter(model_list, tools=[{
-        'type': 'function',
-        'function':
-        {'name': 'roll_dice', 'description': 'Roll `n_dice` 6-sided dice and return the results.', 'parameters': {'properties': {'n_dice': {'title': 'N Dice', 'type': 'integer'}}, 'required': ['n_dice'], 'type': 'object'}, 'annotations': None}}])
+    lb = LiteLlmRouter(
+        model_list,
+        tools=[
+            {
+                "type": "function",
+                "function": {
+                    "name": "roll_dice",
+                    "description": "Roll `n_dice` 6-sided dice and return the results.",
+                    "parameters": {
+                        "properties": {
+                            "n_dice": {"title": "N Dice", "type": "integer"}
+                        },
+                        "required": ["n_dice"],
+                        "type": "object",
+                    },
+                    "annotations": None,
+                },
+            }
+        ],
+    )
     res = await lb.chat_completion(model=model_name, **single_request_content)
     assert isinstance(res, ChatCompletionAddition)
     assert res.choices[0].message.tool_calls[0].function.name == "roll_dice"
-    assert json.loads(res.choices[0].message.tool_calls[0].function.arguments).get("n_dice") == 1
+    assert (
+        json.loads(res.choices[0].message.tool_calls[0].function.arguments).get(
+            "n_dice"
+        )
+        == 1
+    )
     assert res.choices[0].finish_reason == "tool_calls"

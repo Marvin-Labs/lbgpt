@@ -94,12 +94,14 @@ class _BaseGPT(abc.ABC):
 
         if tools is not None:
             # checking if tools are provided and if they are in the correct format
-            assert all(k.get('type') == 'function' for k in tools), 'All tools must be of type "function"'
-            assert all(k.get('function') is not None for k in tools), 'All tools must have a function defined'
+            assert all(
+                k.get("type") == "function" for k in tools
+            ), 'All tools must be of type "function"'
+            assert all(
+                k.get("function") is not None for k in tools
+            ), "All tools must have a function defined"
 
         self.tools = tools
-
-
 
     def request_setup(self):
         pass
@@ -242,7 +244,9 @@ class _BaseGPT(abc.ABC):
             )
         )
 
-    async def _get_from_standard_cache(self, hashed: str) -> Optional[ResponseTypes | dict]:
+    async def _get_from_standard_cache(
+        self, hashed: str
+    ) -> Optional[ResponseTypes | dict]:
         if self.cache is not None:
             logger.debug(f"trying to get {hashed} from standard cache")
 
@@ -277,7 +281,9 @@ class _BaseGPT(abc.ABC):
             else:
                 self.cache[hashed] = json.dumps(convert_to_dictionary(value))
 
-    async def get_from_cache(self, hashed: str, **kwargs) -> Optional[ResponseTypes | dict]:
+    async def get_from_cache(
+        self, hashed: str, **kwargs
+    ) -> Optional[ResponseTypes | dict]:
         if self.cache is not None:
             async with self.semaphore_standard_cache:
                 out = await self._get_from_standard_cache(hashed)

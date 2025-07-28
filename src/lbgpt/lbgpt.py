@@ -2,7 +2,7 @@
 import datetime
 from asyncio import Timeout
 from logging import getLogger
-from typing import Any, Optional, Sequence
+from typing import Any, AsyncIterator, Optional, Sequence, Union
 
 import httpx
 import litellm
@@ -10,7 +10,13 @@ import openai
 from litellm import Router
 from litellm.litellm_core_utils.streaming_handler import CustomStreamWrapper
 from litellm.types.router import DeploymentTypedDict
-from litellm.types.utils import ModelResponse
+from litellm.types.utils import (
+    Delta,
+    ModelResponse,
+    ModelResponseStream,
+    StreamingChoices,
+)
+from litellm.types.utils import Usage as LitellmUsage
 from openai._types import NOT_GIVEN, NotGiven  # noqa
 from openai.types import EmbeddingCreateParams
 
@@ -20,10 +26,12 @@ from lbgpt.allocation import (
 )
 from lbgpt.base import _BaseGPT
 from lbgpt.cache import make_hash_embedding_request
-from lbgpt.types import ChatCompletionAddition, EmbeddingResponseAddition, EmbeddingAddition
+from lbgpt.types import (
+    ChatCompletionAddition,
+    EmbeddingAddition,
+    EmbeddingResponseAddition,
+)
 from lbgpt.usage import Usage
-from litellm.types.utils import Usage as LitellmUsage
-
 
 logger = getLogger(__name__)
 litellm.suppress_debug_info = True
@@ -31,19 +39,19 @@ litellm.suppress_debug_info = True
 
 class ChatGPT(_BaseGPT):
     def __init__(
-            self,
-            api_key: str,
-            max_parallel_calls: int = 5,
-            request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
-            cache: Optional[Any] = None,
-            semantic_cache: Optional[Any] = None,
-            propagate_semantic_cache_to_standard_cache: bool = False,
-            stop_after_attempts: Optional[int] = 10,
-            stop_on_exception: bool = False,
-            max_usage_cache_size: Optional[int] = 1_000,
-            limit_tpm: Optional[int] = None,
-            limit_rpm: Optional[int] = None,
-            auto_cache=True,
+        self,
+        api_key: str,
+        max_parallel_calls: int = 5,
+        request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
+        cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
+        propagate_semantic_cache_to_standard_cache: bool = False,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+        max_usage_cache_size: Optional[int] = 1_000,
+        limit_tpm: Optional[int] = None,
+        limit_rpm: Optional[int] = None,
+        auto_cache=True,
     ):
         super().__init__(
             cache=cache,
@@ -104,23 +112,23 @@ class ChatGPT(_BaseGPT):
 
 class AzureGPT(_BaseGPT):
     def __init__(
-            self,
-            api_key: str,
-            azure_api_base: str,
-            azure_model_map: dict[str, str],
-            cache: Optional[Any] = None,
-            semantic_cache: Optional[Any] = None,
-            propagate_semantic_cache_to_standard_cache: bool = False,
-            azure_openai_version: str = "2024-02-01",
-            azure_openai_type: str = "azure",
-            max_parallel_calls: int = 5,
-            request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
-            stop_after_attempts: Optional[int] = 10,
-            stop_on_exception: bool = False,
-            max_usage_cache_size: Optional[int] = 1_000,
-            limit_tpm: Optional[int] = None,
-            limit_rpm: Optional[int] = None,
-            auto_cache=True,
+        self,
+        api_key: str,
+        azure_api_base: str,
+        azure_model_map: dict[str, str],
+        cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
+        propagate_semantic_cache_to_standard_cache: bool = False,
+        azure_openai_version: str = "2024-02-01",
+        azure_openai_type: str = "azure",
+        max_parallel_calls: int = 5,
+        request_timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+        max_usage_cache_size: Optional[int] = 1_000,
+        limit_tpm: Optional[int] = None,
+        limit_rpm: Optional[int] = None,
+        auto_cache=True,
     ):
         super().__init__(
             cache=cache,
@@ -194,19 +202,19 @@ ALLOCATION_FUNCTIONS = {
 
 class MultiLoadBalancedGPT(_BaseGPT):
     def __init__(
-            self,
-            gpts: list[_BaseGPT],
-            allocation_function: str = "random",
-            allocation_function_kwargs: Optional[dict] = None,
-            allocation_function_weights: Optional[Sequence] = None,
-            cache: Optional[Any] = None,
-            semantic_cache: Optional[Any] = None,
-            propagate_standard_cache_to_semantic_cache: bool = False,
-            propagate_semantic_cache_to_standard_cache: bool = False,
-            stop_after_attempts: Optional[int] = 10,
-            stop_on_exception: bool = False,
-            max_parallel_requests: Optional[int] = None,
-            auto_cache=True,
+        self,
+        gpts: list[_BaseGPT],
+        allocation_function: str = "random",
+        allocation_function_kwargs: Optional[dict] = None,
+        allocation_function_weights: Optional[Sequence] = None,
+        cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
+        propagate_standard_cache_to_semantic_cache: bool = False,
+        propagate_semantic_cache_to_standard_cache: bool = False,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+        max_parallel_requests: Optional[int] = None,
+        auto_cache=True,
     ):
         self.gpts = gpts
 
@@ -265,22 +273,22 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
     """
 
     def __init__(
-            self,
-            openai_api_key: str,
-            azure_api_key: str,
-            azure_api_base: str,
-            azure_model_map: dict[str, str],
-            cache: Optional[Any] = None,
-            semantic_cache: Optional[Any] = None,
-            propagate_semantic_cache_to_standard_cache: bool = False,
-            azure_openai_version: str = "2024-02-01",
-            azure_openai_type: str = "azure",
-            max_parallel_calls_openai: int = 5,
-            max_parallel_calls_azure: int = 5,
-            ratio_openai_to_azure: float = 0.25,
-            stop_after_attempts: Optional[int] = 10,
-            stop_on_exception: bool = False,
-            auto_cache: bool = True,
+        self,
+        openai_api_key: str,
+        azure_api_key: str,
+        azure_api_base: str,
+        azure_model_map: dict[str, str],
+        cache: Optional[Any] = None,
+        semantic_cache: Optional[Any] = None,
+        propagate_semantic_cache_to_standard_cache: bool = False,
+        azure_openai_version: str = "2024-02-01",
+        azure_openai_type: str = "azure",
+        max_parallel_calls_openai: int = 5,
+        max_parallel_calls_azure: int = 5,
+        ratio_openai_to_azure: float = 0.25,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+        auto_cache: bool = True,
     ):
         self.openai = ChatGPT(
             api_key=openai_api_key,
@@ -325,15 +333,15 @@ class LoadBalancedGPT(MultiLoadBalancedGPT):
 
 class LiteLlmRouter(_BaseGPT):
     def __init__(
-            self,
-            model_list: list[DeploymentTypedDict | dict[str, Any]],
-            max_parallel_calls: int = 5,
-            cache: Optional[Any] = None,
-            stop_after_attempts: Optional[int] = 10,
-            stop_on_exception: bool = False,
-            auto_cache: bool=True,
-            tools: Optional[list[dict[str, Any]]] = None,
-            **kwargs,
+        self,
+        model_list: list[DeploymentTypedDict | dict[str, Any]],
+        max_parallel_calls: int = 5,
+        cache: Optional[Any] = None,
+        stop_after_attempts: Optional[int] = 10,
+        stop_on_exception: bool = False,
+        auto_cache: bool = True,
+        tools: Optional[list[dict[str, Any]]] = None,
+        **kwargs,
     ):
         super().__init__(
             cache=cache,
@@ -369,8 +377,7 @@ class LiteLlmRouter(_BaseGPT):
 
         request_arguments = self._prepare_private_args(kwargs)
         out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(
-            tools=(self.tools or []) + request_tools,
-            **request_arguments
+            tools=(self.tools or []) + request_tools, **request_arguments
         )
 
         # if the response is a stream, we need to consume it and build it up
@@ -384,6 +391,44 @@ class LiteLlmRouter(_BaseGPT):
             out, model_class=self.__class__.__name__
         )
 
+    async def streamed_chat_completion(
+        self, **kwargs
+    ) -> AsyncIterator[ModelResponseStream]:
+        """Returns a streamed response."""
+        request_tools = kwargs.pop("tools", [])
+
+        # Force stream=True for streamed_chat_completion
+        if not kwargs.get("stream", False):
+            logger.warning(
+                (
+                    "stream=True is highly suggested for streamed_chat_completion. "
+                    "We are handling this properly here, but this is most likely a bug in your code."
+                )
+            )
+
+        request_arguments = self._prepare_private_args(kwargs)
+        out: ModelResponse | CustomStreamWrapper = await self.router.acompletion(
+            tools=(self.tools or []) + request_tools, **request_arguments
+        )
+
+        # If it's a stream, yield each chunk
+        if isinstance(out, CustomStreamWrapper):
+            async for chunk in out:
+                yield chunk
+        elif isinstance(out, ModelResponse):
+            # If not a stream (shouldn't happen), yield the single response but convert it into a stream response with a BIIIG delta
+            yield ModelResponseStream(
+                **out.model_dump(exclude={"choices"}),
+                choices=[
+                    StreamingChoices(
+                        **out.choices[0].model_dump(exclude={"message"}),
+                        delta=Delta(**out.choices[0].message.model_dump()),
+                    )
+                ],
+            )
+        else:
+            raise ValueError(f"Unexpected response type: {type(out)}")
+
     async def embedding(self, model: str, **kwargs) -> EmbeddingResponseAddition:
         request_arguments = self._prepare_private_args(kwargs)
 
@@ -395,8 +440,8 @@ class LiteLlmRouter(_BaseGPT):
 
     async def cached_embedding(self, model: str, **kwargs) -> EmbeddingResponseAddition:
         # the request accepts a string input, but we want to make sure to convert it to a list
-        if isinstance(kwargs['input'], str):
-            kwargs['input'] = [kwargs['input']]
+        if isinstance(kwargs["input"], str):
+            kwargs["input"] = [kwargs["input"]]
 
         request = EmbeddingCreateParams(model=model, **kwargs)
 
@@ -407,51 +452,66 @@ class LiteLlmRouter(_BaseGPT):
             await self._get_from_standard_cache(hashed) for hashed in hasheds
         ]
 
-        logger.info(f'Found {len([k for k in cached_results if k])} of {len(inputs)} in cache')
+        logger.info(
+            f"Found {len([k for k in cached_results if k])} of {len(inputs)} in cache"
+        )
 
-        missing_results = [input_text for input_text, cached_result in zip(inputs, cached_results) if not cached_result]
-        missing_hashed = [hash_ for hash_, cached_result in zip(hasheds, cached_results) if not cached_result]
+        missing_results = [
+            input_text
+            for input_text, cached_result in zip(inputs, cached_results)
+            if not cached_result
+        ]
+        missing_hashed = [
+            hash_
+            for hash_, cached_result in zip(hasheds, cached_results)
+            if not cached_result
+        ]
 
-        model_name = 'unknown'
+        model_name = "unknown"
 
         usage = LitellmUsage()
 
         if len(missing_results) > 0:
-            logger.debug(f'Fetching {len(missing_results)} missing results')
-            missing_request = EmbeddingCreateParams(model=model, input=missing_results, **kwargs)
+            logger.debug(f"Fetching {len(missing_results)} missing results")
+            missing_request = EmbeddingCreateParams(
+                model=model, input=missing_results, **kwargs
+            )
             missing_response = await self.embedding(**missing_request)
 
             usage = missing_response.usage
 
             for hashed, result in zip(missing_hashed, missing_response.data):
-                await self._set_to_standard_cache(hashed=hashed, value={
-                    'model': model,
-                    'embedding': result.embedding,
-                    'object': 'embedding'
-                })
+                await self._set_to_standard_cache(
+                    hashed=hashed,
+                    value={
+                        "model": model,
+                        "embedding": result.embedding,
+                        "object": "embedding",
+                    },
+                )
 
             model_name = missing_response.model
 
         elif len(cached_results) > 0:
-            model_name = cached_results[0]['model']
+            model_name = cached_results[0]["model"]
 
         return_data: list[EmbeddingAddition] = list()
         misses = 0
         for i, cached_result in enumerate(cached_results):
             if cached_result:
                 # this is a cached result
-                return_data.append(EmbeddingAddition(
-                    embedding=cached_result['embedding'],
-                    is_cached=True,
-                    index=i
-                ))
+                return_data.append(
+                    EmbeddingAddition(
+                        embedding=cached_result["embedding"], is_cached=True, index=i
+                    )
+                )
             else:
                 # this is a cache miss
                 return_data.append(
                     EmbeddingAddition(
-                        embedding=missing_response.data[misses].embedding, # noqa
+                        embedding=missing_response.data[misses].embedding,  # noqa
                         is_cached=False,
-                        index=i
+                        index=i,
                     )
                 )
                 misses += 1
@@ -462,4 +522,3 @@ class LiteLlmRouter(_BaseGPT):
             usage=usage,
             model=model_name,
         )
-

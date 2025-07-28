@@ -57,13 +57,12 @@ class EmbeddingAddition(BaseModel):
 
 class EmbeddingResponseAddition(CreateEmbeddingResponse):
     model_class: Optional[str] = None
-    object: str = 'embedding'
+    object: str = "embedding"
     data: list[EmbeddingAddition]
     usage: Usage
 
     model_config = ConfigDict(
-        protected_namespaces=(),  # Allow fields starting with "model_"
-        extra='ignore'
+        protected_namespaces=(), extra="ignore"  # Allow fields starting with "model_"
     )
 
     @classmethod
@@ -73,10 +72,13 @@ class EmbeddingResponseAddition(CreateEmbeddingResponse):
         model_class: str,
     ) -> Self:
         res = embedding_response.model_dump()
-        res.pop('object', None)
+        res.pop("object", None)
 
         data = [
-            EmbeddingAddition(embedding=data['embedding'], is_cached=False, index=data['index']) for data in res.pop('data')
+            EmbeddingAddition(
+                embedding=data["embedding"], is_cached=False, index=data["index"]
+            )
+            for data in res.pop("data")
         ]
 
         return cls(**res, model_class=model_class, data=data)
